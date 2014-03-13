@@ -1,0 +1,6 @@
+LIBRARY gles3mark
+;DESCRIPTION "gles3mark DLL"
+EXPORTS
+	DLL_init @1
+	DLL_resize @2
+	DLL_step @3
