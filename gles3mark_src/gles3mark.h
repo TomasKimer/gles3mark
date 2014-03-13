@@ -53,16 +53,12 @@ public:
     	std::string msg(buffer, bytesRead);
     	Log::Msg(msg);
 
-        int tgaWidth, tgaHeight;
-        char* tgaData = assetManager->LoadTGA("textures/tiles.tga", &tgaWidth, &tgaHeight);
-        Log::Stream() << tgaWidth << ", " << tgaHeight;
-
 
         // init gl here
         glContext = new GlContext();
         glContext->Create(osWnd);
 
-        gltest->OnInit();
+        gltest->OnInit(assetManager);
 
         Log::Msg((const char*)glGetString(GL_VENDOR));
         Log::Msg((const char*)glGetString(GL_RENDERER));

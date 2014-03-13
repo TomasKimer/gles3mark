@@ -14,6 +14,7 @@
 #endif
 
 #include "log.h"
+#include "assetmanager.h"
 
 #ifndef NULL
 #define NULL 0
@@ -45,45 +46,45 @@ const unsigned char house[] = {
 };
 
 struct Point {
-    float color[3];
+    float texcoord[2];
     float position[3];
 } const houseVertices[] = {
     // Walls
-    { { 0.0, 0.0, 1.0 }, { -5.0, -5.0, -5.0 } },
-    { { 0.0, 1.0, 0.0 }, { -5.0, -5.0, 5.0 } },
-    { { 0.0, 1.0, 1.0 }, { 5.0, -5.0, 5.0 } },
-    { { 1.0, 0.0, 0.0 }, { 5.0, -5.0, -5.0 } },
+    { { 0.0, 0.0 }, { -5.0, -5.0, -5.0 } },
+    { { 0.0, 4.0 }, { -5.0, -5.0, 5.0 } },
+    { { 4.0, 4.0 }, { 5.0, -5.0, 5.0 } },
+    { { 4.0, 0.0 }, { 5.0, -5.0, -5.0 } },
 
-    { { 1.0, 0.0, 1.0 }, { -5.0, 5.0, -5.0 } },
-    { { 1.0, 1.0, 0.0 }, { -5.0, 5.0, 5.0 } },
-    { { 1.0, 1.0, 1.0 }, { 5.0, 5.0, 5.0 } },
-    { { 0.0, 0.0, 1.0 }, { 5.0, 5.0, -5.0 } },
+    { { 0.0, 0.0 }, { -5.0, 5.0, -5.0 } },
+    { { 0.0, 2.0 }, { -5.0, 5.0, 5.0 } },
+    { { 2.0, 2.0 }, { 5.0, 5.0, 5.0 } },
+    { { 2.0, 0.0 }, { 5.0, 5.0, -5.0 } },
 
-    { { 0.0, 1.0, 0.0 }, { -5.0, -5.0, -5.0 } },
-    { { 0.0, 1.0, 1.0 }, { -5.0, -5.0, 5.0 } },
-    { { 1.0, 0.0, 0.0 }, { -5.0, 5.0, 5.0 } },
-    { { 1.0, 0.0, 1.0 }, { -5.0, 5.0, -5.0 } },
+    { { 0.0, 0.0 }, { -5.0, -5.0, -5.0 } },
+    { { 0.0, 1.0 }, { -5.0, -5.0, 5.0 } },
+    { { 1.0, 1.0 }, { -5.0, 5.0, 5.0 } },
+    { { 1.0, 0.0 }, { -5.0, 5.0, -5.0 } },
 
-    { { 0.0, 1.0, 0.0 }, { 5.0, -5.0, -5.0 } },
-    { { 0.0, 1.0, 1.0 }, { 5.0, -5.0, 5.0 } },
-    { { 1.0, 0.0, 0.0 }, { 5.0, 5.0, 5.0 } },
-    { { 1.0, 0.0, 1.0 }, { 5.0, 5.0, -5.0 } },
+    { { 0.0, 0.0 }, { 5.0, -5.0, -5.0 } },
+    { { 0.0, 1.0 }, { 5.0, -5.0, 5.0 } },
+    { { 1.0, 1.0 }, { 5.0, 5.0, 5.0 } },
+    { { 1.0, 0.0 }, { 5.0, 5.0, -5.0 } },
     // Roof
-    { { 0.0, 0.0, 1.0 }, { -5.0, 5.0, -5.0 } },
-    { { 0.0, 1.0, 1.0 }, { 5.0, 5.0, -5.0 } },
-    { { 1.0, 1.0, 1.0 }, { 0.0, 11.0, 0.0 } },
+    { { 0.0, 0.0 }, { -5.0, 5.0, -5.0 } },
+    { { 1.0, 0.0 }, { 5.0, 5.0, -5.0 } },
+    { { 0.0, 1.0 }, { 0.0, 11.0, 0.0 } },
 
-    { { 1.0, 0.0, 0.0 }, { 5.0, 5.0, -5.0 } },
-    { { 1.0, 1.0, 0.0 }, { 5.0, 5.0, 5.0 } },
-    { { 1.0, 1.0, 1.0 }, { 0.0, 11.0, 0.0 } },
+    { { 0.0, 0.0 }, { 5.0, 5.0, -5.0 } },
+    { { 1.0, 0.0 }, { 5.0, 5.0, 5.0 } },
+    { { 0.0, 1.0 }, { 0.0, 11.0, 0.0 } },
 
-    { { 0.0, 1.0, 0.0 }, { 5.0, 5.0, 5.0 } },
-    { { 0.0, 1.0, 1.0 }, { -5.0, 5.0, 5.0 } },
-    { { 1.0, 1.0, 1.0 }, { 0.0, 11.0, 0.0 } },
+    { { 0.0, 0.0 }, { 5.0, 5.0, 5.0 } },
+    { { 0.0, 1.0 }, { -5.0, 5.0, 5.0 } },
+    { { 1.0, 1.0 }, { 0.0, 11.0, 0.0 } },
 
-    { { 0.0, 1.0, 0.0 }, { -5.0, 5.0, 5.0 } },
-    { { 1.0, 1.0, 0.0 }, { -5.0, 5.0, -5.0 } },
-    { { 1.0, 1.0, 1.0 }, { 0.0, 11.0, 0.0 } }
+    { { 0.0, 1.0 }, { -5.0, 5.0, 5.0 } },
+    { { 0.0, 0.0 }, { -5.0, 5.0, -5.0 } },
+    { { 1.0, 1.0 }, { 0.0, 11.0, 0.0 } }
 };
 
 
@@ -91,7 +92,8 @@ class GLTest {
 
     GLuint VBO, EBO;
     GLuint VS, FS, Prog;
-    GLuint positionAttrib, colorAttrib, mvpUniform;    
+    GLuint texture;
+    GLuint positionAttrib, tcAttrib, mvpUniform, textureUniform;
 
     float rx, ry, pz;
     float wheel;
@@ -101,27 +103,34 @@ public:
     GLTest() { rx = 0.0f; ry = 0.0f; pz = -70.0f; wheel = 5.0f; }
     ~GLTest() {    }
     
-    bool OnInit() {
+    bool OnInit(AssetManager* assetManager) {
+        int tgaWidth, tgaHeight;
+        char* tgaData = assetManager->LoadTGA("textures/tiles.tga", &tgaWidth, &tgaHeight);
+        Log::Stream() << tgaWidth << ", " << tgaHeight;
+
+
+
 
         // init gl here
 #ifdef _WIN32
         GLenum error = glewInit();
         if(error != GLEW_OK)
             Log::Msg("!!!! GLEW ERROR !!!!");
-        VS = compileShader(GL_VERTEX_SHADER, "#version 130\n in vec3 position; in vec3 color; uniform mat4 mvp; out vec3 c; void main() { gl_Position = mvp*vec4(position,1); c = color; }");
-        FS = compileShader(GL_FRAGMENT_SHADER, "#version 130\n in vec3 c; out vec4 fragColor; void main() { fragColor = vec4(c,1); }");
+        VS = compileShader(GL_VERTEX_SHADER, "#version 130\n in vec3 position; in vec2 tc; uniform mat4 mvp; out vec2 coord; void main() { gl_Position = mvp*vec4(position,1); coord = tc; }");
+        FS = compileShader(GL_FRAGMENT_SHADER, "#version 130\n in vec2 coord; uniform sampler2D tex; out vec4 fragColor; void main() { fragColor = texture(tex, coord); }");
 #else
         if (!gl3stubInit())
         	Log::Msg("!!!! GL stub init failed !!!!");
-        VS = compileShader(GL_VERTEX_SHADER, "#version 300 es\n in vec3 position; in vec3 color; uniform mat4 mvp; out vec3 c; void main() { gl_Position = mvp*vec4(position,1); c = color; }");
-        FS = compileShader(GL_FRAGMENT_SHADER, "#version 300 es\n in vec3 c; out vec4 fragColor; void main() { fragColor = vec4(c,1); }");
+        VS = compileShader(GL_VERTEX_SHADER, "#version 300 es\n in vec3 position; in vec2 tc; uniform mat4 mvp; out vec2 coord; void main() { gl_Position = mvp*vec4(position,1); coord = tc; }");
+        FS = compileShader(GL_FRAGMENT_SHADER, "#version 300 es\n in vec2 coord; uniform sampler2D tex; out vec4 fragColor; void main() { fragColor = texture(tex, coord); }");
 #endif
 
         Prog = linkShader(2, VS, FS);
 
         positionAttrib = glGetAttribLocation(Prog, "position");
-        colorAttrib = glGetAttribLocation(Prog, "color");
+        tcAttrib = glGetAttribLocation(Prog, "tc");
         mvpUniform = glGetUniformLocation(Prog, "mvp");
+        textureUniform = glGetUniformLocation(Prog, "tex");
 
         // Copy house to graphics card
         glGenBuffers(1, &VBO);
@@ -131,6 +140,10 @@ public:
         glGenBuffers(1, &EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(house), house, GL_STATIC_DRAW);
+
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tgaWidth, tgaHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, tgaData);
         
         return true;
     }
@@ -172,13 +185,19 @@ public:
 
         glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, glm::value_ptr(mvp));
 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glUniform1i(textureUniform, 0);
+
         glEnableVertexAttribArray(positionAttrib);
-        glEnableVertexAttribArray(colorAttrib);
+        glEnableVertexAttribArray(tcAttrib);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
         glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, position));
-        glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, color));
+        glVertexAttribPointer(tcAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, texcoord));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
