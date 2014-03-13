@@ -17,6 +17,17 @@ typedef FILE AssetFile;
 
 class AssetManager {
 
+#pragma pack(push,x1) // Byte alignment (8-bit)
+#pragma pack(1)
+    typedef struct {
+        unsigned char IdSize, MapType, ImageType;
+        unsigned short PaletteStart, PaletteSize;
+        unsigned char PaletteEntryDepth;
+        unsigned short X, Y, Width, Height;
+        unsigned char ColorDepth, Descriptor;
+    } TGA_HEADER;
+#pragma pack(pop,x1)
+
 	void* ioContext;
 
 public:
@@ -84,5 +95,35 @@ private:
         return bytesRead;
     }
 
+public:
+    char* LoadTGA(const std::string& fileName, int *width, int *height) {
+        // Open the file for reading
+        AssetFile* fp = Open(fileName);
+
+        if (fp == nullptr) {  // Error in opening the input file from apk
+            throw std::runtime_error("LoadTGA FAILED: " + fileName);
+            //return nullptr;
+        }
+
+        TGA_HEADER Header;
+        int bytesRead = Read(fp, sizeof (TGA_HEADER), &Header);
+
+        *width = Header.Width;
+        *height = Header.Height;
+
+        if (Header.ColorDepth == 8 || Header.ColorDepth == 24 || Header.ColorDepth == 32) {
+            
+            int bytesToRead = sizeof(char) * (*width) * (*height) * Header.ColorDepth / 8;            
+            char* buffer = (char*)malloc(bytesToRead); // Allocate the image data buffer
+
+            if (buffer) {
+                bytesRead = Read(fp, bytesToRead, buffer);
+                Close(fp);
+                return buffer;
+            }
+        }
+
+        return nullptr;
+    }
 };
 
