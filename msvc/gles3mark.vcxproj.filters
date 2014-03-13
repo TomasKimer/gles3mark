@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\jni\gles3mark.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\gles3mark_src\gltest.h">
       <Filter>Header Files</Filter>
     </ClInclude>

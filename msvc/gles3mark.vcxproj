@@ -19,7 +19,6 @@
     <ClInclude Include="..\gles3mark_src\gles3mark.h" />
     <ClInclude Include="..\gles3mark_src\gltest.h" />
     <ClInclude Include="..\gles3mark_src\log.h" />
-    <ClInclude Include="..\jni\gles3mark.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gles3mark_src\assetmanager.cpp" />
