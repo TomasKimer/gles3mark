@@ -16,11 +16,9 @@
 #include "log.h"
 #include "assetmanager.h"
 
-#ifndef NULL
-#define NULL 0
-#endif
-
 #include <string>
+#include <vector>
+
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -106,26 +104,29 @@ public:
     bool OnInit(AssetManager* assetManager) {
         int tgaWidth, tgaHeight;
         char* tgaData = assetManager->LoadTGA("textures/tiles.tga", &tgaWidth, &tgaHeight);
-        Log::Stream() << tgaWidth << ", " << tgaHeight;
 
+        try {
 
-
-
-        // init gl here
+            // init gl here
 #ifdef _WIN32
-        GLenum error = glewInit();
-        if(error != GLEW_OK)
-            Log::Msg("!!!! GLEW ERROR !!!!");
-        VS = compileShader(GL_VERTEX_SHADER, "#version 130\n in vec3 position; in vec2 tc; uniform mat4 mvp; out vec2 coord; void main() { gl_Position = mvp*vec4(position,1); coord = tc; }");
-        FS = compileShader(GL_FRAGMENT_SHADER, "#version 130\n in vec2 coord; uniform sampler2D tex; out vec4 fragColor; void main() { fragColor = texture(tex, coord); }");
+            GLenum error = glewInit();
+            if (error != GLEW_OK)
+                Log::Msg("!!!! GLEW ERROR !!!!");
+            std::string shaderVer("#version 330");
 #else
-        if (!gl3stubInit())
-        	Log::Msg("!!!! GL stub init failed !!!!");
-        VS = compileShader(GL_VERTEX_SHADER, "#version 300 es\n in vec3 position; in vec2 tc; uniform mat4 mvp; out vec2 coord; void main() { gl_Position = mvp*vec4(position,1); coord = tc; }");
-        FS = compileShader(GL_FRAGMENT_SHADER, "#version 300 es\n in vec2 coord; uniform sampler2D tex; out vec4 fragColor; void main() { fragColor = texture(tex, coord); }");
+            if (!gl3stubInit())
+                Log::Msg("!!!! GL stub init failed !!!!");
+            std::string shaderVer("#version 300 es");
 #endif
+            VS = compileShader(GL_VERTEX_SHADER, shaderVer + assetManager->LoadText("shaders/simple-vs.glsl"));
+            FS = compileShader(GL_FRAGMENT_SHADER, shaderVer + assetManager->LoadText("shaders/simple-fs.glsl"));
 
-        Prog = linkShader(2, VS, FS);
+            Prog = linkShader({ VS, FS });
+
+        }
+        catch (std::exception &e) {
+            Log::Msg(std::string("Init exception: ") + e.what());
+        }
 
         positionAttrib = glGetAttribLocation(Prog, "position");
         tcAttrib = glGetAttribLocation(Prog, "tc");
@@ -201,72 +202,123 @@ public:
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-        glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(*house), GL_UNSIGNED_BYTE, NULL);
+        glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(*house), GL_UNSIGNED_BYTE, nullptr);
 
         ry += 0.1f;
         rx += 0.1f;
 
     }
 
-    GLuint compileShader(const GLenum type, const char * source) {
+    GLuint compileShader(GLenum type, const std::string& source) {
         GLuint shader = glCreateShader(type);
-        //if (shader == 0) throw GL_Exception("glCreateShader failed");
+        if (shader == 0)
+            throw std::runtime_error("glCreateShader failed");
 
-        glShaderSource(shader, 1, &source, NULL);
+        const char *c_str = source.c_str();
+        glShaderSource(shader, 1, &c_str, nullptr);
         glCompileShader(shader);
 
-        //std::cout << getShaderInfoLog(shader);
+        Log::Msg("Compile shader: " + getShaderInfoLog(shader));
 
         int compileStatus;
         glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
 
-        if (compileStatus == GL_FALSE)
-            Log::Msg("shader compilation failed"); //throw std::runtime_error("shader compilation failed");
-        else
-            Log::Msg("shader compilation ok");
-
+        if (compileStatus == GL_FALSE) {
+            glDeleteShader(shader);
+            throw std::runtime_error("shader compilation failed");
+        }            
+        
         return shader;
     }
 
-
-    GLuint linkShader(size_t count, ...) {
-        // Create program object
+    GLuint linkShader(std::initializer_list<GLuint> shaders) {  // size_t count, ...
         GLuint program = glCreateProgram();
-        //if (program == 0) throw GL_Exception("glCreateProgram failed");
+        if (program == 0)
+            throw std::runtime_error("glCreateProgram failed");
 
-        // Attach arguments
-        va_list args;
-        va_start(args, count);
-        for (size_t i = 0; i < count; ++i) {
-            glAttachShader(program, va_arg(args, GLuint));
+        //    // Attach arguments
+        //    va_list args;
+        //    va_start(args, count);
+        //    for (size_t i = 0; i < count; ++i) {
+        //        glAttachShader(program, va_arg(args, GLuint));
+        //    }
+        //    va_end(args);
+
+        for (GLuint shader : shaders) {
+            glAttachShader(program, shader);
         }
-        va_end(args);
 
         // Link program and check for errors
         glLinkProgram(program);
-        //std::cout << getProgramInfoLog(program);
+        
+        Log::Msg("Link shaders: " + getProgramInfoLog(program));
 
         int linkStatus;
         glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
 
-        if (linkStatus == GL_FALSE)
-            Log::Msg("shader linking failed");  //throw std::runtime_error("shader linking failed");
-        else
-            Log::Msg("shader linking ok");
+        if (linkStatus == GL_FALSE) {
+            glDeleteProgram(program);
+            throw std::runtime_error("shader linking failed");
+        }
 
         return program;
     }
 
-    //std::string getInfoLog(GLuint id, PFNGLGETSHADERIVPROC getLen, PFNGLGETSHADERINFOLOGPROC getLog);
-    //// Info logs contain errors and warnings from shader compilation and linking
-    //inline std::string getShaderInfoLog(GLuint shader)
-    //{
-    //    assert(glIsShader(shader));
-    //    return getInfoLog(shader, glGetShaderiv, glGetShaderInfoLog);
-    //}
-    //inline std::string getProgramInfoLog(GLuint program)
-    //{
-    //    assert(glIsProgram(program));
-    //    return getInfoLog(program, glGetProgramiv, glGetProgramInfoLog);
-    //}
+    // Info logs contain errors and warnings from shader compilation and linking
+    std::string getShaderInfoLog(GLuint shader) {
+        //assert(glIsShader(shader));
+
+        // shader, glGetShaderiv, glGetShaderInfoLog
+
+        GLint length = -1;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+        //assert(length >= 0);
+
+        std::vector<GLchar> log(length);
+        glGetShaderInfoLog(shader, length, nullptr, &log[0]);
+
+        //assert(glGetError() == GL_NO_ERROR);
+
+        return std::string(&log[0], log.size());
+    }
+
+    std::string getProgramInfoLog(GLuint program) {
+        //assert(glIsProgram(program));
+
+        // program, glGetProgramiv, glGetProgramInfoLog
+
+        GLint length = -1;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+        //assert(length >= 0);
+
+        std::vector<GLchar> log(length);
+        glGetProgramInfoLog(program, length, nullptr, &log[0]);
+
+        //assert(glGetError() == GL_NO_ERROR);
+
+        return std::string(&log[0], log.size());
+    }
+
+
+    struct GL_Exception : public std::runtime_error {
+        GL_Exception(const GLenum error = glGetError()) throw()
+            : std::runtime_error("OpenGL: " + getGlErrorString(error)) {}
+        GL_Exception(const std::string& text, const GLenum error = glGetError()) throw()
+            : std::runtime_error("OpenGL: " + text + " : " + getGlErrorString(error)) {}
+        
+        std::string getGlErrorString(GLenum error) {
+#define GLERROR(e) case e : return std::string(#e)
+            switch (error) {
+                GLERROR(GL_NO_ERROR);
+                GLERROR(GL_INVALID_ENUM);
+                GLERROR(GL_INVALID_VALUE);
+                GLERROR(GL_INVALID_OPERATION);
+                GLERROR(GL_INVALID_FRAMEBUFFER_OPERATION);
+                GLERROR(GL_OUT_OF_MEMORY);
+                default: return std::string("UNKNOWN_GL_ERROR");
+            }
+#undef GLERROR
+        }
+    };
+
 };

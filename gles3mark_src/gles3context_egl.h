@@ -65,7 +65,7 @@ public:
 
 		ANativeWindow_setBuffersGeometry(window, 0, 0, format);
 
-		EGLSurface surface = eglCreateWindowSurface(display, config, window, NULL);
+		EGLSurface surface = eglCreateWindowSurface(display, config, window, nullptr);
 
 		EGLint contextAttrs[] = {
 				EGL_CONTEXT_CLIENT_VERSION, 3,
@@ -103,7 +103,7 @@ public:
     }
 
     bool HasDisplay() {
-    	return display != NULL;
+    	return display != nullptr;
     }
 
     /**

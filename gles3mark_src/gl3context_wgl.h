@@ -16,7 +16,7 @@ class GL3ContextWGL : public GLContext {
     HDC     gdiDc;
 
 public:
-    GL3ContextWGL(): window(NULL), wglContext(NULL), gdiDc(NULL) { };
+    GL3ContextWGL(): window(nullptr), wglContext(nullptr), gdiDc(nullptr) { };
     virtual ~GL3ContextWGL() {};
 
     virtual bool Create(void* osWnd) {
@@ -46,15 +46,17 @@ public:
         if (!wglMakeCurrent(gdiDc, wglContext)) {
             wglDeleteContext(wglContext);
             ReleaseDC(window, gdiDc);
-            wglContext = NULL;
+            wglContext = nullptr;
             return false;
         }
 
         /*glewInit();
         if (WGLEW_EXT_swap_control)     // if (wglewIsSupported("WGL_EXT_swap_control"))
             wglSwapIntervalEXT(0);*/
+        
+        // !!! TODO !!!
         //if (GLEW_VERSION_3_3) {
-            /* Yay! OpenGL 1.3 is supported! */
+            /* Yay! OpenGL 3.3 is supported! */
             // http://glew.sourceforge.net/basic.html
         //}
         
@@ -63,12 +65,12 @@ public:
 
     virtual void Destroy() {
         if (wglContext) {
-            wglMakeCurrent(NULL, NULL);
+            wglMakeCurrent(nullptr, nullptr);
             wglDeleteContext(wglContext);
             ReleaseDC(window, gdiDc);
-            wglContext = NULL;
-            gdiDc = NULL;
-            window = NULL;
+            wglContext = nullptr;
+            gdiDc = nullptr;
+            window = nullptr;
         }    
     }
     

@@ -12,13 +12,13 @@
 
 #include "../gles3mark_src/gles3mark.h"
 
-static GLES3Mark* gles3mark = NULL;
+static GLES3Mark* gles3mark = nullptr;
 
 
 void DLL_init(HWND hWnd) {
     if (gles3mark) {
         delete gles3mark;
-        gles3mark = NULL;
+        gles3mark = nullptr;
     }
     
     gles3mark = new GLES3Mark();

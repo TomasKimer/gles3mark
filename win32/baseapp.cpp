@@ -4,7 +4,7 @@
 
 
 BaseApp::BaseApp(HINSTANCE hInstance, LPSTR cmdLine)
-: hWnd(NULL), hInstance(hInstance), hCursor(0), windowTitle("gles3mark"), className("gles3markWindow"),
+: hWnd(nullptr), hInstance(hInstance), hCursor(0), windowTitle("gles3mark"), className("gles3markWindow"),
   quit(false), exitCode(0) {
 
     // parse params       
@@ -39,9 +39,9 @@ bool BaseApp::SetupWindow(int w, int h) {
         CW_USEDEFAULT, CW_USEDEFAULT,
         winSize.right - winSize.left,
         winSize.bottom - winSize.top,
-        NULL, NULL, hInstance, (LPVOID)this);
+        nullptr, nullptr, hInstance, (LPVOID)this);
 
-    hCursor = LoadCursor(NULL, IDC_CROSS);
+    hCursor = LoadCursor(nullptr, IDC_CROSS);
 
     POINT center = { width / 2, height / 2 };
     ::ClientToScreen(hWnd, &center);
@@ -50,16 +50,16 @@ bool BaseApp::SetupWindow(int w, int h) {
     ::SetFocus(hWnd);
     ::ShowWindow(hWnd, true);
 
-    return (hWnd != NULL);
+    return (hWnd != nullptr);
 }
 
 void BaseApp::DestroyWindow() {
-    if (hWnd == NULL)
+    if (hWnd == nullptr)
         return;
     
     ::DestroyWindow(hWnd);
     UnregisterClass(className.c_str(), hInstance);
-    hWnd = NULL;
+    hWnd = nullptr;
     hCursor = 0;
     width = 0;
     height = 0;
@@ -162,7 +162,7 @@ LRESULT BaseApp::WindowProc(UINT msg, WPARAM wp, LPARAM lp) {
                 
                 STYLESTRUCT* pss = (STYLESTRUCT*)lp;
                 AdjustWindowRect(&winSize, pss->styleNew, false);
-                ::SetWindowPos(hWnd, NULL, 0, 0, w, h, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
+                ::SetWindowPos(hWnd, nullptr, 0, 0, w, h, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
             }
             break;
 
@@ -184,13 +184,13 @@ int BaseApp::Run() {
 
     OnStartup();
 
-    if (hWnd == NULL) {
+    if (hWnd == nullptr) {
         return exitCode;
     }
 
     while (!quit) {
         MSG msg;
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <stdexcept>
 
 #ifdef ANDROID
@@ -34,20 +35,34 @@ public:
 	AssetManager(void* _ioContext): ioContext(_ioContext) {	}
 	virtual ~AssetManager() {}
 
-	int ReadAsset(const std::string& fileName, int bytesToRead, void* buffer) {
+//	int ReadAsset(const std::string& fileName, int bytesToRead, void* buffer) {
+//
+//        AssetFile* file = Open(fileName);
+//
+//        int bytesRead = Read(file, bytesToRead, buffer);
+//
+//        Close(file);
+//
+//		return bytesRead;
+//	}
 
+    std::string LoadText(const std::string& fileName) {
         AssetFile* file = Open(fileName);
-        
-        int bytesRead = Read(file, bytesToRead, buffer);
 
+        int len = Length(file);
+        std::vector<char> buff(len);
+        Read(file, len, &buff[0]);
         Close(file);
 
-		return bytesRead;
-	}
+        return std::string(&buff[0], buff.size());
+    }
 
-
-
-private:
+    // Load whole file and return it as std::string
+    //std::string LoadText(const std::string& fileName) {
+    //    std::ifstream stream(fileName);
+    //    if (stream.fail()) throw std::runtime_error("Can't open \'" + fileName + "\'");
+    //    return std::string(std::istream_iterator<char>(stream >> std::noskipws), std::istream_iterator<char>());
+    //}
 
     AssetFile* Open(const std::string& fileName) {
         AssetFile *file = nullptr;
@@ -60,7 +75,7 @@ private:
             throw std::runtime_error("AAssetManager == NULL");
         }
 #else
-        file = fopen(("../assets/" + fileName).c_str(), "rb");
+        file = std::fopen(("../assets/" + fileName).c_str(), "rb");
         if (file == nullptr)
             throw std::runtime_error("Cannot open file: " + fileName);
 #endif
@@ -74,7 +89,7 @@ private:
 #ifdef ANDROID
             AAsset_close(file);
 #else
-            fclose(file);
+            std::fclose(file);
 #endif
             file = nullptr;
         }
@@ -89,13 +104,23 @@ private:
 #ifdef ANDROID
         bytesRead = AAsset_read(file, buffer, bytesToRead);
 #else
-        bytesRead = fread(buffer, 1, bytesToRead, file);  // TODO http://www.cplusplus.com/reference/cstdio/fread/
+        bytesRead = std::fread(buffer, 1, bytesToRead, file);  // TODO http://www.cplusplus.com/reference/cstdio/fread/
 #endif
 
         return bytesRead;
     }
 
-public:
+    static int Length(AssetFile* file) {
+#ifdef ANDROID
+    	return AAsset_getLength(file);
+#else
+        std::fseek(file, 0, SEEK_END); // seek to end of file
+        int len = std::ftell(file); // get current file pointer
+        std::fseek(file, 0, SEEK_SET);
+        return len;
+#endif
+    }
+
     char* LoadTGA(const std::string& fileName, int *width, int *height) {
         // Open the file for reading
         AssetFile* fp = Open(fileName);

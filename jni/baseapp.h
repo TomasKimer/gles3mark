@@ -52,7 +52,7 @@ class BaseApp {
 
 		// The window is being shown, get it ready.
 		case APP_CMD_INIT_WINDOW:
-			if (state->window != NULL) {
+			if (state->window != nullptr) {
 				Log::Msg("<<- CMD INIT WINDOW ->>");
 				if (!gles3mark)
 					gles3mark = new GLES3Mark();
@@ -69,7 +69,7 @@ class BaseApp {
 			//glContext->Destroy();
 			if (gles3mark) {
 				 delete gles3mark;
-				 gles3mark = NULL;
+				 gles3mark = nullptr;
 			}
 			animating = false;
 			break;
@@ -77,6 +77,7 @@ class BaseApp {
 		// When our app gains focus, we start monitoring the accelerometer.
 		case APP_CMD_GAINED_FOCUS:
 			Log::Msg("<<- CMD GAINED FOCUS  ->>");
+			animating = true;
 			break;
 
 		// When our app loses focus, we stop monitoring the accelerometer. This is to avoid consuming battery while not being used.
@@ -131,13 +132,13 @@ protected:
 	}
 
 public:
-	BaseApp(android_app* _state): state(_state), /*glContext(NULL),*/ animating(false), gles3mark(NULL) {
+	BaseApp(android_app* _state): state(_state), /*glContext(nullptr),*/ animating(false), gles3mark(nullptr) {
 		state->userData = this;
 		state->onAppCmd = handle_cmd;
 		state->onInputEvent = handle_input;
 
 		// We are starting with a previous saved state; restore from it.
-		if (state->savedState != NULL) {
+		if (state->savedState != nullptr) {
 			savedState = *(SavedState*)state->savedState;
 			Log::Stream() << "State loaded: x: " << savedState.x << ", y: " << savedState.y;
 		}
@@ -160,10 +161,10 @@ public:
 
 	        // If not animating, we will block forever waiting for events.
 	        // If animating, we loop until all events are read, then continue to draw the next frame of animation.
-	        while ((ident = ALooper_pollAll(animating ? 0 : -1, NULL, &events, (void**)&source)) >= 0) {
+	        while ((ident = ALooper_pollAll(animating ? 0 : -1, nullptr, &events, (void**)&source)) >= 0) {
 
 	            // Process this event.
-	            if (source != NULL) {
+	            if (source != nullptr) {
 	                source->process(state, source);
 	            }
 
@@ -177,7 +178,7 @@ public:
 	            	//glContext->Destroy();
 	            	if (gles3mark) {
 	            		delete gles3mark;
-	            		gles3mark = NULL;
+	            		gles3mark = nullptr;
 	            	}
 	            	animating = false;
 	    			showToast("Exitting");
@@ -200,7 +201,7 @@ public:
 
 		// only once
 		JNIEnv *env; // = state->activity->env;
-		if (state->activity->vm->AttachCurrentThread(&env, NULL) != 0)
+		if (state->activity->vm->AttachCurrentThread(&env, nullptr) != 0)
 			Log::Msg("AttachCurrentThread");
 		jobject thiz = state->activity->clazz;
 		jclass clazz = env->GetObjectClass(thiz);

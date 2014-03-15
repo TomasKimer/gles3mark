@@ -3,7 +3,10 @@ package com.tomaskimer.gles3mark;
 import android.os.Bundle;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ConfigurationInfo;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -26,10 +29,22 @@ public class MainActivity extends Activity {
         return true;
     }
     
+    public int GetSupportedGLVersion() {
+    	final ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+    	final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+    	return configurationInfo.reqGlEsVersion;    	
+    }
+    
     public void StartBenchmark(View view) {
-    	Toast.makeText(getApplicationContext(), "Benchmark started", Toast.LENGTH_SHORT).show();
-    	Intent intent = new Intent(this, BenchmarkActivity.class);
-    	startActivityForResult(intent, BENCH_REQUEST_ID); // startActivity(intent);
+    	int supportedGLversion = GetSupportedGLVersion();
+    	if (supportedGLversion < 0x30000) {
+    		Toast.makeText(getApplicationContext(), String.format("Unsupported GL ES version: %x.%x (req. 3.0)",
+    				supportedGLversion >> 16, supportedGLversion & 0x00FF), Toast.LENGTH_LONG).show();
+    		return;
+    	} else {
+    		Intent intent = new Intent(this, BenchmarkActivity.class);
+        	startActivityForResult(intent, BENCH_REQUEST_ID); // startActivity(intent);    		
+    	}
     }
     
     @Override

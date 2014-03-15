@@ -10,7 +10,7 @@ void App::OnStartup() {
     bool ok = true;
     
     dllHandle = LoadLibrary("gles3mark.dll");
-    if (dllHandle != NULL) {
+    if (dllHandle != nullptr) {
 
         init    = (dllInit)  GetProcAddress(dllHandle, "DLL_init"  );
         resize  = (dllResize)GetProcAddress(dllHandle, "DLL_resize");

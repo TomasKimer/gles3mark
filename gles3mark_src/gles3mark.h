@@ -45,34 +45,19 @@ public:
     bool OnInit(void* osWnd, void* ioContext = nullptr) {
     	assetManager = new AssetManager(ioContext);
 
-    	int bytesRead = 0;
-    	int bytesToRead = 1023;
-    	char buffer[1024];
-    	bytesRead = assetManager->ReadAsset("testasset.txt", 1023, buffer);
-        Log::Stream() << "bytes read: " << bytesRead;
-    	std::string msg(buffer, bytesRead);
-    	Log::Msg(msg);
-
-
         // init gl here
         glContext = new GlContext();
         glContext->Create(osWnd);
 
         gltest->OnInit(assetManager);
 
-        Log::Msg((const char*)glGetString(GL_VENDOR));
-        Log::Msg((const char*)glGetString(GL_RENDERER));
-        Log::Msg((const char*)glGetString(GL_VERSION));
-        //Log::Msg((const char*)glGetString(GL_EXTENSIONS));
+        Log::Msg(std::string("GL_VENDOR: ") + (const char*)glGetString(GL_VENDOR));
+        Log::Msg(std::string("GL_RENDERER: ") + (const char*)glGetString(GL_RENDERER));
+        Log::Msg(std::string("GL_VERSION: ") + (const char*)glGetString(GL_VERSION));
+        //Log::Msg(std::string("GL_EXTENSIONS: ") + (const char*)glGetString(GL_EXTENSIONS));
 
-        Log::Stream() << "C++ ver: " << (long)__cplusplus;
+        //Log::Stream() << "C++ ver: " << (long)__cplusplus;
 
-        
-        try {
-        	throw std::runtime_error("blah");
-        } catch (std::exception &e) {
-            Log::Msg(std::string("exception test: ") + e.what());
-        }
 
         //std::atomic<bool> ready (false);
         std::thread t(doSomeWork);

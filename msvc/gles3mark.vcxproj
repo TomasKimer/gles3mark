@@ -28,6 +28,8 @@
     <ClCompile Include="..\win32\gles3mark_dll.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\assets\shaders\simple-fs.glsl" />
+    <None Include="..\assets\shaders\simple-vs.glsl" />
     <None Include="gles3mark_dll.def" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
