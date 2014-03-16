@@ -25,7 +25,7 @@ public:
     /**
      * Initialize an EGL context for the current display.
      */
-    virtual bool Create(void* osWnd) {
+    virtual bool Create(void* osWnd) /*override*/ {
     	window = (ANativeWindow*)osWnd;
 
 		EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);  //eglGetCurrentDisplay()
@@ -109,7 +109,7 @@ public:
     /**
      * Tear down the EGL context currently associated with the display.
      */
-    virtual void Destroy() {
+    virtual void Destroy() /*override*/ {
         if (display != EGL_NO_DISPLAY) {
             eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
             if (context != EGL_NO_CONTEXT) {
@@ -125,13 +125,13 @@ public:
         surface = EGL_NO_SURFACE;
     }
 
-    virtual void Resize(int w, int h, bool vsync) {
+    virtual void Resize(int w, int h, bool vsync) /*override*/ {
     	mWidth = w;
     	mHeight = h;
 
     	eglSwapInterval(display, (int)vsync);
     }
-    virtual void Swap() {
+    virtual void Swap() /*override*/ {
     	eglSwapBuffers(display, surface);
     }
 };

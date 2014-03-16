@@ -9,21 +9,21 @@ void App::OnStartup() {
     
     bool ok = true;
     
-    dllHandle = LoadLibrary("gles3mark.dll");
-    if (dllHandle != nullptr) {
+    DLLHandle = LoadLibrary(DLLPath.c_str());
+    if (DLLHandle != nullptr) {
 
-        init    = (dllInit)  GetProcAddress(dllHandle, "DLL_init"  );
-        resize  = (dllResize)GetProcAddress(dllHandle, "DLL_resize");
-        step    = (dllStep)  GetProcAddress(dllHandle, "DLL_step"  );
+        DLLInit   = (DLLInitT  )GetProcAddress(DLLHandle, "DLL_init"  );
+        DLLResize = (DLLResizeT)GetProcAddress(DLLHandle, "DLL_resize");
+        DLLStep   = (DLLStepT  )GetProcAddress(DLLHandle, "DLL_step"  );
         
-        if (!init || !resize || !step) {
+        if (!DLLInit || !DLLResize || !DLLStep) {
             ShowMsg("GetProcAddress failed!", MB_ICONERROR);
-            FreeLibrary(dllHandle);
+            FreeLibrary(DLLHandle);
             ok = false;
         }        
     }
     else {
-        ShowMsg("LoadLibrary failed: gles3mark.dll", MB_ICONERROR);
+        ShowMsg("LoadLibrary failed: " + DLLPath, MB_ICONERROR);
         ok = false;
     }
 
@@ -35,35 +35,20 @@ void App::OnStartup() {
     // Create window
     BaseApp::OnStartup();
     
-    // Create GL context
-    //glContext = new GL3ContextWGL();
-    //if (!glContext->Create(GetHWND())) {
-    //    delete glContext;
-    //    BaseApp::OnQuit();
-    //    FreeLibrary(dllHandle);
-    //    ShowMsg("Failed to create OpenGL context!", MB_ICONERROR);
-    //    Exit(1);
-    //    return;
-    //}
-
-    init(GetHWND());
-    resize(width, height);
+    DLLInit(GetHWND());
+    DLLResize(width, height);
 }
 
 void App::OnQuit() {
-    //glContext->Destroy();
     BaseApp::OnQuit();
-    FreeLibrary(dllHandle);
+    FreeLibrary(DLLHandle);
 }
 
 void App::OnIdle() {
-    step();
-    //glContext->Swap();
+    DLLStep();
 }
 
 void App::OnResize(int w, int h) {
     BaseApp::OnResize(w, h);
-    //if (glContext)
-    //    glContext->Resize(true);
-    resize(w, h);
+    DLLResize(w, h);
 }

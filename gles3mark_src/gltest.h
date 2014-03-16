@@ -268,12 +268,9 @@ public:
     std::string getShaderInfoLog(GLuint shader) {
         //assert(glIsShader(shader));
 
-        // shader, glGetShaderiv, glGetShaderInfoLog
-
-        GLint length = -1;
+        GLint length;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-        //assert(length >= 0);
-
+        
         std::vector<GLchar> log(length);
         glGetShaderInfoLog(shader, length, nullptr, &log[0]);
 
@@ -284,13 +281,10 @@ public:
 
     std::string getProgramInfoLog(GLuint program) {
         //assert(glIsProgram(program));
-
-        // program, glGetProgramiv, glGetProgramInfoLog
-
-        GLint length = -1;
+        
+        GLint length;
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-        //assert(length >= 0);
-
+        
         std::vector<GLchar> log(length);
         glGetProgramInfoLog(program, length, nullptr, &log[0]);
 

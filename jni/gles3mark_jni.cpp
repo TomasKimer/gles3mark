@@ -19,7 +19,7 @@ static int _state; // for dalvik-to-native synchronization (UI thread to game th
 void android_main(struct android_app* state) {
 	Log::Msg("<<- MAIN START ->>");
 
-	// Make sure glue isn't stripped.
+	// Make sure glue isn't stripped by the linker.
 	app_dummy();
 
 	BaseApp* app = new BaseApp(state);

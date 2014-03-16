@@ -27,6 +27,7 @@ class BaseApp {
 		SavedState():x(0),y(0){}
 	} savedState;
 	bool animating;
+	bool exit;
 
 	/**
 	 * Process the next main command.
@@ -105,6 +106,13 @@ class BaseApp {
 			animating = !animating;
 			savedState.x = AMotionEvent_getX(event, 0);
 			savedState.y = AMotionEvent_getY(event, 0);
+
+			//exit = true;
+			// or:
+			jmethodID FinishHim = env->GetMethodID(clazz, "FinishMe", "(I)V");
+			env->CallVoidMethod(thiz, FinishHim, 934); //CallVoidMethod(thiz, FinishHim);
+			exit = true;
+
 			return 1;
 		}
 		return 0;
@@ -131,8 +139,12 @@ protected:
 		//glContext->Swap();
 	}
 
+	JNIEnv *env; // game thread env (vs main thread env: state->activity->env)
+	jobject thiz;
+	jclass clazz;
+
 public:
-	BaseApp(android_app* _state): state(_state), /*glContext(nullptr),*/ animating(false), gles3mark(nullptr) {
+	BaseApp(android_app* _state): state(_state), /*glContext(nullptr),*/ animating(false), exit(false), gles3mark(nullptr) {
 		state->userData = this;
 		state->onAppCmd = handle_cmd;
 		state->onInputEvent = handle_input;
@@ -149,12 +161,20 @@ public:
 		}
 
 		//state->activity->internalDataPath;
+
+		if (state->activity->vm->AttachCurrentThread(&env, nullptr) == 0) {
+			thiz = state->activity->clazz;
+			clazz = env->GetObjectClass(thiz);
+		} else {
+			Log::Msg("AttachCurrentThread Failed");
+		}
 	}
 
 	virtual ~BaseApp() {}
 
 	void Run() {
-	    while (true) {
+		// our main loop for the app. Will only return once the game is really finished.
+		while (true) {
 	        // Read all pending events.
 	        int ident, events;
 	        android_poll_source* source;
@@ -172,17 +192,21 @@ public:
 	            if (ident == LOOPER_ID_USER) {
 	            }
 
-	            // Check if we are exiting.
+	            // Check if we are exiting.  Which is the case once we called ANativeActivity_finish
 	            if (state->destroyRequested != 0) {
-	            	Log::Msg("<<- DESTROY REQUESTED ->>");
+	            	Log::Msg("<<- DESTROY REQUESTED ->>"); // Quit our app stuff here
 	            	//glContext->Destroy();
 	            	if (gles3mark) {
 	            		delete gles3mark;
 	            		gles3mark = nullptr;
 	            	}
 	            	animating = false;
-	    			showToast("Exitting");
-	                return;
+	    			//showToast("Exitting");
+
+	    			// detach from current thread (when thread exists) - else error: "native thread exited without detaching"
+	    			state->activity->vm->DetachCurrentThread();
+
+	                return; // return the main, so we get back to our java activity which called the nativeactivity
 	            }
 	        }
 
@@ -193,32 +217,22 @@ public:
 	            // Drawing is throttled to the screen update rate, so there is no need to do timing here.
 	        	OnIdle();
 	        }
+
+	        // if our app told us to finish
+	        if (exit) {
+	        	ANativeActivity_finish(state->activity);
+	        }
 	    }
 	}
 
+	// JNI is running the equivalent of the following Java code: activity.showToastAlert(text);
 	bool showToast(const char* text) {
-		// JNI is running the equivalent of the following Java code: activity.showToastAlert(text);
-
-		// only once
-		JNIEnv *env; // = state->activity->env;
-		if (state->activity->vm->AttachCurrentThread(&env, nullptr) != 0)
-			Log::Msg("AttachCurrentThread");
-		jobject thiz = state->activity->clazz;
-		jclass clazz = env->GetObjectClass(thiz);
-
-		// specific
 		jmethodID showToastAlert = env->GetMethodID(clazz, "showToastAlert", "(Ljava/lang/String;)V");
 		jstring jniText = env->NewStringUTF(text);
 		env->CallVoidMethod(thiz, showToastAlert, jniText);
 		env->DeleteLocalRef(jniText);
 
-
-		// only once
-		// detach (when thread exists) - else error: "native thread exited without detaching"
-		state->activity->vm->DetachCurrentThread();
-
 		// Check nvidia's own native_app_glue implementation for encapsulation
-		// and check nvidia's lifecycle !! can be glContext moved to the general engine?
 /*		jstring jniText = mApp->appThreadEnv->NewStringUTF(text);   				        EXCEPTION_RETURN(mApp->appThreadEnv);
 	    jclass thisClass = mApp->appThreadEnv->GetObjectClass(mApp->appThreadThis);         EXCEPTION_RETURN(mApp->appThreadEnv);
 		jmethodID showToastAlert = mApp->appThreadEnv->GetMethodID(thisClass, "showToastAlert", "(Ljava/lang/String;)V"); EXCEPTION_RETURN(mApp->appThreadEnv);

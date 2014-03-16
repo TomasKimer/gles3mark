@@ -125,30 +125,28 @@ public:
         // Open the file for reading
         AssetFile* fp = Open(fileName);
 
-        if (fp == nullptr) {  // Error in opening the input file from apk
-            throw std::runtime_error("LoadTGA FAILED: " + fileName);
-            //return nullptr;
-        }
-
         TGA_HEADER Header;
         int bytesRead = Read(fp, sizeof (TGA_HEADER), &Header);
 
         *width = Header.Width;
         *height = Header.Height;
 
-        if (Header.ColorDepth == 8 || Header.ColorDepth == 24 || Header.ColorDepth == 32) {
-            
-            int bytesToRead = sizeof(char) * (*width) * (*height) * Header.ColorDepth / 8;            
-            char* buffer = (char*)malloc(bytesToRead); // Allocate the image data buffer
+        if (Header.ColorDepth != 8 && Header.ColorDepth != 24 && Header.ColorDepth != 32) {
+            Close(fp);
+            throw std::runtime_error("Unsupported TGA color depth");
+        }            
+        
+        int bytesToRead = sizeof(char) * Header.Width * Header.Height * Header.ColorDepth / 8;
+        char* buffer = new char[bytesToRead]; // Allocate the image data buffer
 
-            if (buffer) {
-                bytesRead = Read(fp, bytesToRead, buffer);
-                Close(fp);
-                return buffer;
-            }
-        }
+        bytesRead = Read(fp, bytesToRead, buffer);
 
-        return nullptr;
+        if (bytesRead != bytesToRead)
+            throw std::runtime_error("Incomplete TGA image data");
+        
+        Close(fp);
+        
+        return buffer;
     }
 };
 

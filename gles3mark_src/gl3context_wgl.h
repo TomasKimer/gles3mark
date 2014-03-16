@@ -19,7 +19,7 @@ public:
     GL3ContextWGL(): window(nullptr), wglContext(nullptr), gdiDc(nullptr) { };
     virtual ~GL3ContextWGL() {};
 
-    virtual bool Create(void* osWnd) {
+    virtual bool Create(void* osWnd) override {
         window = (HWND)osWnd;
 
         PIXELFORMATDESCRIPTOR pfd;
@@ -63,7 +63,7 @@ public:
         return true;
     }
 
-    virtual void Destroy() {
+    virtual void Destroy() override {
         if (wglContext) {
             wglMakeCurrent(nullptr, nullptr);
             wglDeleteContext(wglContext);
@@ -74,7 +74,7 @@ public:
         }    
     }
     
-    virtual void Resize(int w, int h, bool vsync) {
+    virtual void Resize(int w, int h, bool vsync) override {
         mWidth = w;
         mHeight = h;
 
@@ -82,7 +82,7 @@ public:
             wglSwapIntervalEXT(vsync ? 1 : 0);    
     }
     
-    virtual void Swap() {
+    virtual void Swap() override {
         SwapBuffers(gdiDc);
     }
 };
