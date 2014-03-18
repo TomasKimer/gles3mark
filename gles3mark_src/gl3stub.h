@@ -1,6 +1,3 @@
-#ifndef __gl3_h_
-#define __gl3_h_
-
 /*
  * stub gl3.h for dynamic loading, based on:
  * gl3.h last updated on $Date: 2013-02-12 14:37:24 -0800 (Tue, 12 Feb 2013) $
@@ -11,17 +8,8 @@
  * - Converted OpenGL ES 3.0 function prototypes to function pointer
  *   declarations
  * - Added gl3stubInit() declaration
- */
-
-#ifdef ANDROID
-
-#include <GLES2/gl2.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/*
+ *
+ *
 ** Copyright (c) 2007-2013 The Khronos Group Inc.
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a
@@ -44,10 +32,21 @@ extern "C" {
 ** MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.
 */
 
+#ifdef ANDROID
+
+#pragma once
+
+#include <GLES2/gl2.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Call this function before calling any OpenGL ES 3.0 functions. It will
  * return GL_TRUE if the OpenGL ES 3.0 was successfully initialized, GL_FALSE
  * otherwise. */
 GLboolean gl3stubInit();
+
 
 /*-------------------------------------------------------------------------
  * Data type definitions
@@ -492,4 +491,3 @@ extern GL_APICALL void           (* GL_APIENTRY glGetInternalformativ) (GLenum t
 
 #endif
 
-#endif

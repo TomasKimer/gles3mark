@@ -7,8 +7,8 @@
 #include "gl3context_wgl.h"
 typedef GL3ContextWGL GlContext;
 #else
-#include "gles3context_egl.h"
-typedef GLES3ContextEGL GlContext;
+#include "gl3context_egl.h"
+typedef GL3ContextEGL GlContext;
 #endif
 
 #include <string>

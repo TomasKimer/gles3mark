@@ -3,19 +3,29 @@
 
 #include "baseapp.h"
 
-// DLL Imported functions
-typedef void(*DLLInitT  )(HWND);
-typedef void(*DLLResizeT)(int, int);
-typedef void(*DLLStepT  )();
+#include <string>
+#include <stdexcept>
+
+const std::string DLLPATH("gles3mark.dll");
 
 class App : public BaseApp {
 
-    HINSTANCE       DLLHandle;
-    std::string     DLLPath;
+    class DLL {
+        // DLL Imported functions
+        using DLLInitT   = void(*)(HWND    );   // typedef void(*DLLInitT  )(HWND    );
+        using DLLResizeT = void(*)(int, int);   // typedef void(*DLLResizeT)(int, int);
+        using DLLStepT   = void(*)(        );   // typedef void(*DLLStepT  )(        );
 
-    DLLInitT        DLLInit;
-    DLLResizeT      DLLResize;
-    DLLStepT        DLLStep;
+        HINSTANCE   dllHandle;
+    public:
+        DLLInitT    DllInit;
+        DLLResizeT  DllResize;
+        DLLStepT    DllStep;
+
+        DLL() : dllHandle(nullptr) {}
+        void Init(const std::string& path);
+        void Free();
+    } dll;
 
     virtual void    OnStartup()             override;
     virtual void    OnQuit()                override;
@@ -24,5 +34,5 @@ class App : public BaseApp {
 
 public:
     App(HINSTANCE hInstance, LPSTR cmdLine)
-        : BaseApp(hInstance, cmdLine), DLLPath("gles3mark.dll") {}    
+        : BaseApp(hInstance, cmdLine) {}    
 };

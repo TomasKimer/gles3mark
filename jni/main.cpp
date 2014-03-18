@@ -4,11 +4,12 @@
 
 #include <jni.h>
 #include <android_native_app_glue.h>
-
-#include <sys/atomics.h>
-static int _state; // for dalvik-to-native synchronization (UI thread to game thread)
+#include <memory>
 
 #include "baseapp.h"
+
+//#include <sys/atomics.h>
+//static int _state; // for dalvik-to-native synchronization (UI thread to game thread)
 
 
 /**
@@ -19,14 +20,11 @@ static int _state; // for dalvik-to-native synchronization (UI thread to game th
 void android_main(struct android_app* state) {
 	Log::Msg("<<- MAIN START ->>");
 
-	// Make sure glue isn't stripped by the linker.
-	app_dummy();
+	app_dummy(); // Make sure glue isn't stripped by the linker.
 
-	BaseApp* app = new BaseApp(state);
+	std::unique_ptr<BaseApp> app(new BaseApp(state));
 
 	app->Run();
-
-    delete app;
 }
 
 // --- dalvik call to native test ---

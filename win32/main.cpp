@@ -4,6 +4,7 @@
  */
 
 #include "app.h"
+#include <memory>
 
 // Enable dedicated graphics (Nvidia Optimus)
 extern "C" {
@@ -11,11 +12,9 @@ extern "C" {
 }
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    App *app = new App(hInstance, lpCmdLine);
+    std::unique_ptr<App> app(new App(hInstance, lpCmdLine));
 
     int ret = app->Run();
-
-    delete app;
 
     return ret;
 }

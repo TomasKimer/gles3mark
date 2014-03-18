@@ -9,30 +9,24 @@
 #include <SDKDDKVer.h>        // Defines the highest available Windows platform.
 #define WIN32_LEAN_AND_MEAN   // Exclude rarely-used stuff from Windows headers
 #include <windows.h>
+#include <memory>
 
 #include "../gles3mark_src/gles3mark.h"
 
-static GLES3Mark* gles3mark = nullptr;
-
+static std::unique_ptr<GLES3Mark> gles3mark;
 
 void DLL_init(HWND hWnd) {
-    if (gles3mark) {
-        delete gles3mark;
-        gles3mark = nullptr;
-    }
-    
-    gles3mark = new GLES3Mark();
+    gles3mark = std::make_unique<GLES3Mark>();  // gles3mark = std::unique_ptr<GLES3Mark>(new GLES3Mark());
     gles3mark->OnInit((void*)hWnd);
 }
 
 void DLL_resize(int width, int height) {
-    if (gles3mark)
+    if (gles3mark)  // !!
         gles3mark->OnResize(width, height);
 }
 
 void DLL_step() {
-    if (gles3mark)
-        gles3mark->OnStep();
+    gles3mark->OnStep();
 }
 
 /*

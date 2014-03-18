@@ -36,10 +36,10 @@
     <ClInclude Include="..\gles3mark_src\gl3stub.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark_src\gles3context_egl.h">
+    <ClInclude Include="..\gles3mark_src\assetmanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark_src\assetmanager.h">
+    <ClInclude Include="..\gles3mark_src\gl3context_egl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -57,6 +57,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gles3mark_src\assetmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gles3mark_src\gl3context_egl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gles3mark_src\gl3context_wgl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

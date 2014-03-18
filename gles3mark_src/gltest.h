@@ -99,7 +99,10 @@ class GLTest {
     
 public:
     GLTest() { rx = 0.0f; ry = 0.0f; pz = -70.0f; wheel = 5.0f; }
+    
     ~GLTest() {    }
+
+    int value = 5;
     
     bool OnInit(AssetManager* assetManager) {
         int tgaWidth, tgaHeight;
@@ -202,7 +205,7 @@ public:
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-        glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(*house), GL_UNSIGNED_BYTE, nullptr);
+        glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(*house), GL_UNSIGNED_BYTE, nullptr);  // sizeof house / sizeof house[0]
 
         ry += 0.1f;
         rx += 0.1f;

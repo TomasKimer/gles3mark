@@ -8,6 +8,7 @@
 
 #include <jni.h>
 #include <android_native_app_glue.h>
+#include <memory>
 #include "../gles3mark_src/log.h"
 #include "../gles3mark_src/gles3mark.h"
 
@@ -15,9 +16,15 @@
  * Shared state for our app.
  */
 class BaseApp {
-	android_app* state;
-	GLES3Mark* gles3mark;
-	//GLES3ContextEGL* glContext;
+	android_app*	state;
+	std::unique_ptr<GLES3Mark> gles3mark;
+
+	JNIEnv 			*env; // game thread env (vs main thread env: state->activity->env)
+	jobject			thiz;
+	jclass			clazz;
+
+	bool			animating;
+	bool			quit;
 
 	/**
 	 * Our saved state data.
@@ -26,8 +33,7 @@ class BaseApp {
 		int x, y;
 		SavedState():x(0),y(0){}
 	} savedState;
-	bool animating;
-	bool exit;
+
 
 	/**
 	 * Process the next main command.
@@ -53,14 +59,17 @@ class BaseApp {
 
 		// The window is being shown, get it ready.
 		case APP_CMD_INIT_WINDOW:
-			if (state->window != nullptr) {
+			if (state->window) {
 				Log::Msg("<<- CMD INIT WINDOW ->>");
-				if (!gles3mark)
-					gles3mark = new GLES3Mark();
+				//if (!gles3mark)
+				//	gles3mark = new GLES3Mark();
+				gles3mark = std::unique_ptr<GLES3Mark>(new GLES3Mark()); // gles3mark = std::make_unique<GLES3Mark>();
 				gles3mark->OnInit(state->window, state->activity->assetManager);
 				gles3mark->OnResize(gles3mark->GetGLContext()->GetWidth(), gles3mark->GetGLContext()->GetHeight());
 				//glContext->Create(state->window);
-				OnIdle();
+				animating = true;
+
+				//OnIdle();
 			}
 			break;
 
@@ -68,10 +77,7 @@ class BaseApp {
 		case APP_CMD_TERM_WINDOW:
 			Log::Msg("<<- CMD TERM WINDOW ->>");
 			//glContext->Destroy();
-			if (gles3mark) {
-				 delete gles3mark;
-				 gles3mark = nullptr;
-			}
+			gles3mark.reset();
 			animating = false;
 			break;
 
@@ -85,7 +91,7 @@ class BaseApp {
 		case APP_CMD_LOST_FOCUS:
 			Log::Msg("<<- CMD LOST FOCUS ->>");
 			animating = false; // Also stop animating.
-			OnIdle();
+			//OnIdle();
 			break;
 		}
 	}
@@ -107,11 +113,7 @@ class BaseApp {
 			savedState.x = AMotionEvent_getX(event, 0);
 			savedState.y = AMotionEvent_getY(event, 0);
 
-			//exit = true;
-			// or:
-			jmethodID FinishHim = env->GetMethodID(clazz, "FinishMe", "(I)V");
-			env->CallVoidMethod(thiz, FinishHim, 934); //CallVoidMethod(thiz, FinishHim);
-			exit = true;
+			Exit(934);
 
 			return 1;
 		}
@@ -120,31 +122,43 @@ class BaseApp {
 
 protected:
 
-	virtual void OnCreate() {}
+	virtual void OnStartup() {}
 	virtual void OnQuit()   {}
-
-	/**
-	 * Just the current frame in the display.
-	 */
+	virtual void OnResize(int w, int h) {}
 	virtual void OnIdle() {
-		//if (!glContext->HasDisplay())
-		//	return;
-
-		if (gles3mark)
-			gles3mark->OnStep();
-
-		//glClearColor((float)savedState.x/glContext->GetWidth(), 0.f, (float)savedState.y/glContext->GetHeight(), 1.f);
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//glContext->Swap();
+		//if (!glContext->HasDisplay()) return;
+		gles3mark->OnStep();
 	}
 
-	JNIEnv *env; // game thread env (vs main thread env: state->activity->env)
-	jobject thiz;
-	jclass clazz;
+	void Exit(int score) {
+		jmethodID FinishMe = env->GetMethodID(clazz, "FinishMe", "(I)V");
+		env->CallVoidMethod(thiz, FinishMe, score);
+		quit = true;
+	}
+
+
+	// JNI is running the equivalent of the following Java code: activity.showToastAlert(text);
+	bool showToast(const char* text) {
+		jmethodID showToastAlert = env->GetMethodID(clazz, "showToastAlert", "(Ljava/lang/String;)V");
+		jstring jniText = env->NewStringUTF(text);
+		env->CallVoidMethod(thiz, showToastAlert, jniText);
+		env->DeleteLocalRef(jniText);
+
+		// Check nvidia's own native_app_glue implementation for encapsulation
+/*		jstring jniText = mApp->appThreadEnv->NewStringUTF(text);   				        EXCEPTION_RETURN(mApp->appThreadEnv);
+	    jclass thisClass = mApp->appThreadEnv->GetObjectClass(mApp->appThreadThis);         EXCEPTION_RETURN(mApp->appThreadEnv);
+		jmethodID showToastAlert = mApp->appThreadEnv->GetMethodID(thisClass, "showToastAlert", "(Ljava/lang/String;)V"); EXCEPTION_RETURN(mApp->appThreadEnv);
+		mApp->appThreadEnv->CallVoidMethod(mApp->appThreadThis, showToastAlert, jniText); 	EXCEPTION_RETURN(mApp->appThreadEnv);
+*/
+		return true;
+	}
+
+
 
 public:
-	BaseApp(android_app* _state): state(_state), /*glContext(nullptr),*/ animating(false), exit(false), gles3mark(nullptr) {
+	BaseApp(android_app* _state)
+		: state(_state), animating(false), quit(false) {
+
 		state->userData = this;
 		state->onAppCmd = handle_cmd;
 		state->onInputEvent = handle_input;
@@ -155,10 +169,7 @@ public:
 			Log::Stream() << "State loaded: x: " << savedState.x << ", y: " << savedState.y;
 		}
 
-		//glContext = new GLES3ContextEGL();
-		if (!gles3mark) {
-			gles3mark = new GLES3Mark();
-		}
+		//gles3mark = std::unique_ptr<GLES3Mark>(new GLES3Mark());  // gles3mark = std::make_unique<GLES3Mark>();
 
 		//state->activity->internalDataPath;
 
@@ -195,12 +206,8 @@ public:
 	            // Check if we are exiting.  Which is the case once we called ANativeActivity_finish
 	            if (state->destroyRequested != 0) {
 	            	Log::Msg("<<- DESTROY REQUESTED ->>"); // Quit our app stuff here
-	            	//glContext->Destroy();
-	            	if (gles3mark) {
-	            		delete gles3mark;
-	            		gles3mark = nullptr;
-	            	}
-	            	animating = false;
+
+	            	//animating = false;
 	    			//showToast("Exitting");
 
 	    			// detach from current thread (when thread exists) - else error: "native thread exited without detaching"
@@ -210,8 +217,8 @@ public:
 	            }
 	        }
 
+	        // Done with events; draw next animation frame.
 	        if (animating) {
-	            // Done with events; draw next animation frame.
 	            // Update game state
 
 	            // Drawing is throttled to the screen update rate, so there is no need to do timing here.
@@ -219,26 +226,10 @@ public:
 	        }
 
 	        // if our app told us to finish
-	        if (exit) {
+	        if (quit) {
 	        	ANativeActivity_finish(state->activity);
 	        }
 	    }
-	}
-
-	// JNI is running the equivalent of the following Java code: activity.showToastAlert(text);
-	bool showToast(const char* text) {
-		jmethodID showToastAlert = env->GetMethodID(clazz, "showToastAlert", "(Ljava/lang/String;)V");
-		jstring jniText = env->NewStringUTF(text);
-		env->CallVoidMethod(thiz, showToastAlert, jniText);
-		env->DeleteLocalRef(jniText);
-
-		// Check nvidia's own native_app_glue implementation for encapsulation
-/*		jstring jniText = mApp->appThreadEnv->NewStringUTF(text);   				        EXCEPTION_RETURN(mApp->appThreadEnv);
-	    jclass thisClass = mApp->appThreadEnv->GetObjectClass(mApp->appThreadThis);         EXCEPTION_RETURN(mApp->appThreadEnv);
-		jmethodID showToastAlert = mApp->appThreadEnv->GetMethodID(thisClass, "showToastAlert", "(Ljava/lang/String;)V"); EXCEPTION_RETURN(mApp->appThreadEnv);
-		mApp->appThreadEnv->CallVoidMethod(mApp->appThreadThis, showToastAlert, jniText); 	EXCEPTION_RETURN(mApp->appThreadEnv);
-*/
-		return true;
 	}
 };
 

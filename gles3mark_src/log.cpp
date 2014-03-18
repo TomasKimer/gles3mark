@@ -72,7 +72,7 @@ void Log::logMsg(const std::string & msg)
        << ":" << std::setw(2) << std::setfill('0') << locTime->tm_sec
        << ": ";    
 
-    std::cout << timestamp.str() << msg << std::endl;    //OutputDebugString(msg.c_str());
+    std::cerr << timestamp.str() << msg << '\n';    //OutputDebugString(msg.c_str());
 #endif
 
 #ifdef ANDROID

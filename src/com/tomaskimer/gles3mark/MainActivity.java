@@ -49,6 +49,7 @@ public class MainActivity extends Activity {
     
     @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	//Log.e("onActivityResult", String.format("%d, %d", requestCode, resultCode));
     	if (requestCode == BENCH_REQUEST_ID) {
             if (resultCode == RESULT_OK) {  // -1,  0 = RESULT_CANCELED
               String myValue = data.getStringExtra("score"); 
