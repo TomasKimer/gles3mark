@@ -205,10 +205,10 @@ public:
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-        glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(*house), GL_UNSIGNED_BYTE, nullptr);  // sizeof house / sizeof house[0]
+        glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(house[0]), GL_UNSIGNED_BYTE, nullptr);  // sizeof house / sizeof house[0]
 
-        ry += 0.1f;
-        rx += 0.1f;
+        //ry += 0.1f;
+        rx += 0.03f;
 
     }
 

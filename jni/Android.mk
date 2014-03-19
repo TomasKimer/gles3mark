@@ -7,6 +7,7 @@ LOCAL_CFLAGS	:= -Werror
 LOCAL_CPPFLAGS  := -std=c++11 #-fexceptions
 LOCAL_CPP_FEATURES := exceptions
 LOCAL_SRC_FILES := baseapp.cpp \
+				   app.cpp \
 				   main.cpp \
 				   ../gles3mark_src/gl3context_egl.cpp \
 				   ../gles3mark_src/gles3mark.cpp \

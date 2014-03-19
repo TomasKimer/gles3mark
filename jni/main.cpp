@@ -1,31 +1,28 @@
-// TODO rename to main and move BaseApp and GLContext + revise dir structure
 
 #ifdef ANDROID
 
-#include <jni.h>
 #include <android_native_app_glue.h>
 #include <memory>
+#include "app.h"
 
-#include "baseapp.h"
+/**
+ * This is the main entry point of a native application that is using
+ * android_native_app_glue. It runs in its own thread, with its own
+ * event loop for receiving input events and doing other things.
+ */
+void android_main(struct android_app* state) {
+	std::unique_ptr<App> app(new App(state));
+
+	app->Run();
+}
+
+
+
+
 
 //#include <sys/atomics.h>
 //static int _state; // for dalvik-to-native synchronization (UI thread to game thread)
 
-
-/**
- * This is the main entry point of a native application that is using
- * android_native_app_glue.  It runs in its own thread, with its own
- * event loop for receiving input events and doing other things.
- */
-void android_main(struct android_app* state) {
-	Log::Msg("<<- MAIN START ->>");
-
-	app_dummy(); // Make sure glue isn't stripped by the linker.
-
-	std::unique_ptr<BaseApp> app(new BaseApp(state));
-
-	app->Run();
-}
 
 // --- dalvik call to native test ---
 /*

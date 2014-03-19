@@ -13,8 +13,6 @@ extern "C" {
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     std::unique_ptr<App> app(new App(hInstance, lpCmdLine));
-
-    int ret = app->Run();
-
-    return ret;
+    
+    return app->Run();
 }

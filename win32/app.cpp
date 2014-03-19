@@ -44,9 +44,9 @@ void App::DLL::Init(const std::string& path) {
     if (!dllHandle)
         throw std::runtime_error("LoadLibrary failed : " + path);
 
-    DllInit   = (DLLInitT  )GetProcAddress(dllHandle, "DLL_init");
-    DllResize = (DLLResizeT)GetProcAddress(dllHandle, "DLL_resize");
-    DllStep   = (DLLStepT  )GetProcAddress(dllHandle, "DLL_step");
+    DllInit   = reinterpret_cast<DLLInitT  >(GetProcAddress(dllHandle, "DLL_init"  ));
+    DllResize = reinterpret_cast<DLLResizeT>(GetProcAddress(dllHandle, "DLL_resize"));
+    DllStep   = reinterpret_cast<DLLStepT  >(GetProcAddress(dllHandle, "DLL_step"  ));
 
     if (!DllInit || !DllResize || !DllStep) {
         FreeLibrary(dllHandle);
