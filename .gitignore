@@ -11,6 +11,8 @@
 # generated files
 bin/*
 !bin/glew32.dll
+!bin/Assimp32.dll
+!bin/Assimp32d.dll
 gen/
 obj/
 libs/armeabi/

@@ -4,15 +4,20 @@
 
 #include "assetmanager.h"
 
-std::string AssetManager::LoadText(const std::string& fileName) {
+std::vector<char> AssetManager::LoadContents(const std::string& fileName) {
     AssetFile* file = Open(fileName);
-
+    
     int len = Length(file);
     std::vector<char> buff(len);
     Read(file, len, &buff[0]);
     Close(file);
 
-    return std::string(&buff[0], buff.size());
+    return buff;
+}
+
+std::string AssetManager::LoadText(const std::string& fileName) {
+    std::vector<char> contents = LoadContents(fileName);    
+    return std::string(&contents[0], contents.size());
 }
 
 int AssetManager::ReadAsset(const std::string& fileName, int bytesToRead, void* buffer) {

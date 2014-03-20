@@ -21,6 +21,7 @@ typedef GL3ContextEGL GlContext;
 #include "log.h"
 
 
+
 class GLES3Mark {
 
     AssetManager* assetManager;

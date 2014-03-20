@@ -35,6 +35,7 @@ public:
 	AssetManager(void* _ioContext): ioContext(_ioContext) {	}
 	virtual ~AssetManager() {}
 
+    std::vector<char> LoadContents(const std::string& fileName);
     std::string LoadText(const std::string& fileName);
     int ReadAsset(const std::string& fileName, int bytesToRead, void* buffer);
 

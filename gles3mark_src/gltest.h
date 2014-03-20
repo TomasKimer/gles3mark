@@ -24,6 +24,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
 
 // House indices
 const unsigned char house[] = {
@@ -88,6 +92,37 @@ struct Point {
 
 class GLTest {
 
+    class AssimpModel {
+
+        Assimp::Importer importer;
+        const aiScene* scene;
+
+    public:
+        void Load(AssetManager& assetManager, const std::string& fileName) {
+            std::vector<char> rawModelData = assetManager.LoadContents("models/" + fileName);
+            scene = importer.ReadFileFromMemory(&rawModelData[0], rawModelData.size(), aiProcessPreset_TargetRealtime_Quality);
+            if (!scene)
+                throw std::runtime_error("Failed to load model: " + fileName);
+
+            for (unsigned int i = 0; i < scene->mNumMeshes; i++) { // ++i?
+                const aiMesh* mesh = scene->mMeshes[i];
+                Log::Stream() << "Mesh " << i << " - Vertices: " << mesh->mNumVertices << ", faces: " << mesh->mNumFaces;  // normals, uv
+                if (mesh->HasTextureCoords(0))
+                    Log::Stream() << "Mesh " << i << " - has texture coords";
+
+                //if (mesh->HasNormals())
+                //    Log::Stream() << "Mesh " << i << " - has normals";
+            }
+
+            for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
+                const aiMaterial* material = scene->mMaterials[i];
+                Log::Stream() << "Material " << i << " - Diffuse textures: " << material->GetTextureCount(aiTextureType_DIFFUSE);
+            }
+        }
+
+
+    } model;
+
     GLuint VBO, EBO;
     GLuint VS, FS, Prog;
     GLuint texture;
@@ -105,10 +140,18 @@ public:
     int value = 5;
     
     bool OnInit(AssetManager* assetManager) {
-        int tgaWidth, tgaHeight;
-        char* tgaData = assetManager->LoadTGA("textures/tiles.tga", &tgaWidth, &tgaHeight);
 
+        int tgaWidth, tgaHeight;
+        char* tgaData;
         try {
+            
+            tgaData = assetManager->LoadTGA("textures/tiles.tga", &tgaWidth, &tgaHeight);
+            model.Load(*assetManager, "e112.3ds");
+
+
+
+
+
 
             // init gl here
 #ifdef _WIN32
