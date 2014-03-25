@@ -5,8 +5,9 @@
 #include <sstream>
 
 void App::OnStartup() {
-
+//#ifdef _DEBUG
     DebugConsole::RedirectIOToConsole();
+//#endif
 
     try {
         dll.Init(DLLPATH);

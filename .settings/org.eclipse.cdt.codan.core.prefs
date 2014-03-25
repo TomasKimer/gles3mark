@@ -19,9 +19,9 @@ org.eclipse.cdt.codan.internal.checkers.CatchByReference=Warning
 org.eclipse.cdt.codan.internal.checkers.CatchByReference.params={unknown\=>false,exceptions\=>()}
 org.eclipse.cdt.codan.internal.checkers.CircularReferenceProblem=Error
 org.eclipse.cdt.codan.internal.checkers.CircularReferenceProblem.params={launchModes\=>{RUN_ON_FULL_BUILD\=>false,RUN_ON_INC_BUILD\=>false,RUN_AS_YOU_TYPE\=>true,RUN_ON_DEMAND\=>true}}
-org.eclipse.cdt.codan.internal.checkers.FieldResolutionProblem=Error
+org.eclipse.cdt.codan.internal.checkers.FieldResolutionProblem=Warning
 org.eclipse.cdt.codan.internal.checkers.FieldResolutionProblem.params={launchModes\=>{RUN_ON_FULL_BUILD\=>false,RUN_ON_INC_BUILD\=>false,RUN_AS_YOU_TYPE\=>true,RUN_ON_DEMAND\=>true}}
-org.eclipse.cdt.codan.internal.checkers.FunctionResolutionProblem=Error
+org.eclipse.cdt.codan.internal.checkers.FunctionResolutionProblem=Warning
 org.eclipse.cdt.codan.internal.checkers.FunctionResolutionProblem.params={launchModes\=>{RUN_ON_FULL_BUILD\=>false,RUN_ON_INC_BUILD\=>false,RUN_AS_YOU_TYPE\=>true,RUN_ON_DEMAND\=>true}}
 org.eclipse.cdt.codan.internal.checkers.InvalidArguments=Warning
 org.eclipse.cdt.codan.internal.checkers.InvalidArguments.params={launchModes\=>{RUN_ON_FULL_BUILD\=>false,RUN_ON_INC_BUILD\=>false,RUN_AS_YOU_TYPE\=>true,RUN_ON_DEMAND\=>true}}

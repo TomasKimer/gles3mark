@@ -10,11 +10,30 @@
 
 #ifdef ANDROID
 #include <android/asset_manager.h>
-typedef AAsset AssetFile;
+//typedef AAsset AssetFile;
 #else
 #include <cstdio>
-typedef FILE AssetFile;
+//typedef FILE AssetFile;
 #endif
+
+class AssetFile {
+#ifdef ANDROID
+    AAsset* file;
+#else
+    std::FILE* file;
+#endif
+    static void* ioContext;
+
+public:
+    AssetFile(): file(nullptr) {}    
+    static void SetContext(void* _ioContext) { ioContext = _ioContext; }
+
+    void Open(const std::string& fileName);
+    void Close();
+    int Read(size_t bytesToRead, void* buffer);
+    int Length();
+};
+
 
 class AssetManager {
 
@@ -29,20 +48,13 @@ class AssetManager {
     } TGA_HEADER;
 #pragma pack(pop,x1)
 
-	void* ioContext;
-
 public:
-	AssetManager(void* _ioContext): ioContext(_ioContext) {	}
+    AssetManager(void* _ioContext = nullptr) { AssetFile::SetContext(_ioContext); }
 	virtual ~AssetManager() {}
 
     std::vector<char> LoadContents(const std::string& fileName);
     std::string LoadText(const std::string& fileName);
     int ReadAsset(const std::string& fileName, int bytesToRead, void* buffer);
-
-    AssetFile* Open(const std::string& fileName);
-    static void Close(AssetFile* file);
-    static int Read(AssetFile* file, size_t bytesToRead, void* buffer);
-    static int Length(AssetFile* file);
 
     char* LoadTGA(const std::string& fileName, int *width, int *height);
 };

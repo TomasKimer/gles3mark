@@ -15,6 +15,7 @@
 
 #include "log.h"
 #include "assetmanager.h"
+#include "modelimporter.h"
 
 #include <string>
 #include <vector>
@@ -23,10 +24,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
 
 
 // House indices
@@ -92,37 +89,6 @@ struct Point {
 
 class GLTest {
 
-    class AssimpModel {
-
-        Assimp::Importer importer;
-        const aiScene* scene;
-
-    public:
-        void Load(AssetManager& assetManager, const std::string& fileName) {
-            std::vector<char> rawModelData = assetManager.LoadContents("models/" + fileName);
-            scene = importer.ReadFileFromMemory(&rawModelData[0], rawModelData.size(), aiProcessPreset_TargetRealtime_Quality);
-            if (!scene)
-                throw std::runtime_error("Failed to load model: " + fileName);
-
-            for (unsigned int i = 0; i < scene->mNumMeshes; i++) { // ++i?
-                const aiMesh* mesh = scene->mMeshes[i];
-                Log::Stream() << "Mesh " << i << " - Vertices: " << mesh->mNumVertices << ", faces: " << mesh->mNumFaces;  // normals, uv
-                if (mesh->HasTextureCoords(0))
-                    Log::Stream() << "Mesh " << i << " - has texture coords";
-
-                //if (mesh->HasNormals())
-                //    Log::Stream() << "Mesh " << i << " - has normals";
-            }
-
-            for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
-                const aiMaterial* material = scene->mMaterials[i];
-                Log::Stream() << "Material " << i << " - Diffuse textures: " << material->GetTextureCount(aiTextureType_DIFFUSE);
-            }
-        }
-
-
-    } model;
-
     GLuint VBO, EBO;
     GLuint VS, FS, Prog;
     GLuint texture;
@@ -133,6 +99,7 @@ class GLTest {
     int width, height;
     
 public:
+    
     GLTest() { rx = 0.0f; ry = 0.0f; pz = -70.0f; wheel = 5.0f; }
     
     ~GLTest() {    }
@@ -143,14 +110,12 @@ public:
 
         int tgaWidth, tgaHeight;
         char* tgaData;
-        try {
+        try {            
+            tgaData = assetManager->LoadTGA("textures/tiles.tga", &tgaWidth, &tgaHeight);            
             
-            tgaData = assetManager->LoadTGA("textures/tiles.tga", &tgaWidth, &tgaHeight);
+            ModelImporter* modelImporter = new ModelImporter();
+            ModelImporter::AssimpModel model;
             model.Load(*assetManager, "e112.3ds");
-
-
-
-
 
 
             // init gl here
@@ -158,20 +123,18 @@ public:
             GLenum error = glewInit();
             if (error != GLEW_OK)
                 Log::Msg("!!!! GLEW ERROR !!!!");
-            std::string shaderVer("#version 330");
 #else
             if (!gl3stubInit())
                 Log::Msg("!!!! GL stub init failed !!!!");
-            std::string shaderVer("#version 300 es");
 #endif
-            VS = compileShader(GL_VERTEX_SHADER, shaderVer + assetManager->LoadText("shaders/simple-vs.glsl"));
-            FS = compileShader(GL_FRAGMENT_SHADER, shaderVer + assetManager->LoadText("shaders/simple-fs.glsl"));
+            VS = compileShader(GL_VERTEX_SHADER, assetManager->LoadText("shaders/simple-vs.glsl"));
+            FS = compileShader(GL_FRAGMENT_SHADER, assetManager->LoadText("shaders/simple-fs.glsl"));
 
             Prog = linkShader({ VS, FS });
 
         }
         catch (std::exception &e) {
-            Log::Msg(std::string("Init exception: ") + e.what());
+            Log::Msg(std::string("Init exception: ") + e.what(), Log::Severity::Error);
         }
 
         positionAttrib = glGetAttribLocation(Prog, "position");
@@ -260,7 +223,12 @@ public:
         if (shader == 0)
             throw std::runtime_error("glCreateShader failed");
 
-        const char *c_str = source.c_str();
+#ifdef _WIN32
+        std::string verSrc = "#version 330\n" + source;
+#else
+        std::string verSrc = "#version 300 es\n" + source;
+#endif
+        const char *c_str = verSrc.c_str();
         glShaderSource(shader, 1, &c_str, nullptr);
         glCompileShader(shader);
 

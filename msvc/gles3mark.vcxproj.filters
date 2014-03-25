@@ -42,6 +42,9 @@
     <ClInclude Include="..\gles3mark_src\gl3context_egl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\gles3mark_src\modelimporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\win32\gles3mark_dll.cpp">

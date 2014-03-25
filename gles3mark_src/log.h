@@ -22,11 +22,15 @@
 class Log
 {
 public:
+    enum class Severity {
+        Verbose,
+        Debug,
+        Info,
+        Warn,
+        Error
+    };    
+    
     ~Log(void);
-
-    static void Create(const std::string & filename);
-    static void Destroy();
-    static void Msg(const std::string & msg);
 
     class LogStream
     {
@@ -37,12 +41,13 @@ public:
         LogStream(const LogStream& ls)
         {    
             m_cache.str(ls.m_cache.str());
+            m_severity = ls.m_severity;
         }
         
         ~LogStream()
         {                
             if (m_cache.tellp() > 0)  // flush on destroy
-                m_instance->logMsg(m_cache.str());
+                m_instance->logMsg(m_cache.str(), m_severity);
         }
     
         template <typename T>
@@ -54,22 +59,28 @@ public:
     
         LogStream& operator<< (const Flush& v)
         {
-            m_instance->logMsg(m_cache.str());
+            m_instance->logMsg(m_cache.str(), m_severity);
             m_cache.str("");
             return *this;            
         }
+
+        void SetPriority(Severity severity) { m_severity = severity; }
     
     private:
         std::stringstream m_cache;
+        Severity m_severity;
     };
 
-    static LogStream Stream();
+    static void      Create (const std::string & filename);
+    static void      Destroy();
+    static void      Msg(const std::string & msg, Severity severity = Severity::Verbose);
+    static LogStream Stream(Severity severity = Severity::Verbose);
 
 private:
     Log(void);
     static Log *m_instance;
 
-    void logMsg(const std::string & msg);
+    void logMsg(const std::string & msg, Severity severity);
 
     LogStream m_stream;
 

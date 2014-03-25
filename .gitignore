@@ -16,6 +16,7 @@ bin/*
 gen/
 obj/
 libs/armeabi/
+*.log
 
 # MSVC 2013
 msvc/Debug/
