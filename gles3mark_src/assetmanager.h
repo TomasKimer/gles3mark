@@ -8,31 +8,7 @@
 #include <vector>
 #include <stdexcept>
 
-#ifdef ANDROID
-#include <android/asset_manager.h>
-//typedef AAsset AssetFile;
-#else
-#include <cstdio>
-//typedef FILE AssetFile;
-#endif
-
-class AssetFile {
-#ifdef ANDROID
-    AAsset* file;
-#else
-    std::FILE* file;
-#endif
-    static void* ioContext;
-
-public:
-    AssetFile(): file(nullptr) {}    
-    static void SetContext(void* _ioContext) { ioContext = _ioContext; }
-
-    void Open(const std::string& fileName);
-    void Close();
-    int Read(size_t bytesToRead, void* buffer);
-    int Length();
-};
+#include "assetfile.h"
 
 
 class AssetManager {
@@ -50,7 +26,7 @@ class AssetManager {
 
 public:
     AssetManager(void* _ioContext = nullptr) { AssetFile::SetContext(_ioContext); }
-	virtual ~AssetManager() {}
+    virtual ~AssetManager() { }
 
     std::vector<char> LoadContents(const std::string& fileName);
     std::string LoadText(const std::string& fileName);

@@ -15,56 +15,44 @@ static const char* TAG = "gles3mark log";
 #include <iostream>
 #endif
 
-Log *Log::m_instance = nullptr;
+Log* Log::mInstance = nullptr;
 
-Log::Log(void)
-{
+Log::~Log(void) {
+    if (mInstance->mOutput.is_open())
+        mInstance->mOutput.close();
 }
 
-Log::~Log(void)
-{
-    if (m_instance->m_output.is_open())
-        m_instance->m_output.close();
-}
-
-void Log::Create(const std::string & filename = "app.log")
-{
-    if (!m_instance)
-    {
-        m_instance = new Log();
+void Log::Create(const std::string & filename = "app.log") {
+    if (!mInstance) {
+        mInstance = new Log();
 #ifndef ANDROID
-        m_instance->m_output.open(filename.c_str(), std::ios::out);
-        if (m_instance->m_output.fail())
-            m_instance->logMsg("Failed to open Log file " + filename + " for writing", Severity::Warn);
+        mInstance->mOutput.open(filename.c_str(), std::ios::out);
+        if (mInstance->mOutput.fail())
+            mInstance->logMsg("Failed to open Log file " + filename + " for writing", Severity::Warn);
 #endif
     }
 }
 
-void Log::Destroy()
-{
-    if (m_instance)
-    {        
-        delete m_instance;
-        m_instance = nullptr;
+void Log::Destroy() {
+    if (mInstance) {        
+        delete mInstance;
+        mInstance = nullptr;
     }
 }
 
-void Log::Msg(const std::string & msg, Severity severity)
-{
+void Log::Msg(const std::string & msg, Severity severity) {
     Create();
     if (!msg.empty())
-        m_instance->logMsg(msg, severity);
+        mInstance->logMsg(msg, severity);
 }
 
-Log::LogStream Log::Stream(Severity severity)
-{
+Log::LogStream Log::Stream(Severity severity) {
     Create();
-    m_instance->m_stream.SetPriority(severity);
-    return m_instance->m_stream;
+    mInstance->mStream.SetSeverity(severity);
+    return mInstance->mStream;
 }
 
-void Log::logMsg(const std::string & msg, Severity severity)
-{
+void Log::logMsg(const std::string & msg, Severity severity) {
 #ifndef ANDROID
     time_t actTime;
     time(&actTime);
@@ -93,9 +81,9 @@ void Log::logMsg(const std::string & msg, Severity severity)
     }
 
     std::cerr << timestamp.str() << sseverity << msg << '\n';    //OutputDebugString(msg.c_str());
-    if (m_output.is_open()) {
-        m_output << timestamp.str() << sseverity << msg << '\n';  // std::endl ?
-        m_output.flush();
+    if (mOutput.is_open()) {
+        mOutput << timestamp.str() << sseverity << msg << '\n';  // std::endl ?
+        mOutput.flush();
     }
 
 #else

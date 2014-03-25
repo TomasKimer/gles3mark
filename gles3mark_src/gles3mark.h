@@ -52,14 +52,8 @@ public:
 
         gltest->OnInit(assetManager);
 
-        Log::Msg(std::string("GL_VENDOR: ") + (const char*)glGetString(GL_VENDOR));
-        Log::Msg(std::string("GL_RENDERER: ") + (const char*)glGetString(GL_RENDERER));
-        Log::Msg(std::string("GL_VERSION: ") + (const char*)glGetString(GL_VERSION));
-        //Log::Msg(std::string("GL_EXTENSIONS: ") + (const char*)glGetString(GL_EXTENSIONS));
-
         //Log::Stream() << "C++ ver: " << (long)__cplusplus;
-
-
+        
         //std::atomic<bool> ready (false);
         std::thread t(doSomeWork);
         t.join();
@@ -79,7 +73,7 @@ public:
 
         gltest->OnResize(w, h);
 
-        Log::Stream() << "Resize: " << w << ", " << h;
+        Log::V() << "Resize: " << w << ", " << h;
     }
 
     void OnStep() {

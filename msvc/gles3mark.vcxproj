@@ -11,22 +11,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\gles3mark_src\assetfile.h" />
     <ClInclude Include="..\gles3mark_src\assetmanager.h" />
+    <ClInclude Include="..\gles3mark_src\camera.h" />
     <ClInclude Include="..\gles3mark_src\gl3context_egl.h" />
     <ClInclude Include="..\gles3mark_src\gl3context_wgl.h" />
     <ClInclude Include="..\gles3mark_src\gl3stub.h" />
     <ClInclude Include="..\gles3mark_src\glcontext.h" />
     <ClInclude Include="..\gles3mark_src\gles3mark.h" />
+    <ClInclude Include="..\gles3mark_src\glhelper.h" />
     <ClInclude Include="..\gles3mark_src\gltest.h" />
     <ClInclude Include="..\gles3mark_src\log.h" />
     <ClInclude Include="..\gles3mark_src\modelimporter.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\gles3mark_src\assetfile.cpp" />
     <ClCompile Include="..\gles3mark_src\assetmanager.cpp" />
+    <ClCompile Include="..\gles3mark_src\camera.cpp" />
     <ClCompile Include="..\gles3mark_src\gl3context_egl.cpp" />
     <ClCompile Include="..\gles3mark_src\gl3context_wgl.cpp" />
     <ClCompile Include="..\gles3mark_src\gl3stub.c" />
     <ClCompile Include="..\gles3mark_src\gles3mark.cpp" />
+    <ClCompile Include="..\gles3mark_src\glhelper.cpp" />
     <ClCompile Include="..\gles3mark_src\log.cpp" />
     <ClCompile Include="..\win32\gles3mark_dll.cpp" />
   </ItemGroup>

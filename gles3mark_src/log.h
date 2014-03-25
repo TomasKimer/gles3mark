@@ -19,8 +19,7 @@
 /**
  * Event logging.
  */
-class Log
-{
+class Log {
 public:
     enum class Severity {
         Verbose,
@@ -28,61 +27,67 @@ public:
         Info,
         Warn,
         Error
-    };    
-    
-    ~Log(void);
+    };
 
-    class LogStream
-    {
+private:
+    class LogStream {
     public:            
-        struct Flush {};  // indicates end of stream
-    
         LogStream() {}            
-        LogStream(const LogStream& ls)
-        {    
-            m_cache.str(ls.m_cache.str());
-            m_severity = ls.m_severity;
+        LogStream(const LogStream& ls) {    
+            mCache.str(ls.mCache.str());
+            mSeverity = ls.mSeverity;
         }
         
-        ~LogStream()
-        {                
-            if (m_cache.tellp() > 0)  // flush on destroy
-                m_instance->logMsg(m_cache.str(), m_severity);
+        ~LogStream() {                
+            if (mCache.tellp() > 0)  // flush on destroy
+                mInstance->logMsg(mCache.str(), mSeverity);
         }
+
+        struct Flush {};  // indicates end of stream
     
         template <typename T>
-        LogStream& operator<< (const T& v)
-        {
-            m_cache << v;
+        LogStream& operator<< (const T& v) {
+            mCache << v;
             return *this;
         }
-    
-        LogStream& operator<< (const Flush& v)
-        {
-            m_instance->logMsg(m_cache.str(), m_severity);
-            m_cache.str("");
+            
+        LogStream& operator<< (const Flush& v) {
+            mInstance->logMsg(mCache.str(), mSeverity);
+            mCache.str("");
             return *this;            
         }
 
-        void SetPriority(Severity severity) { m_severity = severity; }
+        void SetSeverity(Severity severity) { mSeverity = severity; }
     
     private:
-        std::stringstream m_cache;
-        Severity m_severity;
-    };
+        std::stringstream mCache;
+        Severity mSeverity;
+    } mStream;
 
-    static void      Create (const std::string & filename);
-    static void      Destroy();
-    static void      Msg(const std::string & msg, Severity severity = Severity::Verbose);
-    static LogStream Stream(Severity severity = Severity::Verbose);
-
-private:
-    Log(void);
-    static Log *m_instance;
-
+    static Log* mInstance;
+    std::ofstream mOutput;
+    
+    Log() {}
     void logMsg(const std::string & msg, Severity severity);
 
-    LogStream m_stream;
+public:
+    ~Log();
+    static void       Create (const std::string & filename);
+    static void       Destroy();
+    static void       Msg(const std::string & msg, Severity severity = Severity::Verbose);
+    static LogStream  Stream(Severity severity = Severity::Verbose);
 
-    std::ofstream m_output;
+    
+    // --- shortcuts ---
+    static void       V(const std::string & msg) { Msg(msg, Severity::Verbose); }
+    static void       D(const std::string & msg) { Msg(msg, Severity::Debug); }
+    static void       I(const std::string & msg) { Msg(msg, Severity::Info); }
+    static void       W(const std::string & msg) { Msg(msg, Severity::Warn); }
+    static void       E(const std::string & msg) { Msg(msg, Severity::Error); }
+       
+    static LogStream  V() { return Stream(Severity::Verbose); }
+    static LogStream  D() { return Stream(Severity::Debug  ); }
+    static LogStream  I() { return Stream(Severity::Info   ); }
+    static LogStream  W() { return Stream(Severity::Warn   ); }
+    static LogStream  E() { return Stream(Severity::Error  ); }
 };

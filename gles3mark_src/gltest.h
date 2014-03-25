@@ -2,20 +2,11 @@
 
 #pragma once
 
-#ifdef _WIN32
-
-#include <GL/glew.h>
-#pragma comment(lib, "glew32.lib")
-#include <GL/GL.h>
-#pragma comment(lib, "opengl32.lib")
-#else
-//#include <GLES3/gl3.h> // TODO glimports.h
-#include "gl3stub.h"
-#endif
-
 #include "log.h"
 #include "assetmanager.h"
 #include "modelimporter.h"
+#include "camera.h"
+#include "glhelper.h"
 
 #include <string>
 #include <vector>
@@ -24,6 +15,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 
 // House indices
@@ -97,6 +89,9 @@ class GLTest {
     float rx, ry, pz;
     float wheel;
     int width, height;
+
+    Camera camera;
+    glm::quat rot;
     
 public:
     
@@ -105,9 +100,9 @@ public:
     ~GLTest() {    }
 
     int value = 5;
+
     
     bool OnInit(AssetManager* assetManager) {
-
         int tgaWidth, tgaHeight;
         char* tgaData;
         try {            
@@ -119,18 +114,13 @@ public:
 
 
             // init gl here
-#ifdef _WIN32
-            GLenum error = glewInit();
-            if (error != GLEW_OK)
-                Log::Msg("!!!! GLEW ERROR !!!!");
-#else
-            if (!gl3stubInit())
-                Log::Msg("!!!! GL stub init failed !!!!");
-#endif
-            VS = compileShader(GL_VERTEX_SHADER, assetManager->LoadText("shaders/simple-vs.glsl"));
-            FS = compileShader(GL_FRAGMENT_SHADER, assetManager->LoadText("shaders/simple-fs.glsl"));
+            GLHelper::InitGL();
+            GLHelper::GLInfo();
 
-            Prog = linkShader({ VS, FS });
+            VS = GLHelper::compileShader(GL_VERTEX_SHADER, assetManager->LoadText("shaders/simple-vs.glsl"));
+            FS = GLHelper::compileShader(GL_FRAGMENT_SHADER, assetManager->LoadText("shaders/simple-fs.glsl"));
+
+            Prog = GLHelper::linkShader({ VS, FS });
 
         }
         catch (std::exception &e) {
@@ -154,6 +144,9 @@ public:
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tgaWidth, tgaHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, tgaData);
+
+
+        camera.Move(glm::vec3(0, 0, -70.f));
         
         return true;
     }
@@ -176,22 +169,14 @@ public:
         glUseProgram(Prog);
 
         //MVP
-        glm::mat4 projection;
-
         float aspect = (float)width / (float)height;
+        glm::mat4 projection = glm::perspective(0.785f, aspect, 1.0f, 1000.0f);
 
-        projection = glm::perspective(0.785f, aspect, 1.0f, 1000.0f);
-
-        glm::mat4 mvp = glm::rotate(
-            glm::rotate(
-            glm::translate(
-            projection,
-            glm::vec3(0, 0, pz)
-            ),
-            ry, glm::vec3(1, 0, 0)
-            ),
-            rx, glm::vec3(0, 1, 0)
-            );
+        rot = glm::rotate(rot, 0.03f, glm::vec3(0, 1, 0));
+        glm::mat4 model = glm::mat4_cast(rot);    //glm::rotate(glm::rotate(glm::mat4(), ry, glm::vec3(1, 0, 0)), rx, glm::vec3(0, 1, 0));
+        glm::mat4 view = camera.GetMatrix();
+        
+        glm::mat4 mvp = projection * view * model; //glm::rotate( glm::rotate(  glm::translate( projection,  glm::vec3(0, 0, pz)     ),  ry, glm::vec3(1, 0, 0)   ), rx, glm::vec3(0, 1, 0)       );
 
         glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, glm::value_ptr(mvp));
 
@@ -217,116 +202,4 @@ public:
         rx += 0.03f;
 
     }
-
-    GLuint compileShader(GLenum type, const std::string& source) {
-        GLuint shader = glCreateShader(type);
-        if (shader == 0)
-            throw std::runtime_error("glCreateShader failed");
-
-#ifdef _WIN32
-        std::string verSrc = "#version 330\n" + source;
-#else
-        std::string verSrc = "#version 300 es\n" + source;
-#endif
-        const char *c_str = verSrc.c_str();
-        glShaderSource(shader, 1, &c_str, nullptr);
-        glCompileShader(shader);
-
-        Log::Msg("Compile shader: " + getShaderInfoLog(shader));
-
-        int compileStatus;
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
-
-        if (compileStatus == GL_FALSE) {
-            glDeleteShader(shader);
-            throw std::runtime_error("shader compilation failed");
-        }            
-        
-        return shader;
-    }
-
-    GLuint linkShader(std::initializer_list<GLuint> shaders) {  // size_t count, ...
-        GLuint program = glCreateProgram();
-        if (program == 0)
-            throw std::runtime_error("glCreateProgram failed");
-
-        //    // Attach arguments
-        //    va_list args;
-        //    va_start(args, count);
-        //    for (size_t i = 0; i < count; ++i) {
-        //        glAttachShader(program, va_arg(args, GLuint));
-        //    }
-        //    va_end(args);
-
-        for (GLuint shader : shaders) {
-            glAttachShader(program, shader);
-        }
-
-        // Link program and check for errors
-        glLinkProgram(program);
-        
-        Log::Msg("Link shaders: " + getProgramInfoLog(program));
-
-        int linkStatus;
-        glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
-
-        if (linkStatus == GL_FALSE) {
-            glDeleteProgram(program);
-            throw std::runtime_error("shader linking failed");
-        }
-
-        return program;
-    }
-
-    // Info logs contain errors and warnings from shader compilation and linking
-    std::string getShaderInfoLog(GLuint shader) {
-        //assert(glIsShader(shader));
-
-        GLint length;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-        
-        std::vector<GLchar> log(length);
-        glGetShaderInfoLog(shader, length, nullptr, &log[0]);
-
-        //assert(glGetError() == GL_NO_ERROR);
-
-        return std::string(&log[0], log.size());
-    }
-
-    std::string getProgramInfoLog(GLuint program) {
-        //assert(glIsProgram(program));
-        
-        GLint length;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-        
-        std::vector<GLchar> log(length);
-        glGetProgramInfoLog(program, length, nullptr, &log[0]);
-
-        //assert(glGetError() == GL_NO_ERROR);
-
-        return std::string(&log[0], log.size());
-    }
-
-
-    struct GL_Exception : public std::runtime_error {
-        GL_Exception(const GLenum error = glGetError()) throw()
-            : std::runtime_error("OpenGL: " + getGlErrorString(error)) {}
-        GL_Exception(const std::string& text, const GLenum error = glGetError()) throw()
-            : std::runtime_error("OpenGL: " + text + " : " + getGlErrorString(error)) {}
-        
-        std::string getGlErrorString(GLenum error) {
-#define GLERROR(e) case e : return std::string(#e)
-            switch (error) {
-                GLERROR(GL_NO_ERROR);
-                GLERROR(GL_INVALID_ENUM);
-                GLERROR(GL_INVALID_VALUE);
-                GLERROR(GL_INVALID_OPERATION);
-                GLERROR(GL_INVALID_FRAMEBUFFER_OPERATION);
-                GLERROR(GL_OUT_OF_MEMORY);
-                default: return std::string("UNKNOWN_GL_ERROR");
-            }
-#undef GLERROR
-        }
-    };
-
 };

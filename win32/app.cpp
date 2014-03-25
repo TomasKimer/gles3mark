@@ -47,8 +47,7 @@ void App::DLL::Init(const std::string& path) {
         std::stringstream ss;
         ss << GetLastError();
         throw std::runtime_error("LoadLibrary failed : " + path + "\nCode: " + ss.str());
-    }
-        
+    }        
 
     DllInit   = reinterpret_cast<DLLInitT  >(GetProcAddress(dllHandle, "DLL_init"  ));
     DllResize = reinterpret_cast<DLLResizeT>(GetProcAddress(dllHandle, "DLL_resize"));
