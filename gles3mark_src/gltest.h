@@ -86,22 +86,17 @@ class GLTest {
     GLuint texture;
     GLuint positionAttrib, tcAttrib, mvpUniform, textureUniform;
 
-    float rx, ry, pz;
-    float wheel;
     int width, height;
 
-    Camera camera;
+
     glm::quat rot;
     
 public:
+    Camera camera;
     
-    GLTest() { rx = 0.0f; ry = 0.0f; pz = -70.0f; wheel = 5.0f; }
-    
-    ~GLTest() {    }
-
-    int value = 5;
-
-    
+    GLTest()  {}
+    ~GLTest() {}
+        
     bool OnInit(AssetManager* assetManager) {
         int tgaWidth, tgaHeight;
         char* tgaData;
@@ -111,14 +106,15 @@ public:
             ModelImporter* modelImporter = new ModelImporter();
             ModelImporter::AssimpModel model;
             model.Load(*assetManager, "e112.3ds");
+            model.Process();
 
 
             // init gl here
             GLHelper::InitGL();
             GLHelper::GLInfo();
 
-            VS = GLHelper::compileShader(GL_VERTEX_SHADER, assetManager->LoadText("shaders/simple-vs.glsl"));
-            FS = GLHelper::compileShader(GL_FRAGMENT_SHADER, assetManager->LoadText("shaders/simple-fs.glsl"));
+            VS = GLHelper::compileShader(GL_VERTEX_SHADER, assetManager->LoadText("shaders/simple.vert"));
+            FS = GLHelper::compileShader(GL_FRAGMENT_SHADER, assetManager->LoadText("shaders/simple.frag"));
 
             Prog = GLHelper::linkShader({ VS, FS });
 
@@ -147,6 +143,11 @@ public:
 
 
         camera.Move(glm::vec3(0, 0, -70.f));
+
+
+        glEnable(GL_DEPTH_TEST);
+        //glDepthFunc(GL_LESS);
+        //glClearColor(1.f, 0.f, 1.f, 1.f);
         
         return true;
     }
@@ -155,28 +156,24 @@ public:
     	glViewport(0, 0, w, h);
     	width = w;
     	height = h;
+        camera.Perspective(glm::radians(60.0f), static_cast<float>(width) / height, 1.0f, 1000.0f);
+        //camera.Orthographic(0, static_cast<float>(w), 0, static_cast<float>(h), -1.0f, 1.0f);
     }
 
     void OnStep() {
-        // draw here
-
-        //glClearColor(1.f, 0.f, 1.f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
+        // draw here       
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);        
 
         glUseProgram(Prog);
 
         //MVP
-        float aspect = (float)width / (float)height;
-        glm::mat4 projection = glm::perspective(0.785f, aspect, 1.0f, 1000.0f);
+        glm::mat4& projection = camera.GetProjectionMatrix();
+        glm::mat4  view       = camera.GetViewMatrix();
 
         rot = glm::rotate(rot, 0.03f, glm::vec3(0, 1, 0));
-        glm::mat4 model = glm::mat4_cast(rot);    //glm::rotate(glm::rotate(glm::mat4(), ry, glm::vec3(1, 0, 0)), rx, glm::vec3(0, 1, 0));
-        glm::mat4 view = camera.GetMatrix();
+        glm::mat4 model = glm::mat4_cast(rot);        
         
-        glm::mat4 mvp = projection * view * model; //glm::rotate( glm::rotate(  glm::translate( projection,  glm::vec3(0, 0, pz)     ),  ry, glm::vec3(1, 0, 0)   ), rx, glm::vec3(0, 1, 0)       );
+        glm::mat4 mvp = projection * view * model;
 
         glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, glm::value_ptr(mvp));
 
@@ -197,9 +194,5 @@ public:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
         glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(house[0]), GL_UNSIGNED_BYTE, nullptr);  // sizeof house / sizeof house[0]
-
-        //ry += 0.1f;
-        rx += 0.03f;
-
     }
 };

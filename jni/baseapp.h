@@ -54,13 +54,14 @@ class BaseApp {
 	int32_t HandleInput(AInputEvent* event);
 
 protected:
+	int score;
 
 	virtual void OnStartup() {}
 	virtual void OnQuit()   {}
 	virtual void OnResize(int w, int h) {}
-	virtual void OnIdle() {
+	virtual bool OnIdle() {
 		//if (!glContext->HasDisplay()) return;
-		gles3mark->OnStep();
+		return gles3mark->OnStep();
 	}
 
 	void Exit(int score);

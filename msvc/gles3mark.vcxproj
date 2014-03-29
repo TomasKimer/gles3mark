@@ -14,6 +14,7 @@
     <ClInclude Include="..\gles3mark_src\assetfile.h" />
     <ClInclude Include="..\gles3mark_src\assetmanager.h" />
     <ClInclude Include="..\gles3mark_src\camera.h" />
+    <ClInclude Include="..\gles3mark_src\gameobject.h" />
     <ClInclude Include="..\gles3mark_src\gl3context_egl.h" />
     <ClInclude Include="..\gles3mark_src\gl3context_wgl.h" />
     <ClInclude Include="..\gles3mark_src\gl3stub.h" />
@@ -21,6 +22,7 @@
     <ClInclude Include="..\gles3mark_src\gles3mark.h" />
     <ClInclude Include="..\gles3mark_src\glhelper.h" />
     <ClInclude Include="..\gles3mark_src\gltest.h" />
+    <ClInclude Include="..\gles3mark_src\inputmanager.h" />
     <ClInclude Include="..\gles3mark_src\log.h" />
     <ClInclude Include="..\gles3mark_src\modelimporter.h" />
   </ItemGroup>
@@ -37,8 +39,8 @@
     <ClCompile Include="..\win32\gles3mark_dll.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\assets\shaders\simple-fs.glsl" />
-    <None Include="..\assets\shaders\simple-vs.glsl" />
+    <None Include="..\assets\shaders\simple.frag" />
+    <None Include="..\assets\shaders\simple.vert" />
     <None Include="gles3mark_dll.def" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

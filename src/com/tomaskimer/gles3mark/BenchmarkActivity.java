@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 public class BenchmarkActivity extends NativeActivity {
 
-	int score;
+	//int score;
 	
 	static {
 		System.loadLibrary("gles3mark");
@@ -21,7 +21,7 @@ public class BenchmarkActivity extends NativeActivity {
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		//Log.v("NativeSubclass", "onCreate");
-		score = 0;
+		//score = 0;
 	}
 	
 	@Override
@@ -53,8 +53,8 @@ public class BenchmarkActivity extends NativeActivity {
 //        		if (getParent() == null) setResult(Activity.RESULT_OK, resultData);
 //        		else getParent().setResult(Activity.RESULT_OK, resultData);
             	
-            	score = finalScore;
-            	//finish();
+            	//score = finalScore;
+            	finish();
             }
         });
     }

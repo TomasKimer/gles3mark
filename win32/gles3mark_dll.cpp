@@ -25,8 +25,20 @@ void DLL_resize(int width, int height) {
         gles3mark->OnResize(width, height);
 }
 
-void DLL_step() {
-    gles3mark->OnStep();
+bool DLL_step() {
+    return gles3mark->OnStep();
+}
+
+void DLL_keyDown(int key) {
+    gles3mark->OnKeyDown(key);
+}
+
+void DLL_keyUp(int key) {
+    gles3mark->OnKeyUp(key);
+}
+
+void DLL_mouseMove(int x, int y, int dx, int dy) {
+    gles3mark->OnMouseMove(x, y, dx, dy);
 }
 
 /*

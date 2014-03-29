@@ -39,5 +39,6 @@ public:
             : std::runtime_error("OpenGL: " + text + " : " + getGlErrorString(error)) {}
 
         std::string getGlErrorString(GLenum error);
+        // TODO https://www.khronos.org/opengles/sdk/docs/man/xhtml/glCheckFramebufferStatus.xml
     };
 };

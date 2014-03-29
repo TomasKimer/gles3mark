@@ -7,7 +7,7 @@
 
 
 BaseApp::BaseApp(android_app* _state)
-	: state(_state), animating(false), quit(false) {
+	: state(_state), animating(false), quit(false), score(0) {
 
 	Log::Msg("<<- MAIN START ->>");
 
@@ -45,12 +45,13 @@ void BaseApp::Run() {
 		while ((ident = ALooper_pollAll(animating ? 0 : -1, nullptr, &events, (void**)&source)) >= 0) {
 
 			// Process this event.
-			if (source != nullptr) {
+			if (source) {
 				source->process(state, source);
 			}
 
 			// If a sensor has data, process it now.
 			if (ident == LOOPER_ID_USER) {
+				Log::Msg("LOOPER_ID_USER");
 			}
 
 			// Check if we are exiting.  Which is the case once we called ANativeActivity_finish
@@ -68,16 +69,20 @@ void BaseApp::Run() {
 		}
 
 		// Done with events; draw next animation frame.
-		if (animating) {
+		if (animating && !quit) {
 			// Update game state
 
 			// Drawing is throttled to the screen update rate, so there is no need to do timing here.
-			OnIdle();
+			if (!OnIdle()) {
+				quit = true;
+				jmethodID FinishMe = env->GetMethodID(clazz, "FinishMe", "(I)V");
+				env->CallVoidMethod(thiz, FinishMe, gles3mark->GetScore());
+			}
 		}
 
 		// if our app told us to finish
 		if (quit) {
-			ANativeActivity_finish(state->activity);
+			//ANativeActivity_finish(state->activity);   // Failed writing to work fd: Try again
 		}
 	}
 }
@@ -86,15 +91,40 @@ void BaseApp::Run() {
  * Process the next input event.
  */
 int32_t BaseApp::HandleInput(AInputEvent* event) {
-	if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
-		animating = !animating;
-		savedState.x = AMotionEvent_getX(event, 0);
-		savedState.y = AMotionEvent_getY(event, 0);
+	if (quit)
+		return 0;
 
-		Exit(934);
+	if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
+		//animating = !animating
+		int x = AMotionEvent_getX(event, 0);
+		int y = AMotionEvent_getY(event, 0);
+
+		if (AMotionEvent_getAction(event) == AMOTION_EVENT_ACTION_DOWN) {
+			if (x > 0 && x < 100 && y > 0 && y < 100) {
+				gles3mark->OnKeyDown(InputManager::KeyCode::Escape);
+				Log::E("keydown exit");
+				return 0;
+			}
+
+			savedState.x = x;
+			savedState.y = y;
+		}
+		else if (AMotionEvent_getAction(event) == AMOTION_EVENT_ACTION_UP) {
+
+		}
+		else if (AMotionEvent_getAction(event) == AMOTION_EVENT_ACTION_MOVE) {
+			int dx = x - savedState.x;
+			int dy = y - savedState.y;
+
+			gles3mark->OnMouseMove(x, y, dx, dy);
+
+			savedState.x = x;
+			savedState.y = y;
+		}
 
 		return 1;
 	}
+
 	return 0;
 }
 

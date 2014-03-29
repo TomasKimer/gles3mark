@@ -4,3 +4,6 @@ EXPORTS
 	DLL_init @1
 	DLL_resize @2
 	DLL_step @3
+	DLL_keyDown @4
+	DLL_keyUp @5
+	DLL_mouseMove @6

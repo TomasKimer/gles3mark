@@ -35,8 +35,11 @@ protected:
     // HANDLERS
     virtual void    OnStartup()             { SetupWindow(1280, 720);   }
     virtual void    OnQuit()                { DestroyWindow(); Exit(0); }
-    virtual void    OnIdle()                {                           }
+    virtual bool    OnIdle()                { return true;              }
     virtual void    OnResize(int w, int h)  { width = w, height = h;    }
+    virtual void    OnKeyDown(int key)      { }
+    virtual void    OnKeyUp  (int key)      { }
+    virtual void    OnMouseMove(int x, int y, int dx, int dy) { }
 
 public:
     BaseApp(HINSTANCE hInstance, LPSTR cmdLine);

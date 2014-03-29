@@ -30,8 +30,8 @@ void App::OnQuit() {
     dll.Free();
 }
 
-void App::OnIdle() {
-    dll.DllStep();
+bool App::OnIdle() {
+    return dll.DllStep();
 }
 
 void App::OnResize(int w, int h) {
@@ -39,6 +39,17 @@ void App::OnResize(int w, int h) {
     dll.DllResize(w, h);
 }
 
+void App::OnKeyDown(int key) {
+    dll.DllKeyDown(key);
+}
+
+void App::OnKeyUp(int key) {
+    dll.DllKeyUp(key);
+}
+
+void App::OnMouseMove(int x, int y, int dx, int dy) {
+    dll.DllMouseMove(x, y, dx, dy);
+}
 
 void App::DLL::Init(const std::string& path) {
     dllHandle = LoadLibrary(path.c_str());
@@ -49,11 +60,14 @@ void App::DLL::Init(const std::string& path) {
         throw std::runtime_error("LoadLibrary failed : " + path + "\nCode: " + ss.str());
     }        
 
-    DllInit   = reinterpret_cast<DLLInitT  >(GetProcAddress(dllHandle, "DLL_init"  ));
-    DllResize = reinterpret_cast<DLLResizeT>(GetProcAddress(dllHandle, "DLL_resize"));
-    DllStep   = reinterpret_cast<DLLStepT  >(GetProcAddress(dllHandle, "DLL_step"  ));
+    DllInit      = reinterpret_cast<DLLInitT     >(GetProcAddress(dllHandle, "DLL_init"     ));
+    DllResize    = reinterpret_cast<DLLResizeT   >(GetProcAddress(dllHandle, "DLL_resize"   ));
+    DllStep      = reinterpret_cast<DLLStepT     >(GetProcAddress(dllHandle, "DLL_step"     ));
+    DllKeyDown   = reinterpret_cast<DLLKeyDownT  >(GetProcAddress(dllHandle, "DLL_keyDown"  ));
+    DllKeyUp     = reinterpret_cast<DLLKeyUpT    >(GetProcAddress(dllHandle, "DLL_keyUp"    ));
+    DllMouseMove = reinterpret_cast<DLLMouseMoveT>(GetProcAddress(dllHandle, "DLL_mouseMove"));
 
-    if (!DllInit || !DllResize || !DllStep) {
+    if (!DllInit || !DllResize || !DllStep || !DllKeyDown || !DllKeyUp || !DllMouseMove) {
         FreeLibrary(dllHandle);
         throw std::runtime_error("GetProcAddress failed!");
     }

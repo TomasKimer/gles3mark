@@ -18,6 +18,7 @@ static const char* TAG = "gles3mark log";
 Log* Log::mInstance = nullptr;
 
 Log::~Log(void) {
+    mInstance->logMsg("Log destroyed.", Severity::Verbose);
     if (mInstance->mOutput.is_open())
         mInstance->mOutput.close();
 }
@@ -27,6 +28,7 @@ void Log::Create(const std::string & filename = "app.log") {
         mInstance = new Log();
 #ifndef ANDROID
         mInstance->mOutput.open(filename.c_str(), std::ios::out);
+        mInstance->logMsg("Log created.", Severity::Verbose);
         if (mInstance->mOutput.fail())
             mInstance->logMsg("Failed to open Log file " + filename + " for writing", Severity::Warn);
 #endif
@@ -81,7 +83,7 @@ void Log::logMsg(const std::string & msg, Severity severity) {
     }
 
     std::cerr << timestamp.str() << sseverity << msg << '\n';    //OutputDebugString(msg.c_str());
-    if (mOutput.is_open()) {
+    if (mOutput.is_open() /*&& severity == Severity::Verbose*/) {
         mOutput << timestamp.str() << sseverity << msg << '\n';  // std::endl ?
         mOutput.flush();
     }

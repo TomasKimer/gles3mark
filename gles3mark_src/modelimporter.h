@@ -14,17 +14,20 @@ class ModelImporter {
 public:
     class AssimpModel {
 
-        Assimp::Importer importer;
+        Assimp::Importer importer; // !! must be alive during the scene processing
         const aiScene* scene;
 
     public:
         void Load(AssetManager& assetManager, const std::string& fileName) {
             std::vector<char> rawModelData = assetManager.LoadContents("models/" + fileName);
+           
             scene = importer.ReadFileFromMemory(&rawModelData[0], rawModelData.size(), aiProcessPreset_TargetRealtime_Quality);
             if (!scene) {
                 throw std::runtime_error("Failed to load model: " + fileName + " - " + importer.GetErrorString());
             }
+        }
 
+        void Process() {
             for (unsigned int i = 0; i < scene->mNumMeshes; i++) { // ++i?
                 const aiMesh* mesh = scene->mMeshes[i];
                 Log::Stream() << "Mesh " << i << " - Vertices: " << mesh->mNumVertices << ", faces: " << mesh->mNumFaces;  // normals, uv

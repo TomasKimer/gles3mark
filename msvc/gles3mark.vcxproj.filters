@@ -54,6 +54,12 @@
     <ClInclude Include="..\gles3mark_src\glhelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\gles3mark_src\gameobject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark_src\inputmanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\win32\gles3mark_dll.cpp">
@@ -91,10 +97,10 @@
     <None Include="gles3mark_dll.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\assets\shaders\simple-fs.glsl">
+    <None Include="..\assets\shaders\simple.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="..\assets\shaders\simple-vs.glsl">
+    <None Include="..\assets\shaders\simple.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>

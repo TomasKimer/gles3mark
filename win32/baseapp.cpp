@@ -1,5 +1,6 @@
 
 
+//#include <windowsx.h>
 #include "baseapp.h"
 
 
@@ -97,19 +98,18 @@ LRESULT CALLBACK BaseApp::SystemWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
     BaseApp* self;
 
     if (msg == WM_NCCREATE) {
-        self = static_cast<BaseApp*>(((LPCREATESTRUCT)lp)->lpCreateParams);
+        self = reinterpret_cast<BaseApp*>((reinterpret_cast<LPCREATESTRUCT>(lp))->lpCreateParams);
 
         if (self) {
-            SetWindowLongPtr(hwnd, 0, (LONG_PTR)self);
+            SetWindowLongPtr(hwnd, 0, reinterpret_cast<LONG_PTR>(self));
             self->hWnd = hwnd;
         }
     }
     else {
-        self = (BaseApp*)GetWindowLongPtr(hwnd, 0); // UPInt
+        self = reinterpret_cast<BaseApp*>(GetWindowLongPtr(hwnd, 0)); // UPInt
     }
 
-    return self ? self->WindowProc(msg, wp, lp) :
-        DefWindowProc(hwnd, msg, wp, lp);
+    return self ? self->WindowProc(msg, wp, lp) : DefWindowProc(hwnd, msg, wp, lp);
 }
 
 LRESULT BaseApp::WindowProc(UINT msg, WPARAM wp, LPARAM lp) {
@@ -126,9 +126,47 @@ LRESULT BaseApp::WindowProc(UINT msg, WPARAM wp, LPARAM lp) {
             ::SetCursor(hCursor);
             return 0;
 
-        case WM_MOUSEMOVE:
+        case WM_MOUSEMOVE: {
+                LONG dx = 0, dy = 0;
+                POINT newPos = { LOWORD(lp), HIWORD(lp) };  // GET_X_LPARAM(lp)   GET_Y_LPARAM(lp)
+                if (wp & MK_RBUTTON) {                
+                    ::ClientToScreen(hWnd, &newPos);
+                    if (newPos.x == windowCenter.x && newPos.y == windowCenter.y)
+                        break;
+                    ::SetCursorPos(windowCenter.x, windowCenter.y);
 
+                    dx = newPos.x - windowCenter.x;
+                    dy = newPos.y - windowCenter.y;
+                }
+                OnMouseMove(newPos.x, newPos.y, dx, dy);
+            }
+            break;
 
+        case WM_RBUTTONDOWN:  // called once per down
+        //case WM_LBUTTONDOWN:
+        //case WM_MBUTTONDOWN:
+            ::SetCapture(hWnd);
+            ShowCursor(FALSE);
+            ::SetCursorPos(windowCenter.x, windowCenter.y);
+            break;
+        
+        case WM_RBUTTONUP:
+        //case WM_LBUTTONUP:
+        //case WM_MBUTTONUP:
+            ReleaseCapture();
+            ShowCursor(TRUE);
+            break;
+
+        case WM_MOUSEWHEEL:
+            break;
+            
+        case WM_KEYDOWN:
+            if (!(lp & (1 << 30)))  // if key was already down, do nothing
+                OnKeyDown(wp);  // MapVirtualKey(wp, MAPVK_VK_TO_CHAR)
+            break;
+
+        case WM_KEYUP:
+            OnKeyUp(wp);
             break;
 
         case WM_MOVE: {
@@ -184,7 +222,7 @@ int BaseApp::Run() {
 
     OnStartup();
 
-    if (hWnd == nullptr) {
+    if (!hWnd) {
         return exitCode;
     }
 
@@ -195,7 +233,10 @@ int BaseApp::Run() {
             DispatchMessage(&msg);
         }
         else {
-            OnIdle();
+            if (!OnIdle()) {
+                OnQuit();
+                quit = true;
+            }
             
             if (IsIconic(hWnd)) {
                 Sleep(10);
