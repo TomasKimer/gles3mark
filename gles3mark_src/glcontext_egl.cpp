@@ -1,18 +1,18 @@
 #ifdef ANDROID
 
-#include "gl3context_egl.h"
+#include "glcontext_egl.h"
 
 /**
  * Initialize an EGL context for the current display.
  */
-bool GL3ContextEGL::Create(void* osWnd) {
+bool GLContextEGL::Create(void* osWnd) {
 	window = (ANativeWindow*)osWnd;
 
 	EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);  //eglGetCurrentDisplay()
 
 	EGLint major, minor;
 	eglInitialize(display, &major, &minor);
-	//LOGI("EGL Initialized: %d.%d", major, minor);
+	//LOGI("EGL Initialized: %d.%d", major, minor);  // TODO log?
 
 	/*
 	 * Here specify the attributes of the desired configuration.
@@ -53,12 +53,8 @@ bool GL3ContextEGL::Create(void* osWnd) {
 	EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, contextAttrs);  // NULL, NULL
 
 	if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
-		//LOGW("Unable to eglMakeCurrent");
 		return false; //-1
 	}
-
-	// Turn off vsync - 0
-	//eglSwapInterval(display, 1);
 
 	EGLint w, h;
 	eglQuerySurface(display, surface, EGL_WIDTH, &w);
@@ -71,25 +67,17 @@ bool GL3ContextEGL::Create(void* osWnd) {
 	this->mWidth = w;
 	this->mHeight = h;
 
-	// Initialize GL state.
-	//glDisable(GL_DEPTH_TEST);
-	//if (!gl3stubInit())
-	//	return false;//LOGW("GL3 stub init failed");
-	//glVersion = (const char*)glGetString(GL_VERSION);
-	//LOGI("OpenGL initialized: %s", glVersion);
-	//LOGI("Renderer: %s %s", (const char*)glGetString(GL_VENDOR), (const char*)glGetString(GL_RENDERER));
-
 	return true; //0
 }
 
-bool GL3ContextEGL::HasDisplay() {
+bool GLContextEGL::HasDisplay() {
 	return display != nullptr;
 }
 
 /**
  * Tear down the EGL context currently associated with the display.
  */
-void GL3ContextEGL::Destroy() {
+void GLContextEGL::Destroy() {
 	if (display != EGL_NO_DISPLAY) {
 		eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 		if (context != EGL_NO_CONTEXT) {
@@ -105,13 +93,13 @@ void GL3ContextEGL::Destroy() {
 	surface = EGL_NO_SURFACE;
 }
 
-void GL3ContextEGL::Resize(int w, int h, bool vsync) {
+void GLContextEGL::Resize(int w, int h, bool vsync) {
 	mWidth = w;
 	mHeight = h;
 
-	eglSwapInterval(display, (int)vsync);
+	eglSwapInterval(display, (int)vsync);  	// Turn off vsync - 0
 }
-void GL3ContextEGL::Swap() /*override*/ {
+void GLContextEGL::Swap() /*override*/ {
 	eglSwapBuffers(display, surface);
 }
 

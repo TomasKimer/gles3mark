@@ -1,8 +1,12 @@
 #ifdef _WIN32
 
-#include "gl3context_wgl.h"
+#include <GL/glew.h>
+#include <GL/wglew.h>
+#pragma comment(lib, "glew32.lib")
 
-bool GL3ContextWGL::Create(void* osWnd) {
+#include "glcontext_wgl.h"
+
+bool GLContextWGL::Create(void* osWnd) {
     window = (HWND)osWnd;
 
     PIXELFORMATDESCRIPTOR pfd;
@@ -33,20 +37,10 @@ bool GL3ContextWGL::Create(void* osWnd) {
         return false;
     }
 
-    /*glewInit();
-    if (WGLEW_EXT_swap_control)     // if (wglewIsSupported("WGL_EXT_swap_control"))
-    wglSwapIntervalEXT(0);*/
-
-    // !!! TODO !!!
-    //if (GLEW_VERSION_3_3) {
-    /* Yay! OpenGL 3.3 is supported! */
-    // http://glew.sourceforge.net/basic.html
-    //}
-
     return true;
 }
 
-void GL3ContextWGL::Destroy() {
+void GLContextWGL::Destroy() {
     if (wglContext) {
         wglMakeCurrent(nullptr, nullptr);
         wglDeleteContext(wglContext);
@@ -57,15 +51,15 @@ void GL3ContextWGL::Destroy() {
     }
 }
 
-void GL3ContextWGL::Resize(int w, int h, bool vsync) {
+void GLContextWGL::Resize(int w, int h, bool vsync) {
     mWidth = w;
     mHeight = h;
 
-    if (WGLEW_EXT_swap_control)
+    if (WGLEW_EXT_swap_control)  // if (wglewIsSupported("WGL_EXT_swap_control"))
         wglSwapIntervalEXT(vsync ? 1 : 0);
 }
 
-void GL3ContextWGL::Swap() {
+void GLContextWGL::Swap() {
     SwapBuffers(gdiDc);
 }
 

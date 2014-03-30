@@ -5,19 +5,16 @@
 #include "glcontext.h"
 
 #include <windows.h>
-#include <GL/glew.h>
-#include <GL/wglew.h>
-#pragma comment(lib, "glew32.lib")
 
-class GL3ContextWGL : public GLContext {
+class GLContextWGL : public GLContext {
     
     HWND    window;
     HGLRC   wglContext;
     HDC     gdiDc;
 
 public:
-    GL3ContextWGL(): window(nullptr), wglContext(nullptr), gdiDc(nullptr) {};
-    virtual ~GL3ContextWGL() {};
+    GLContextWGL(): window(nullptr), wglContext(nullptr), gdiDc(nullptr) {};
+    virtual ~GLContextWGL() {};
 
     virtual bool Create(void* osWnd) override;
     virtual void Destroy() override;    

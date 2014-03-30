@@ -4,11 +4,11 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include "gl3context_wgl.h"
-typedef GL3ContextWGL GlContext;
+#include "glcontext_wgl.h"
+typedef GLContextWGL GlContext;
 #else
-#include "gl3context_egl.h"
-typedef GL3ContextEGL GlContext;
+#include "glcontext_egl.h"
+typedef GLContextEGL GlContext;
 #endif
 
 #include <string>
@@ -31,10 +31,12 @@ class GLES3Mark {
     GLTest* gltest;
     bool quit;
     unsigned int score;
+    float joystickMoveX;
+    float joystickMoveY;
 
 
 public:
-    GLES3Mark() : glContext(nullptr), quit(false), score(42) {
+    GLES3Mark() : glContext(nullptr), quit(false), score(42), joystickMoveX(0), joystickMoveY(0) {
     	gltest = new GLTest();
     }
 
@@ -101,6 +103,11 @@ public:
         }
     }
 
+    void SetJoystickMove(float x, float y) {
+        joystickMoveX = x;
+        joystickMoveY = y;
+    }
+
     void OnProcessInput() {
         if (inputManager.IsKeyDown(InputManager::KeyCode::W))
             gltest->camera.Move(glm::vec3(0, 0, 1));
@@ -130,6 +137,8 @@ public:
     bool OnStep() {  // TODO return Exit Code
         // draw here
         OnProcessInput();
+        if (joystickMoveX != 0.f || joystickMoveY != 0.f)
+            gltest->camera.Move(glm::vec3(joystickMoveX, 0, joystickMoveY));
 
         if (quit)
             return false;

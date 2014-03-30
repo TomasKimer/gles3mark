@@ -55,6 +55,8 @@ class BaseApp {
 
 protected:
 	int score;
+	int movePointerId, aimPointerId;
+	int moveCenterX, moveCenterY;
 
 	virtual void OnStartup() {}
 	virtual void OnQuit()   {}

@@ -7,7 +7,8 @@
 
 
 BaseApp::BaseApp(android_app* _state)
-	: state(_state), animating(false), quit(false), score(0) {
+	: state(_state), animating(false), quit(false), score(0),
+	  movePointerId(-1), aimPointerId(-1) {
 
 	Log::Msg("<<- MAIN START ->>");
 
@@ -95,31 +96,80 @@ int32_t BaseApp::HandleInput(AInputEvent* event) {
 		return 0;
 
 	if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
-		//animating = !animating
-		int x = AMotionEvent_getX(event, 0);
-		int y = AMotionEvent_getY(event, 0);
 
-		if (AMotionEvent_getAction(event) == AMOTION_EVENT_ACTION_DOWN) {
+		int action = AMotionEvent_getAction(event) & AMOTION_EVENT_ACTION_MASK;
+		int pointerIndex, pointerId, x, y;
+
+		if (action != AMOTION_EVENT_ACTION_MOVE) {
+			pointerIndex = (AMotionEvent_getAction(event) & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+			pointerId = AMotionEvent_getPointerId(event, pointerIndex);
+
+			x = AMotionEvent_getX(event, pointerIndex);
+			y = AMotionEvent_getY(event, pointerIndex);
+		}
+
+		switch (action) {
+		case AMOTION_EVENT_ACTION_DOWN:
+		case AMOTION_EVENT_ACTION_POINTER_DOWN:
+			//Log::D() << "Finger " << pointerId << " down, x: " << x << ", y: " << y;
+
 			if (x > 0 && x < 100 && y > 0 && y < 100) {
-				gles3mark->OnKeyDown(InputManager::KeyCode::Escape);
-				Log::E("keydown exit");
+				gles3mark->OnKeyDown(InputManager::KeyCode::Escape);  // TODO gles3mark->RequestExit() ?
 				return 0;
 			}
 
-			savedState.x = x;
-			savedState.y = y;
-		}
-		else if (AMotionEvent_getAction(event) == AMOTION_EVENT_ACTION_UP) {
+			if (x < gles3mark->GetGLContext()->GetWidth() / 2) {
+				movePointerId = pointerId;
+				moveCenterX = x;
+				moveCenterY = y;
+			}
+			else {
+				aimPointerId = pointerId;
+				savedState.x = x;
+				savedState.y = y;
+			}
 
-		}
-		else if (AMotionEvent_getAction(event) == AMOTION_EVENT_ACTION_MOVE) {
-			int dx = x - savedState.x;
-			int dy = y - savedState.y;
+			break;
 
-			gles3mark->OnMouseMove(x, y, dx, dy);
+		case AMOTION_EVENT_ACTION_UP:
+		case AMOTION_EVENT_ACTION_POINTER_UP:
+		case AMOTION_EVENT_ACTION_CANCEL:
+			//Log::D() << "Finger " << pointerId << " up, x: " << x << ", y: " << y;
 
-			savedState.x = x;
-			savedState.y = y;
+			if (pointerId == movePointerId) {
+				gles3mark->SetJoystickMove(0, 0);
+				movePointerId = -1;
+			}
+			else if (pointerId == aimPointerId) {
+				aimPointerId = -1;
+			}
+
+			break;
+
+		case AMOTION_EVENT_ACTION_MOVE:
+			for (int i = 0; i < AMotionEvent_getPointerCount(event); ++i) {
+				pointerIndex = i;
+				pointerId = AMotionEvent_getPointerId(event, pointerIndex);
+
+				x = AMotionEvent_getX(event, pointerIndex);
+				y = AMotionEvent_getY(event, pointerIndex);
+
+				//Log::D() << "Finger " << pointerId << " move, x: " << x << ", y: " << y;
+
+				if (pointerId == aimPointerId) {
+					int dx = x - savedState.x;
+					int dy = y - savedState.y;
+
+					gles3mark->OnMouseMove(x, y, dx, dy);
+
+					savedState.x = x;
+					savedState.y = y;
+				}
+				else if (pointerId == movePointerId) {
+					gles3mark->SetJoystickMove((moveCenterX - x) * 0.01f, (moveCenterY - y) * 0.01f);
+				}
+			}
+			break;
 		}
 
 		return 1;

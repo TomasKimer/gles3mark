@@ -10,23 +10,32 @@ void GLHelper::InitGL() {
     GLenum error = glewInit();
     if (error != GLEW_OK)
         throw std::runtime_error("GLEW init failed");
+    if (!GLEW_VERSION_3_3)  //  http://glew.sourceforge.net/basic.html
+        throw std::runtime_error("Yay! OpenGL 3.3 is NOT supported!");
 #else
     if (!gl3stubInit())
         throw std::runtime_error("GL stub init failed");
 #endif
+    Log::Msg("OpenGL initialized");
+}
+
+static std::string GLString(GLenum name) {
+    return std::string(reinterpret_cast<const char*>(glGetString(name)));
 }
 
 void GLHelper::GLInfo() {
-    Log::Msg(std::string("GL_VENDOR: ") + reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
-    Log::Msg(std::string("GL_RENDERER: ") + reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
-    Log::Msg(std::string("GL_VERSION: ") + reinterpret_cast<const char*>(glGetString(GL_VERSION)));
-    Log::Msg(std::string("GL_SHADING_LANGUAGE_VERSION: ") + reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
-    //Log::Msg(std::string("GL_EXTENSIONS: ") + reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS)));
+    Log::Msg("GL_VENDOR: "                   + GLString(GL_VENDOR                  ));
+    Log::Msg("GL_RENDERER: "                 + GLString(GL_RENDERER                ));
+    Log::Msg("GL_VERSION: "                  + GLString(GL_VERSION                 ));
+    Log::Msg("GL_SHADING_LANGUAGE_VERSION: " + GLString(GL_SHADING_LANGUAGE_VERSION));
+    //Log::Msg("GL_EXTENSIONS: " + GLString(GL_EXTENSIONS));
 
     // glGet
     // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glGet.xml
     // http://www.opengl.org/sdk/docs/man/html/glGet.xhtml
 }
+
+
 
 GLuint GLHelper::compileShader(GLenum type, const std::string& source) {
     GLuint shader = glCreateShader(type);
@@ -34,7 +43,7 @@ GLuint GLHelper::compileShader(GLenum type, const std::string& source) {
         throw std::runtime_error("glCreateShader failed");
 
 #ifdef _WIN32
-    std::string verSrc = "#version 330\n" + source;
+    std::string verSrc = "#version 330 core\n" + source;
 #else
     std::string verSrc = "#version 300 es\n" + source;
 #endif

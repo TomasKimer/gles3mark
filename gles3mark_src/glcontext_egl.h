@@ -7,15 +7,15 @@
 
 //TODO Unify HWND/ANativeWindow? - #include <EGL/eglplatform.h>, EGL for WIN?
 
-class GL3ContextEGL : public GLContext {
+class GLContextEGL : public GLContext {
 	 EGLDisplay display;
 	 EGLSurface surface;
 	 EGLContext context;
 	 ANativeWindow* window;
 
 public:
-    GL3ContextEGL() {};
-    virtual ~GL3ContextEGL() {};
+    GLContextEGL() {};
+    virtual ~GLContextEGL() {};
 
     /**
      * Initialize an EGL context for the current display.
