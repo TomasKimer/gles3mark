@@ -19,24 +19,38 @@ typedef GLContextEGL GlContext;
 #include "assetmanager.h"
 #include "gltest.h"
 #include "log.h"
-#include "inputmanager.h"
+#include "input.h"
+#include "time.h"
+#include "fpscounter.h"
 
 
+class IGLES3MarkLib {
+public:
+    virtual ~IGLES3MarkLib() = default;
+    virtual bool OnInit(void* osWnd, void* ioContext = nullptr) = 0;
+    virtual void OnResize(int w, int h) = 0;
+    virtual bool OnStep() = 0;
+    virtual unsigned int GetScore() = 0;
+    virtual GlContext* GetGLContext() = 0;  // TODO
+};
 
-class GLES3Mark {
+
+class GLES3Mark : public IGLES3MarkLib, public IInputListener {
 
     AssetManager* assetManager;
-    InputManager inputManager;
+    Input inputManager;
 	GlContext* glContext;
     GLTest* gltest;
     bool quit;
     unsigned int score;
-    float joystickMoveX;
-    float joystickMoveY;
+    
+    glm::vec3 joystickMove;
+    glm::ivec2 joystickMoveCenter;
+    int movePointerId, aimPointerId;
 
 
 public:
-    GLES3Mark() : glContext(nullptr), quit(false), score(42), joystickMoveX(0), joystickMoveY(0) {
+    GLES3Mark() : glContext(nullptr), quit(false), score(42), movePointerId(-2), aimPointerId(-2) {
     	gltest = new GLTest();
     }
 
@@ -47,9 +61,9 @@ public:
     	}
     }
     
-    GlContext* GetGLContext() { return glContext; }
+    GlContext* GetGLContext() override { return glContext; }
 
-    bool OnInit(void* osWnd, void* ioContext = nullptr) {
+    bool OnInit(void* osWnd, void* ioContext = nullptr) override {
     	assetManager = new AssetManager(ioContext);
 
         // init gl here
@@ -60,72 +74,80 @@ public:
 
         //Log::Stream() << "C++ ver: " << (long)__cplusplus;
         
+        
+        StopWatch<std::chrono::high_resolution_clock> sw;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        Log::V() << "Elapsed time: " << sw.elapsed<std::chrono::nanoseconds>() << " nanoseconds";
+        
         //std::atomic<bool> ready (false);
-        std::thread t(doSomeWork);
+        Log::V() << "Concurrent threads supported: " << std::thread::hardware_concurrency();
+        int outParam;
+        std::thread t(doSomeWork, 5, std::ref(outParam));
         t.join();
+        Log::V() << "thread joined, out param: " << outParam;
 
         return true;
     }
 
-    void OnKeyDown(int osKey) {
-        OnKeyDown(InputManager::OsKeyToKeyCode(osKey));
-    }
 
-    void OnKeyUp(int osKey) {
-        OnKeyUp(InputManager::OsKeyToKeyCode(osKey));
-    }
-
-    void OnKeyDown(InputManager::KeyCode keyCode) {   // TODO rename to keyPress
+    void OnKeyDown(Input::KeyCode keyCode) override {   // TODO rename to keyPress
         inputManager.RegisterKeyDown(keyCode);
         
         switch (keyCode) {
-            case InputManager::KeyCode::Escape:
+            case Input::KeyCode::Escape:
                 quit = true;
                 break;
 
-            case InputManager::KeyCode::Return:
+            case Input::KeyCode::Return:
                 gltest->camera.Reset();
                 break;
 
-            case InputManager::KeyCode::Space:
+            case Input::KeyCode::Space:
                 gltest->camera.DebugDump();
                 break;
         }
     }
 
-    void OnKeyUp(InputManager::KeyCode keyCode) {
+    void OnKeyUp(Input::KeyCode keyCode) override {
         inputManager.RegisterKeyUp(keyCode);
     }    
 
-    void OnMouseMove(int x, int y, int dx, int dy) {
-        if (dx != 0 || dy != 0) {
-            gltest->camera.Aim(-dy * 0.001f, -dx * 0.001f);
+    void OnTouchDown(int screenX, int screenY, int pointer = -1, Input::Button button = Input::Button::Default) override {
+        if (pointer == -1) return;
+        
+        if (screenX > 0 && screenX < 100 && screenY > 0 && screenY < 100)
+            quit = true;
+
+        if (screenX < glContext->GetWidth() / 2) {
+            movePointerId = pointer;
+            joystickMoveCenter = glm::ivec2(screenX, screenY);
+        }
+        else {
+            aimPointerId = pointer;
         }
     }
 
-    void SetJoystickMove(float x, float y) {
-        joystickMoveX = x;
-        joystickMoveY = y;
+    void OnTouchUp(int screenX, int screenY, int pointer = -1, Input::Button button = Input::Button::Default) override {
+        if (pointer == movePointerId) {
+            joystickMove = glm::vec3(0);
+            movePointerId = -1;
+        }
+        else if (pointer == aimPointerId) {
+            aimPointerId = -1;
+        }
     }
 
-    void OnProcessInput() {
-        if (inputManager.IsKeyDown(InputManager::KeyCode::W))
-            gltest->camera.Move(glm::vec3(0, 0, 1));
-        if (inputManager.IsKeyDown(InputManager::KeyCode::S))
-            gltest->camera.Move(glm::vec3(0, 0, -1));
-        if (inputManager.IsKeyDown(InputManager::KeyCode::A))
-            gltest->camera.Move(glm::vec3(1, 0, 0));
-        if (inputManager.IsKeyDown(InputManager::KeyCode::D))
-            gltest->camera.Move(glm::vec3(-1, 0, 0));
+    void OnTouchDragged(int x, int y, int dx, int dy, int pointer = -1) override {
+        if (pointer == movePointerId) {
+            joystickMove.x = (joystickMoveCenter.x - x) * 0.01f;
+            joystickMove.z = (joystickMoveCenter.y - y) * 0.01f;
+        }
+        else if (dx != 0 || dy != 0) {
+            gltest->camera.Aim(-dy * 0.001f, -dx * 0.001f);
+        }
     }
-
-    static void doSomeWork(void)
-    {
-    	Log::Msg("thread test: hello from thread...");
-        return;
-    }
-
-    void OnResize(int w, int h) {
+    
+    void OnResize(int w, int h) override {
         if (glContext)
             glContext->Resize(w, h, true);
 
@@ -134,11 +156,11 @@ public:
         Log::V() << "Resize: " << w << ", " << h;
     }
 
-    bool OnStep() {  // TODO return Exit Code
+    bool OnStep() override {  // TODO return Exit Code
         // draw here
         OnProcessInput();
-        if (joystickMoveX != 0.f || joystickMoveY != 0.f)
-            gltest->camera.Move(glm::vec3(joystickMoveX, 0, joystickMoveY));
+        if (joystickMove.x != 0.f || joystickMove.z != 0.f)
+            gltest->camera.Move(joystickMove);
 
         if (quit)
             return false;
@@ -150,7 +172,26 @@ public:
         return true;
     }
 
-    unsigned int GetScore() {
+    unsigned int GetScore() override {
         return score;
+    }
+
+
+private:
+    void OnProcessInput() {
+        if (inputManager.IsKeyDown(Input::KeyCode::W))
+            gltest->camera.Move(glm::vec3(0, 0, 1));
+        if (inputManager.IsKeyDown(Input::KeyCode::S))
+            gltest->camera.Move(glm::vec3(0, 0, -1));
+        if (inputManager.IsKeyDown(Input::KeyCode::A))
+            gltest->camera.Move(glm::vec3(1, 0, 0));
+        if (inputManager.IsKeyDown(Input::KeyCode::D))
+            gltest->camera.Move(glm::vec3(-1, 0, 0));
+    }
+
+    static void doSomeWork(int param, int& outParam) {
+        Log::V() << "thread test: hello from thread, param: " << param;
+        outParam = 42;
+        return;
     }
 };

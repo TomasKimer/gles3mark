@@ -105,7 +105,7 @@ public:
             
             ModelImporter* modelImporter = new ModelImporter();
             ModelImporter::AssimpModel model;
-            model.Load(*assetManager, "e112.3ds");
+            model.Load(*assetManager, "monkey.3ds");
             model.Process();
 
 

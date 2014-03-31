@@ -51,13 +51,19 @@
     <ClInclude Include="..\gles3mark_src\gameobject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark_src\inputmanager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\gles3mark_src\glcontext_egl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gles3mark_src\glcontext_wgl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark_src\time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark_src\input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark_src\fpscounter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -30,15 +30,15 @@ bool DLL_step() {
 }
 
 void DLL_keyDown(int key) {
-    gles3mark->OnKeyDown(key);
+    gles3mark->OnKeyDown(Input::OsKeyToKeyCode(key));
 }
 
 void DLL_keyUp(int key) {
-    gles3mark->OnKeyUp(key);
+    gles3mark->OnKeyUp(Input::OsKeyToKeyCode(key));
 }
 
 void DLL_mouseMove(int x, int y, int dx, int dy) {
-    gles3mark->OnMouseMove(x, y, dx, dy);
+    gles3mark->OnTouchDragged(x, y, dx, dy);
 }
 
 /*

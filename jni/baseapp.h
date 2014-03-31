@@ -8,6 +8,7 @@
 
 #include <android_native_app_glue.h>
 #include <memory>
+#include <vector>
 #include "../gles3mark_src/gles3mark.h"
 
 /**
@@ -27,9 +28,9 @@ class BaseApp {
 	/**
 	 * Our saved state data.
 	 */
-	struct SavedState {
+	struct Point {
 		int x, y;
-		SavedState():x(0),y(0){}
+		Point():x(0),y(0){}
 	} savedState;
 
 
@@ -54,9 +55,8 @@ class BaseApp {
 	int32_t HandleInput(AInputEvent* event);
 
 protected:
-	int score;
-	int movePointerId, aimPointerId;
-	int moveCenterX, moveCenterY;
+	//int score;
+	std::vector<Point> touchDragPoints;
 
 	virtual void OnStartup() {}
 	virtual void OnQuit()   {}
@@ -65,8 +65,6 @@ protected:
 		//if (!glContext->HasDisplay()) return;
 		return gles3mark->OnStep();
 	}
-
-	void Exit(int score);
 
 	// JNI is running the equivalent of the following Java code: activity.showToastAlert(text);
 	bool showToast(const char* text);

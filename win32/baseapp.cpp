@@ -138,7 +138,7 @@ LRESULT BaseApp::WindowProc(UINT msg, WPARAM wp, LPARAM lp) {
                     dx = newPos.x - windowCenter.x;
                     dy = newPos.y - windowCenter.y;
                 }
-                OnMouseMove(newPos.x, newPos.y, dx, dy);
+                OnMouseMove(LOWORD(lp), HIWORD(lp), dx, dy);
             }
             break;
 
@@ -239,7 +239,7 @@ int BaseApp::Run() {
             }
             
             if (IsIconic(hWnd)) {
-                Sleep(10);
+                Sleep(10);  // std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
         }
     }

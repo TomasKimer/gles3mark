@@ -7,8 +7,8 @@
 
 
 BaseApp::BaseApp(android_app* _state)
-	: state(_state), animating(false), quit(false), score(0),
-	  movePointerId(-1), aimPointerId(-1) {
+	: state(_state), animating(false), quit(false),
+	  touchDragPoints(10, Point()) {
 
 	Log::Msg("<<- MAIN START ->>");
 
@@ -20,7 +20,7 @@ BaseApp::BaseApp(android_app* _state)
 
 	// We are starting with a previous saved state; restore from it.
 	if (state->savedState != nullptr) {
-		savedState = *(SavedState*)state->savedState;
+		savedState = *(Point*)state->savedState;
 		Log::Stream() << "State loaded: x: " << savedState.x << ", y: " << savedState.y;
 	}
 
@@ -76,8 +76,8 @@ void BaseApp::Run() {
 			// Drawing is throttled to the screen update rate, so there is no need to do timing here.
 			if (!OnIdle()) {
 				quit = true;
-				jmethodID FinishMe = env->GetMethodID(clazz, "FinishMe", "(I)V");
-				env->CallVoidMethod(thiz, FinishMe, gles3mark->GetScore());
+				jmethodID finishMe = env->GetMethodID(clazz, "FinishMe", "(I)V");
+				env->CallVoidMethod(thiz, finishMe, gles3mark->GetScore());
 			}
 		}
 
@@ -111,38 +111,19 @@ int32_t BaseApp::HandleInput(AInputEvent* event) {
 		switch (action) {
 		case AMOTION_EVENT_ACTION_DOWN:
 		case AMOTION_EVENT_ACTION_POINTER_DOWN:
-			//Log::D() << "Finger " << pointerId << " down, x: " << x << ", y: " << y;
 
-			if (x > 0 && x < 100 && y > 0 && y < 100) {
-				gles3mark->OnKeyDown(InputManager::KeyCode::Escape);  // TODO gles3mark->RequestExit() ?
-				return 0;
-			}
+			gles3mark->OnTouchDown(x, y, pointerId);  // bool? if false return 0?
 
-			if (x < gles3mark->GetGLContext()->GetWidth() / 2) {
-				movePointerId = pointerId;
-				moveCenterX = x;
-				moveCenterY = y;
-			}
-			else {
-				aimPointerId = pointerId;
-				savedState.x = x;
-				savedState.y = y;
-			}
+			touchDragPoints[pointerId].x = x;
+			touchDragPoints[pointerId].y = y;
 
 			break;
 
 		case AMOTION_EVENT_ACTION_UP:
 		case AMOTION_EVENT_ACTION_POINTER_UP:
 		case AMOTION_EVENT_ACTION_CANCEL:
-			//Log::D() << "Finger " << pointerId << " up, x: " << x << ", y: " << y;
 
-			if (pointerId == movePointerId) {
-				gles3mark->SetJoystickMove(0, 0);
-				movePointerId = -1;
-			}
-			else if (pointerId == aimPointerId) {
-				aimPointerId = -1;
-			}
+			gles3mark->OnTouchUp(x, y, pointerId);
 
 			break;
 
@@ -154,20 +135,13 @@ int32_t BaseApp::HandleInput(AInputEvent* event) {
 				x = AMotionEvent_getX(event, pointerIndex);
 				y = AMotionEvent_getY(event, pointerIndex);
 
-				//Log::D() << "Finger " << pointerId << " move, x: " << x << ", y: " << y;
+				int dx = x - touchDragPoints[pointerId].x;
+				int dy = y - touchDragPoints[pointerId].y;
 
-				if (pointerId == aimPointerId) {
-					int dx = x - savedState.x;
-					int dy = y - savedState.y;
+				gles3mark->OnTouchDragged(x, y, dx, dy, pointerId);
 
-					gles3mark->OnMouseMove(x, y, dx, dy);
-
-					savedState.x = x;
-					savedState.y = y;
-				}
-				else if (pointerId == movePointerId) {
-					gles3mark->SetJoystickMove((moveCenterX - x) * 0.01f, (moveCenterY - y) * 0.01f);
-				}
+				touchDragPoints[pointerId].x = x;
+				touchDragPoints[pointerId].y = y;
 			}
 			break;
 		}
@@ -246,9 +220,9 @@ void BaseApp::HandleCommand(int32_t cmd) {
 	 */
 	case APP_CMD_SAVE_STATE:
 		Log::Msg("APP_CMD_SAVE_STATE");
-		state->savedState = malloc(sizeof(SavedState));
-		*((SavedState*)state->savedState) = savedState;
-		state->savedStateSize = sizeof(SavedState);
+		state->savedState = malloc(sizeof(Point));
+		*((Point*)state->savedState) = savedState;
+		state->savedStateSize = sizeof(Point);
 		//Log::Stream() << "State saved: x: " << savedState.x << ", y: " << savedState.y;
 		break;
 
@@ -340,7 +314,6 @@ void BaseApp::HandleCommand(int32_t cmd) {
 	}
 }
 
-
 /**
  * Process the next main command.
  */
@@ -355,13 +328,6 @@ void BaseApp::handle_cmd(android_app* app, int32_t cmd) {
 int32_t BaseApp::handle_input(android_app* app, AInputEvent* event) {
 	BaseApp* me = (BaseApp*)app->userData;
 	return me->HandleInput(event);
-}
-
-// JNI
-void BaseApp::Exit(int score) {
-	jmethodID FinishMe = env->GetMethodID(clazz, "FinishMe", "(I)V");
-	env->CallVoidMethod(thiz, FinishMe, score);
-	quit = true;
 }
 
 // JNI is running the equivalent of the following Java code: activity.showToastAlert(text);
