@@ -49,12 +49,12 @@ public:
 
 
     class AssimpLogger : public Assimp::Logger {
-        virtual void OnDebug(const char* message) {}
-        virtual void OnInfo (const char* message) { Log::Msg(std::string("Assimp: ") + message, Log::Severity::Verbose); }
-        virtual void OnWarn (const char* message) { /*Log::Msg(std::string("Assimp: ") + message, Log::Severity::Warn);*/ }
-        virtual void OnError(const char* message) { Log::Msg(std::string("Assimp: ") + message, Log::Severity::Error); }
-        bool attachStream (Assimp::LogStream *pStream, unsigned int severity) { return true; }
-        bool detatchStream(Assimp::LogStream *pStream, unsigned int severity) { return true; }
+        virtual void OnDebug(const char* msg) override {}// Log::D() << "Assimp: " << msg; }
+        virtual void OnInfo (const char* msg) override { Log::V() << "Assimp: " << msg; }
+        virtual void OnWarn (const char* msg) override { Log::W() << "Assimp: " << msg; }
+        virtual void OnError(const char* msg) override { Log::E() << "Assimp: " << msg; }
+        virtual bool attachStream (Assimp::LogStream*, unsigned) override { return true; }
+        virtual bool detatchStream(Assimp::LogStream*, unsigned) override { return true; }
     };
 
 

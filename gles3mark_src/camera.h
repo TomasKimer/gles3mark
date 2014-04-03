@@ -9,6 +9,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "log.h"
+#include "transform.h"
 
 class Camera {
 public:
@@ -59,7 +60,8 @@ public:
     }
 
     glm::mat4 GetViewMatrix() {
-        return glm::lookAt(eye, target + eye, up);
+        view = glm::lookAt(eye, target + eye, up);
+        return view;
     }
 
     glm::mat4& GetProjectionMatrix() {
@@ -77,7 +79,7 @@ public:
     glm::vec3 GetEye()    { return eye; }
     glm::vec3 GetTarget() { return target; }
 
-    void DebugDump() {
+    void DebugDump() {    // friend std::ostream& operator << (std::ostream& o, const Camera& v) {  ??
         Log::V("----------- Camera Debug Dump ------------------");
         Log::V() << "pos "    << eye.x    << " " << eye.y    << " " << eye.z;
         Log::V() << "target " << target.x << " " << target.y << " " << target.z;
@@ -90,12 +92,17 @@ private:
     glm::vec3 target;       // view direction  -- ??
     glm::vec3 up;           // up vector
 
-    glm::fquat rotation;     // TODO transform class, combine with lookAt?
-
-    glm::mat4 projection;
-
     float angleHoriz;       // ??
     float angleVert;
+
+
+    glm::mat4 projection;
+    glm::mat4 view; //
+    
+
+    glm::vec3 position;
+    glm::quat rotation;
+    Transform transform;   // TODO, combine with lookAt?
 
 
     // TODO

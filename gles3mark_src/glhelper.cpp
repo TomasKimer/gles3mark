@@ -3,21 +3,8 @@
 #include <vector>
 
 #include "glhelper.h"
+#include <cassert>
 
-
-void GLHelper::InitGL() {
-#ifdef _WIN32
-    GLenum error = glewInit();
-    if (error != GLEW_OK)
-        throw std::runtime_error("GLEW init failed");
-    if (!GLEW_VERSION_3_3)  //  http://glew.sourceforge.net/basic.html
-        throw std::runtime_error("Yay! OpenGL 3.3 is NOT supported!");
-#else
-    if (!gl3stubInit())
-        throw std::runtime_error("GL stub init failed");
-#endif
-    Log::Msg("OpenGL initialized");
-}
 
 static std::string GLString(GLenum name) {
     return std::string(reinterpret_cast<const char*>(glGetString(name)));
@@ -28,7 +15,7 @@ void GLHelper::GLInfo() {
     Log::Msg("GL_RENDERER: "                 + GLString(GL_RENDERER                ));
     Log::Msg("GL_VERSION: "                  + GLString(GL_VERSION                 ));
     Log::Msg("GL_SHADING_LANGUAGE_VERSION: " + GLString(GL_SHADING_LANGUAGE_VERSION));
-    //Log::Msg("GL_EXTENSIONS: " + GLString(GL_EXTENSIONS));
+    //Log::Msg("GL_EXTENSIONS: " + GLString(GL_EXTENSIONS));  glGetStringi
 
     // glGet
     // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glGet.xml
@@ -36,23 +23,19 @@ void GLHelper::GLInfo() {
 }
 
 
-
 GLuint GLHelper::compileShader(GLenum type, const std::string& source) {
     GLuint shader = glCreateShader(type);
     if (shader == 0)
         throw std::runtime_error("glCreateShader failed");
 
-#ifdef _WIN32
-    std::string verSrc = "#version 330 core\n" + source;
-#else
-    std::string verSrc = "#version 300 es\n" + source;
-#endif
+    std::string verSrc = SHADER_VERSION + "\n" + source;
     const char *c_str = verSrc.c_str();
+
     glShaderSource(shader, 1, &c_str, nullptr);
     glCompileShader(shader);
 
-    std::string infoLog(getShaderInfoLog(shader));
-    Log::Msg("Compile shader: " + (infoLog[0] == 0 ? std::string("OK") : infoLog));
+    std::string infoLog(getInfoLog(shader));
+    Log::V() << "Compile shader: " << (infoLog[0] == 0 ? "OK" : infoLog);
 
     int compileStatus;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
@@ -70,14 +53,7 @@ GLuint GLHelper::linkShader(std::initializer_list<GLuint> shaders) {  // size_t 
     if (program == 0)
         throw std::runtime_error("glCreateProgram failed");
 
-    //    // Attach arguments
-    //    va_list args;
-    //    va_start(args, count);
-    //    for (size_t i = 0; i < count; ++i) {
-    //        glAttachShader(program, va_arg(args, GLuint));
-    //    }
-    //    va_end(args);
-
+    // Attach arguments
     for (GLuint shader : shaders) {
         glAttachShader(program, shader);
     }
@@ -85,8 +61,8 @@ GLuint GLHelper::linkShader(std::initializer_list<GLuint> shaders) {  // size_t 
     // Link program and check for errors
     glLinkProgram(program);
 
-    std::string infoLog(getProgramInfoLog(program));
-    Log::Msg("Link shaders: " + (infoLog[0] == 0 ? std::string("OK") : infoLog));
+    std::string infoLog(getInfoLog(program));
+    Log::V() << "Link shaders: " << (infoLog[0] == 0 ? "OK" : infoLog);
     
     int linkStatus;
     glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
@@ -100,35 +76,30 @@ GLuint GLHelper::linkShader(std::initializer_list<GLuint> shaders) {  // size_t 
 }
 
 // Info logs contain errors and warnings from shader compilation and linking
-std::string GLHelper::getShaderInfoLog(GLuint shader) {
-    //assert(glIsShader(shader));
-
+std::string GLHelper::getInfoLog(GLuint shaderOrProgram) {
     GLint length;
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+    std::vector<GLchar> log;
+    
+    if (glIsShader(shaderOrProgram)) {
+        glGetShaderiv(shaderOrProgram, GL_INFO_LOG_LENGTH, &length);
+        log.resize(length);
+        glGetShaderInfoLog(shaderOrProgram, length, nullptr, &log[0]);
+    }
+    else if (glIsProgram) {
+        glGetProgramiv(shaderOrProgram, GL_INFO_LOG_LENGTH, &length);
+        log.resize(length);
+        glGetProgramInfoLog(shaderOrProgram, length, nullptr, &log[0]);
+    }
+    else
+        throw std::invalid_argument("Argument is neither shader nor program.");
 
-    std::vector<GLchar> log(length);
-    glGetShaderInfoLog(shader, length, nullptr, &log[0]);
-
-    //assert(glGetError() == GL_NO_ERROR);
+    assert(glGetError() == GL_NO_ERROR);
 
     return std::string(&log[0], log.size());
 }
 
-std::string GLHelper::getProgramInfoLog(GLuint program) {
-    //assert(glIsProgram(program));
 
-    GLint length;
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-
-    std::vector<GLchar> log(length);
-    glGetProgramInfoLog(program, length, nullptr, &log[0]);
-
-    //assert(glGetError() == GL_NO_ERROR);
-
-    return std::string(&log[0], log.size());
-}
-
-std::string GLHelper::GL_Exception::getGlErrorString(GLenum error) {
+std::string GLHelper::getGlErrorString(GLenum error) {
 #define GLERROR(e) case e : return std::string(#e)
     switch (error) {
         GLERROR(GL_NO_ERROR);

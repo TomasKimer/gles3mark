@@ -7,9 +7,11 @@
 #include "modelimporter.h"
 #include "camera.h"
 #include "glhelper.h"
+#include "time.h"
 
 #include <string>
 #include <vector>
+#include <cassert>
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -81,7 +83,7 @@ struct Point {
 
 class GLTest {
 
-    GLuint VBO, EBO;
+    GLuint VBO, EBO, VAO;
     GLuint VS, FS, Prog;
     GLuint texture;
     GLuint positionAttrib, tcAttrib, mvpUniform, textureUniform;
@@ -90,6 +92,7 @@ class GLTest {
 
 
     glm::quat rot;
+    Transform testTrans;
     
 public:
     Camera camera;
@@ -110,14 +113,12 @@ public:
 
 
             // init gl here
-            GLHelper::InitGL();
             GLHelper::GLInfo();
 
             VS = GLHelper::compileShader(GL_VERTEX_SHADER, assetManager->LoadText("shaders/simple.vert"));
             FS = GLHelper::compileShader(GL_FRAGMENT_SHADER, assetManager->LoadText("shaders/simple.frag"));
 
             Prog = GLHelper::linkShader({ VS, FS });
-
         }
         catch (std::exception &e) {
             Log::Msg(std::string("Init exception: ") + e.what(), Log::Severity::Error);
@@ -125,25 +126,56 @@ public:
 
         positionAttrib = glGetAttribLocation(Prog, "position");
         tcAttrib = glGetAttribLocation(Prog, "tc");
+        
+        //glUseProgram(Prog);
+        //glBindAttribLocation(_programID, 0, "in_Position");
+        //glBindAttribLocation(_programID, 1, "in_Normal");
+        //glBindAttribLocation(_programID, 2, "in_TexCoord");
+        //glBindFragDataLocation(_programID, 0, "FColor");
+        //glUseProgram(0);
+        
+        
         mvpUniform = glGetUniformLocation(Prog, "mvp");
         textureUniform = glGetUniformLocation(Prog, "tex");
+
+        // setup VAO
+        // Narozdil od VBO neukladaji data o vrcholech (pozice, normala, ...)
+        // VAO ukladaji reference na VBO a nastaveni atributu.
+        // VAO usnadnuji a urychluji vykreslovani. Pro vykresleni staci aktivovat VAO a ten si pamatuje veskere nastaveni.
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
 
         // Copy house to graphics card
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(houseVertices), houseVertices, GL_STATIC_DRAW);
+        // setup vertex shader attribute bindings (connecting current <position and tc> buffer to associated 'in' variable in vertex shader)
+        GL_CHECK(glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, position)));
+        GL_CHECK(glVertexAttribPointer(tcAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, texcoord)));
 
+        // setup vbo for index buffer
         glGenBuffers(1, &EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(house), house, GL_STATIC_DRAW);
+        GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(house), house, GL_STATIC_DRAW));
+
+        // enable vertex buffers
+        glEnableVertexAttribArray(positionAttrib);
+        glEnableVertexAttribArray(tcAttrib);
+
+        // unbind VAO
+        glBindVertexArray(0);
+
 
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tgaWidth, tgaHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, tgaData);
-
 
         camera.Move(glm::vec3(0, 0, -70.f));
 
+        testTrans.Rotate(Transform::Up(), glm::radians(90.0f), Transform::Space::World);
+        testTrans.Translate(glm::vec3(0,0,-70));
 
         glEnable(GL_DEPTH_TEST);
         //glDepthFunc(GL_LESS);
@@ -157,42 +189,61 @@ public:
     	width = w;
     	height = h;
         camera.Perspective(glm::radians(60.0f), static_cast<float>(width) / height, 1.0f, 1000.0f);
-        //camera.Orthographic(0, static_cast<float>(w), 0, static_cast<float>(h), -1.0f, 1.0f);
+        //camera.Orthographic(0, static_cast<float>(w), 0, static_cast<float>(h), 1.0f, 1.0000f);
     }
 
-    void OnStep() {
-        // draw here       
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);        
-
-        glUseProgram(Prog);
-
+    void OnStep(Time& time) {
         //MVP
         glm::mat4& projection = camera.GetProjectionMatrix();
         glm::mat4  view       = camera.GetViewMatrix();
 
-        rot = glm::rotate(rot, 0.03f, glm::vec3(0, 1, 0));
-        glm::mat4 model = glm::mat4_cast(rot);        
+        rot = glm::rotate(rot, time.DeltaTime(), glm::vec3(0, 1, 0));
+        glm::mat4 model = glm::mat4_cast(rot); //testTrans.GetMatrix(); //        
         
         glm::mat4 mvp = projection * view * model;
 
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glUseProgram(Prog);
         glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, glm::value_ptr(mvp));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glUniform1i(textureUniform, 0);
-
-        glEnableVertexAttribArray(positionAttrib);
-        glEnableVertexAttribArray(tcAttrib);
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-        glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, position));
-        glVertexAttribPointer(tcAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, texcoord));
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
+        
+        glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(house[0]), GL_UNSIGNED_BYTE, nullptr);  // sizeof house / sizeof house[0]
+        glBindVertexArray(0);
+
+
+        //glBindBuffer(GL_ARRAY_BUFFER, VBO);         
+        //glEnableVertexAttribArray(positionAttrib);
+        //GL_CHECK( glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, position)) );        
+        //glEnableVertexAttribArray(tcAttrib);
+        //glVertexAttribPointer(tcAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, texcoord));
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        //glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(house[0]), GL_UNSIGNED_BYTE, nullptr);  // sizeof house / sizeof house[0]
+
+
+        //glDisableVertexAttribArray(positionAttrib);
+        //glDisableVertexAttribArray(tcAttrib);
+
+        //glUseProgram(0);
+        //glFlush();
+        //assert(glGetError() == GL_NO_ERROR);
+    }
+
+    void Destroy() {
+        glBindVertexArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        glDeleteBuffers(1, &VBO);
+        glDeleteBuffers(1, &EBO);
+        glDeleteVertexArrays(1, &VAO);
+
+        glDeleteShader(Prog);
     }
 };

@@ -10,8 +10,9 @@
 #include <android/log.h>
 static const char* TAG = "gles3mark log";
 #else
-#include <iomanip>
+#include <chrono>
 #include <ctime>
+#include <iomanip>
 #include <iostream>
 #endif
 
@@ -56,15 +57,11 @@ Log::LogStream Log::Stream(Severity severity) {
 
 void Log::logMsg(const std::string & msg, Severity severity) {
 #ifndef ANDROID
-    time_t actTime;
-    time(&actTime);
-    tm* locTime = localtime(&actTime); //tm locTime; localtime_s(&locTime, &actTime);
-    
-    std::stringstream timestamp;    
-    timestamp << std::setw(2) << std::setfill('0') << locTime->tm_hour
-        << ":" << std::setw(2) << std::setfill('0') << locTime->tm_min
-        << ":" << std::setw(2) << std::setfill('0') << locTime->tm_sec
-        << "  ";
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+
+    std::stringstream timestamp;
+    timestamp << std::put_time(std::localtime(&in_time_t), "%X") << "  ";  // %Y-%m-%d %X
 
     std::string sseverity;
     switch (severity) {

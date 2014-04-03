@@ -41,9 +41,13 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
     Input inputManager;
 	GlContext* glContext;
     GLTest* gltest;
+    Time time;
+    FPSCounter fpsCounter;
+
     bool quit;
     unsigned int score;
     
+    // multitouch controls
     glm::vec3 joystickMove;
     glm::ivec2 joystickMoveCenter;
     int movePointerId, aimPointerId;
@@ -75,10 +79,7 @@ public:
         //Log::Stream() << "C++ ver: " << (long)__cplusplus;
         
         
-        StopWatch<std::chrono::high_resolution_clock> sw;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        Log::V() << "Elapsed time: " << sw.elapsed<std::chrono::nanoseconds>() << " nanoseconds";
-        
+       
         //std::atomic<bool> ready (false);
         Log::V() << "Concurrent threads supported: " << std::thread::hardware_concurrency();
         int outParam;
@@ -139,33 +140,42 @@ public:
 
     void OnTouchDragged(int x, int y, int dx, int dy, int pointer = -1) override {
         if (pointer == movePointerId) {
-            joystickMove.x = (joystickMoveCenter.x - x) * 0.01f;
-            joystickMove.z = (joystickMoveCenter.y - y) * 0.01f;
+            joystickMove.x = static_cast<float>(joystickMoveCenter.x - x);
+            joystickMove.z = static_cast<float>(joystickMoveCenter.y - y);
         }
-        else if (dx != 0 || dy != 0) {
-            gltest->camera.Aim(-dy * 0.001f, -dx * 0.001f);
+        else {//if (dx != 0 || dy != 0) {
+            gltest->camera.Aim(-dy * 0.002f, -dx * 0.002f);  // 0.0025
         }
     }
     
     void OnResize(int w, int h) override {
         if (glContext)
-            glContext->Resize(w, h, true);
+            glContext->Resize(w, h, false);
 
         gltest->OnResize(w, h);
 
         Log::V() << "Resize: " << w << ", " << h;
     }
 
+   
     bool OnStep() override {  // TODO return Exit Code
-        // draw here
+        if (quit) return false;
+        
+        time.Update();
+        if (time.RealTimeSinceStartup() > 1.5f) {
+            fpsCounter.Update(time.DeltaTime());
+            if (fpsCounter.JustUpdated())
+                Log::V() << time << ", FPS " << fpsCounter;
+        }
+
         OnProcessInput();
-        if (joystickMove.x != 0.f || joystickMove.z != 0.f)
-            gltest->camera.Move(joystickMove);
+        //if (joystickMove.x != 0.f || joystickMove.z != 0.f)
+        gltest->camera.Move(joystickMove * time.DeltaTime());
 
-        if (quit)
-            return false;
 
-        gltest->OnStep();
+        gltest->OnStep(time);
+
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         glContext->Swap();
 
@@ -179,14 +189,12 @@ public:
 
 private:
     void OnProcessInput() {
-        if (inputManager.IsKeyDown(Input::KeyCode::W))
-            gltest->camera.Move(glm::vec3(0, 0, 1));
-        if (inputManager.IsKeyDown(Input::KeyCode::S))
-            gltest->camera.Move(glm::vec3(0, 0, -1));
-        if (inputManager.IsKeyDown(Input::KeyCode::A))
-            gltest->camera.Move(glm::vec3(1, 0, 0));
-        if (inputManager.IsKeyDown(Input::KeyCode::D))
-            gltest->camera.Move(glm::vec3(-1, 0, 0));
+        float step = time.DeltaTime() * 100.0f;
+
+        float x = -((-1.0f * inputManager.IsKeyDown(Input::KeyCode::A)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::D))) * step;
+        float z =  ((-1.0f * inputManager.IsKeyDown(Input::KeyCode::S)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::W))) * step;
+        
+        gltest->camera.Move(glm::vec3(x, 0, z));
     }
 
     static void doSomeWork(int param, int& outParam) {
@@ -194,4 +202,20 @@ private:
         outParam = 42;
         return;
     }
+
+
+    // --- TODO? move to frontend main loops? ---
+    // http://fabiensanglard.net/timer_and_framerate/index.php#comment-1277535160
+    float simulationTime = 0;
+    void OnStepFixed() {
+        time.Update();
+        float realTime = time.RealTimeSinceStartup();
+        while (simulationTime < realTime) {
+            simulationTime += 0.016f;
+            Update(0.016f);
+        }
+        Render();
+    }
+    void Update(float deltaTime) {}
+    void Render() {}
 };
