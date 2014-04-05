@@ -4,8 +4,8 @@
 class GLContext {
 
 public:
-    GLContext() {};
-    virtual ~GLContext() {};
+    GLContext(): mWidth(0), mHeight(0) {};
+    virtual ~GLContext() = default;
     
     virtual bool Create(void* osWnd) = 0;
     virtual void Destroy() = 0;

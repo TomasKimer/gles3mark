@@ -20,64 +20,11 @@
 #include <glm/gtc/quaternion.hpp>
 
 
-// House indices
-const unsigned char house[] = {
-    //Walls
-    0, 1, 2,
-    0, 2, 3,
-    4, 5, 6,
-    4, 6, 7,
-    8, 9, 10,
-    8, 10, 11,
-    12, 13, 14,
-    12, 14, 15,
-    //Roof
-    16, 17, 18,
-    19, 20, 21,
-    22, 23, 24,
-    25, 26, 27
-};
-
-struct Point {
-    float texcoord[2];
-    float position[3];
-} const houseVertices[] = {
-    // Walls
-    { { 0.0, 0.0 }, { -5.0, -5.0, -5.0 } },
-    { { 0.0, 4.0 }, { -5.0, -5.0, 5.0 } },
-    { { 4.0, 4.0 }, { 5.0, -5.0, 5.0 } },
-    { { 4.0, 0.0 }, { 5.0, -5.0, -5.0 } },
-
-    { { 0.0, 0.0 }, { -5.0, 5.0, -5.0 } },
-    { { 0.0, 2.0 }, { -5.0, 5.0, 5.0 } },
-    { { 2.0, 2.0 }, { 5.0, 5.0, 5.0 } },
-    { { 2.0, 0.0 }, { 5.0, 5.0, -5.0 } },
-
-    { { 0.0, 0.0 }, { -5.0, -5.0, -5.0 } },
-    { { 0.0, 1.0 }, { -5.0, -5.0, 5.0 } },
-    { { 1.0, 1.0 }, { -5.0, 5.0, 5.0 } },
-    { { 1.0, 0.0 }, { -5.0, 5.0, -5.0 } },
-
-    { { 0.0, 0.0 }, { 5.0, -5.0, -5.0 } },
-    { { 0.0, 1.0 }, { 5.0, -5.0, 5.0 } },
-    { { 1.0, 1.0 }, { 5.0, 5.0, 5.0 } },
-    { { 1.0, 0.0 }, { 5.0, 5.0, -5.0 } },
-    // Roof
-    { { 0.0, 0.0 }, { -5.0, 5.0, -5.0 } },
-    { { 1.0, 0.0 }, { 5.0, 5.0, -5.0 } },
-    { { 0.0, 1.0 }, { 0.0, 11.0, 0.0 } },
-
-    { { 0.0, 0.0 }, { 5.0, 5.0, -5.0 } },
-    { { 1.0, 0.0 }, { 5.0, 5.0, 5.0 } },
-    { { 0.0, 1.0 }, { 0.0, 11.0, 0.0 } },
-
-    { { 0.0, 0.0 }, { 5.0, 5.0, 5.0 } },
-    { { 0.0, 1.0 }, { -5.0, 5.0, 5.0 } },
-    { { 1.0, 1.0 }, { 0.0, 11.0, 0.0 } },
-
-    { { 0.0, 1.0 }, { -5.0, 5.0, 5.0 } },
-    { { 0.0, 0.0 }, { -5.0, 5.0, -5.0 } },
-    { { 1.0, 1.0 }, { 0.0, 11.0, 0.0 } }
+struct VboEntry {
+    glm::vec3 pos;    // x, y, z;		// souradnice
+    glm::vec3 normal; //float nx, ny, nz;	// normala
+//    float tx, ty, tz;	// tangenta
+    glm::vec2 texcoord; //float u, v;			// textura
 };
 
 
@@ -86,10 +33,11 @@ class GLTest {
     GLuint VBO, EBO, VAO;
     GLuint VS, FS, Prog;
     GLuint texture;
-    GLuint positionAttrib, tcAttrib, mvpUniform, textureUniform;
+    GLuint positionAttrib, normalAttrib, tcAttrib;
+    GLuint mvpUniform, textureUniform;
 
     int width, height;
-
+    Mesh* mesh;
 
     glm::quat rot;
     Transform testTrans;
@@ -104,15 +52,13 @@ public:
         int tgaWidth, tgaHeight;
         char* tgaData;
         try {            
-            tgaData = assetManager->LoadTGA("textures/tiles.tga", &tgaWidth, &tgaHeight);            
+            tgaData = assetManager->LoadTGA("textures/chair2.tga", &tgaWidth, &tgaHeight);            
             
-            ModelImporter* modelImporter = new ModelImporter();
-            ModelImporter::AssimpModel model;
-            model.Load(*assetManager, "monkey.3ds");
-            model.Process();
+            AssimpModelImporter* modelImporter = new AssimpModelImporter(*assetManager);
+            mesh = modelImporter->Import("chairs.3ds");
+            //mesh->MakeTestMesh();           
 
 
-            // init gl here
             GLHelper::GLInfo();
 
             VS = GLHelper::compileShader(GL_VERTEX_SHADER, assetManager->LoadText("shaders/simple.vert"));
@@ -124,8 +70,9 @@ public:
             Log::Msg(std::string("Init exception: ") + e.what(), Log::Severity::Error);
         }
 
-        positionAttrib = glGetAttribLocation(Prog, "position");
-        tcAttrib = glGetAttribLocation(Prog, "tc");
+        positionAttrib = glGetAttribLocation(Prog, "vertexPosition");
+        normalAttrib = glGetAttribLocation(Prog, "vertexNormal");
+        tcAttrib = glGetAttribLocation(Prog, "vertexTextureCoord");
         
         //glUseProgram(Prog);
         //glBindAttribLocation(_programID, 0, "in_Position");
@@ -142,24 +89,34 @@ public:
         // Narozdil od VBO neukladaji data o vrcholech (pozice, normala, ...)
         // VAO ukladaji reference na VBO a nastaveni atributu.
         // VAO usnadnuji a urychluji vykreslovani. Pro vykresleni staci aktivovat VAO a ten si pamatuje veskere nastaveni.
-        glGenVertexArrays(1, &VAO);
+        glGenVertexArrays(1, &VAO);  // TODO VAO + UBO pro kazdy mesh?
         glBindVertexArray(VAO);
 
         // Copy house to graphics card
-        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &VBO);      // TODO neni treba ukladat? - staci ulozit jen VAO -- stejna promenna na vsechny docasne buffery
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(houseVertices), houseVertices, GL_STATIC_DRAW);
+        GL_CHECK( glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(glm::vec3) * 2 + mesh->texCoords.size() * sizeof(glm::vec2), nullptr, GL_STATIC_DRAW) );
+
+        for (size_t i = 0; i < mesh->vertices.size(); ++i) {
+            GL_CHECK( glBufferSubData(GL_ARRAY_BUFFER, i * sizeof(VboEntry) + offsetof(VboEntry, pos)     , sizeof(glm::vec3), &mesh->vertices [i]) );
+            GL_CHECK( glBufferSubData(GL_ARRAY_BUFFER, i * sizeof(VboEntry) + offsetof(VboEntry, normal)  , sizeof(glm::vec3), &mesh->normals  [i]) );
+            GL_CHECK( glBufferSubData(GL_ARRAY_BUFFER, i * sizeof(VboEntry) + offsetof(VboEntry, texcoord), sizeof(glm::vec2), &mesh->texCoords[i]) );
+        }
+        
         // setup vertex shader attribute bindings (connecting current <position and tc> buffer to associated 'in' variable in vertex shader)
-        GL_CHECK(glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, position)));
-        GL_CHECK(glVertexAttribPointer(tcAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, texcoord)));
+        GL_CHECK( glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (GLvoid*)offsetof(VboEntry, pos     )) );
+        GL_CHECK( glVertexAttribPointer(normalAttrib  , 3, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (GLvoid*)offsetof(VboEntry, normal  )) );
+        GL_CHECK( glVertexAttribPointer(tcAttrib      , 2, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (GLvoid*)offsetof(VboEntry, texcoord)) );
+        
 
         // setup vbo for index buffer
         glGenBuffers(1, &EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(house), house, GL_STATIC_DRAW));
+        GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->faces.size()*sizeof(glm::ivec3), &mesh->faces[0].x, GL_STATIC_DRAW));
 
         // enable vertex buffers
         glEnableVertexAttribArray(positionAttrib);
+        glEnableVertexAttribArray(normalAttrib);
         glEnableVertexAttribArray(tcAttrib);
 
         // unbind VAO
@@ -213,25 +170,12 @@ public:
         glUniform1i(textureUniform, 0);
         
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(house[0]), GL_UNSIGNED_BYTE, nullptr);  // sizeof house / sizeof house[0]
+        GL_CHECK( glDrawElements(GL_TRIANGLES, mesh->faces.size() * 3, GL_UNSIGNED_INT, nullptr) );  // sizeof house / sizeof house[0]
         glBindVertexArray(0);
-
-
-        //glBindBuffer(GL_ARRAY_BUFFER, VBO);         
-        //glEnableVertexAttribArray(positionAttrib);
-        //GL_CHECK( glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, position)) );        
-        //glEnableVertexAttribArray(tcAttrib);
-        //glVertexAttribPointer(tcAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(Point), (void*)offsetof(Point, texcoord));
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        //glDrawElements(GL_TRIANGLES, sizeof(house) / sizeof(house[0]), GL_UNSIGNED_BYTE, nullptr);  // sizeof house / sizeof house[0]
-
-
-        //glDisableVertexAttribArray(positionAttrib);
-        //glDisableVertexAttribArray(tcAttrib);
 
         //glUseProgram(0);
         //glFlush();
-        //assert(glGetError() == GL_NO_ERROR);
+        assert(glGetError() == GL_NO_ERROR);
     }
 
     void Destroy() {

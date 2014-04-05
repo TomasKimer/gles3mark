@@ -18,7 +18,7 @@
 #ifdef ANDROID
 
 #include <EGL/egl.h>
-#include "gl3stub.h"
+#include "gl3stub_egl.h"
 
 GLboolean gl3stubInit() {
     #define FIND_PROC(s) s = (void*)eglGetProcAddress(#s)

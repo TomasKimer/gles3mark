@@ -8,8 +8,8 @@
 //#pragma comment(lib, "glew32.lib")
 //#pragma comment(lib, "opengl32.lib")
 #else
-//#include <GLES3/gl3.h> // TODO glimports.h
-#include "gl3stub.h"
+//#include <GLES3/gl3.h> //glimports.h?
+#include "gl3stub_egl.h"
 #endif
 
 #include <string>

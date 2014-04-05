@@ -1,7 +1,7 @@
 #ifdef ANDROID
 
 #include "glcontext_egl.h"
-#include "gl3stub.h"
+#include "gl3stub_egl.h"
 #include "log.h"
 
 /**

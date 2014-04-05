@@ -3,8 +3,9 @@
  */
 
 #include "assetmanager.h"
+#include "log.h"
 
-std::vector<char> AssetManager::LoadContents(const std::string& fileName) {
+std::vector<char> AssetManager::LoadContents(const std::string& fileName) const {
     AssetFile file;
     file.Open(fileName);
 
@@ -16,12 +17,12 @@ std::vector<char> AssetManager::LoadContents(const std::string& fileName) {
     return buff;
 }
 
-std::string AssetManager::LoadText(const std::string& fileName) {
+std::string AssetManager::LoadText(const std::string& fileName) const {
     std::vector<char> contents = LoadContents(fileName);
     return std::string(&contents[0], contents.size());
 }
 
-int AssetManager::ReadAsset(const std::string& fileName, int bytesToRead, void* buffer) {
+int AssetManager::ReadAsset(const std::string& fileName, int bytesToRead, void* buffer) const {
     AssetFile file;
     file.Open(fileName);
     int bytesRead = file.Read(bytesToRead, buffer);
@@ -29,7 +30,7 @@ int AssetManager::ReadAsset(const std::string& fileName, int bytesToRead, void* 
     return bytesRead;
 }
 
-char* AssetManager::LoadTGA(const std::string& fileName, int *width, int *height) {
+char* AssetManager::LoadTGA(const std::string& fileName, int *width, int *height) const {
     AssetFile fp;
     fp.Open(fileName);
 
@@ -39,6 +40,7 @@ char* AssetManager::LoadTGA(const std::string& fileName, int *width, int *height
     *width = Header.Width;
     *height = Header.Height;
 
+    Log::V() << "TGA color depth: " << (int)Header.ColorDepth;
     if (Header.ColorDepth != 8 && Header.ColorDepth != 24 && Header.ColorDepth != 32) {
         fp.Close();
         throw std::runtime_error("Unsupported TGA color depth");

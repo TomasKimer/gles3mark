@@ -66,7 +66,10 @@
     <ClInclude Include="..\gles3mark_src\transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark_src\gl3stub.h">
+    <ClInclude Include="..\gles3mark_src\gl3stub_egl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark_src\mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,7 +101,7 @@
     <ClCompile Include="..\gles3mark_src\glcontext_wgl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\gles3mark_src\gl3stub.c">
+    <ClCompile Include="..\gles3mark_src\gl3stub_egl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -110,6 +113,12 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="..\assets\shaders\simple.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\assets\shaders\phong.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\assets\shaders\phong.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>

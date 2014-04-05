@@ -28,10 +28,10 @@ public:
     AssetManager(void* _ioContext = nullptr) { AssetFile::SetContext(_ioContext); }
     virtual ~AssetManager() { }
 
-    std::vector<char> LoadContents(const std::string& fileName);
-    std::string LoadText(const std::string& fileName);
-    int ReadAsset(const std::string& fileName, int bytesToRead, void* buffer);
+    std::vector<char> LoadContents(const std::string& fileName) const;
+    std::string LoadText(const std::string& fileName) const;
+    int ReadAsset(const std::string& fileName, int bytesToRead, void* buffer) const;
 
-    char* LoadTGA(const std::string& fileName, int *width, int *height);
+    char* LoadTGA(const std::string& fileName, int *width, int *height) const;
 };
 
