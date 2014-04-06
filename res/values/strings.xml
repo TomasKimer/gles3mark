@@ -3,6 +3,10 @@
 
     <string name="app_name">gles3mark</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="button_start">Start Benchmark</string>
+    <string name="title_activity_main">gles3mark</string>
+    <string name="title_section1">Test</string>
+    <string name="title_section2">Ranking</string>
+    <string name="title_section3">Device Info</string>
 
 </resources>

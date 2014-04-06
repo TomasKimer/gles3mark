@@ -76,8 +76,10 @@ void BaseApp::Run() {
 			// Drawing is throttled to the screen update rate, so there is no need to do timing here.
 			if (!OnIdle()) {
 				quit = true;
-				jmethodID finishMe = env->GetMethodID(clazz, "FinishMe", "(I)V");
-				env->CallVoidMethod(thiz, finishMe, gles3mark->GetScore());
+				jmethodID finishMe = env->GetMethodID(clazz, "FinishMe", "(Ljava/lang/String;)V");  // "(I)V" - int
+				jstring jniText = env->NewStringUTF(gles3mark->GetResultXML().c_str());
+				env->CallVoidMethod(thiz, finishMe, jniText);
+				env->DeleteLocalRef(jniText);
 			}
 		}
 

@@ -7,18 +7,21 @@
     <uses-sdk
         android:minSdkVersion="18"
         android:targetSdkVersion="19" />
-    
-    <uses-feature
-        android:glEsVersion="0x00030000" />
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature android:glEsVersion="0x00030000" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity
+         <activity
             android:name="com.tomaskimer.gles3mark.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/title_activity_main"
+            android:configChanges="keyboardHidden|orientation|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,13 +30,15 @@
         <!-- android:launchMode="singleTop/singleTask/singleInstance" http://developer.android.com/guide/topics/manifest/activity-element.html#lmode -->
         <activity
             android:name="com.tomaskimer.gles3mark.BenchmarkActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:configChanges="orientation|keyboardHidden"
             android:label="Benchmark Activity"
-            android:screenOrientation="landscape"
             android:launchMode="standard"
-            android:configChanges="orientation|keyboardHidden">
-            <meta-data android:name="android.app.lib_name" android:value="gles3mark" />
-        </activity>
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="gles3mark" />
+        </activity>       
     </application>
-	
+
 </manifest>

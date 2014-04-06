@@ -23,6 +23,9 @@ typedef GLContextEGL GlContext;
 #include "time.h"
 #include "fpscounter.h"
 
+#include <random>
+#include <glm/gtc/random.hpp>
+
 
 class IGLES3MarkLib {
 public:
@@ -30,7 +33,7 @@ public:
     virtual bool OnInit(void* osWnd, void* ioContext = nullptr) = 0;
     virtual void OnResize(int w, int h) = 0;
     virtual bool OnStep() = 0;
-    virtual unsigned int GetScore() = 0;
+    virtual std::string GetResultXML() = 0;
     virtual GlContext* GetGLContext() = 0;  // TODO
 };
 
@@ -56,6 +59,12 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
 public:
     GLES3Mark() : glContext(nullptr), quit(false), score(42), movePointerId(-2), aimPointerId(-2) {
     	gltest = new GLTest();
+        score = (int)glm::linearRand(10.f, 1000.f);
+
+        std::random_device rd;
+        //std::minstd_rand generator(rd()); 
+        std::uniform_int_distribution<> dist(10, 1000);
+        score = dist(rd); // generator
     }
 
     ~GLES3Mark() {
@@ -182,8 +191,11 @@ public:
         return true;
     }
 
-    unsigned int GetScore() override {
-        return score;
+    std::string GetResultXML() override {
+        std::stringstream ss;
+        ss << score;
+        
+        return ss.str();
     }
 
 

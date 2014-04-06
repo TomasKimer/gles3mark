@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+// TODO https://developer.android.com/training/system-ui/immersive.html ?
 public class BenchmarkActivity extends NativeActivity {
 
 	//int score;
@@ -43,12 +44,12 @@ public class BenchmarkActivity extends NativeActivity {
 		super.onBackPressed();
 	}
 	
-    public void FinishMe(int _score) {  // final
-    	final int finalScore = _score;
+    public void FinishMe(String _xmlResult) {  // final
+    	final String xmlResult = _xmlResult;
         this.runOnUiThread(new Runnable() {
             public void run() {
             	Intent resultData = new Intent();
-        		resultData.putExtra("score", String.format("%d", finalScore));
+        		resultData.putExtra("XML Result", xmlResult);
         		setResult(Activity.RESULT_OK, resultData);
 //        		if (getParent() == null) setResult(Activity.RESULT_OK, resultData);
 //        		else getParent().setResult(Activity.RESULT_OK, resultData);
