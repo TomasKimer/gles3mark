@@ -221,9 +221,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
 
-		public TestSectionFragment() { Log.d("FRAGMENT", "Test constructor");}
+		public TestSectionFragment() {}
 		
-		TextView scoreTextView;
+		private TextView scoreTextView;
 		public void SetScoreLabel(String score) {
 			scoreTextView.setText(score);
 		}
@@ -231,18 +231,18 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
+			// http://stackoverflow.com/questions/20550016/savedinstancestate-is-always-null-in-fragment
 			//setRetainInstance(true); // ???
 		}
 
 		@Override
 		public void onSaveInstanceState(Bundle outState) {
 			super.onSaveInstanceState(outState);
-			Log.d("FRAGMENT", "save instance state");
 		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			Log.d("FRAGMENT", "Test onCreateView " + getTag());
+			//Log.d("FRAGMENT", "Test onCreateView " + getTag());
 			
 			View rootView = inflater.inflate(R.layout.fragment_main_test, container, false);
 			scoreTextView = (TextView)rootView.findViewById(R.id.score_label);
@@ -256,9 +256,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 		@Override
 		public void onViewCreated(View view, Bundle savedInstanceState) {
-			// TODO Auto-generated method stub
 			super.onViewCreated(view, savedInstanceState);
-			Log.d("FRAGMENT", "onViewCreated");
 		}
 	}
 	
@@ -285,6 +283,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		}
 
 		@Override
+		// TODO custom http://www.androidhive.info/2012/02/android-custom-listview-with-image-and-text/
+		// TODO simple http://stackoverflow.com/questions/6305899/custom-listview-android
+		// http://developer.android.com/reference/android/widget/SimpleAdapter.html
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main_ranking, container, false); // for custom listview (defined in rankingfragment.xml)
 			/////ListView rankingTextView = (ListView) rootView.findViewById(R.id.ranking_listView);

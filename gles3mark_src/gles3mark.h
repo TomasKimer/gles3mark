@@ -64,7 +64,7 @@ public:
         std::random_device rd;
         //std::minstd_rand generator(rd()); 
         std::uniform_int_distribution<> dist(10, 1000);
-        score = dist(rd); // generator
+        score = dist(rd); // generator(dist)
     }
 
     ~GLES3Mark() {
@@ -168,7 +168,10 @@ public:
 
    
     bool OnStep() override {  // TODO return Exit Code
-        if (quit) return false;
+        if (quit) {
+            OnDestroy();
+            return false;
+        }
         
         time.Update();
         if (time.RealTimeSinceStartup() > 1.5f) {
@@ -207,6 +210,10 @@ private:
         float z =  ((-1.0f * inputManager.IsKeyDown(Input::KeyCode::S)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::W))) * step;
         
         gltest->camera.Move(glm::vec3(x, 0, z));
+    }
+
+    void OnDestroy() {
+        // vs destructor?
     }
 
     static void doSomeWork(int param, int& outParam) {

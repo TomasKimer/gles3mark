@@ -235,7 +235,6 @@ int BaseApp::Run() {
         else {
             if (!OnIdle()) {
                 OnQuit();
-                quit = true;
             }
             
             if (IsIconic(hWnd)) {

@@ -74,9 +74,9 @@ public class DeviceInfo {
     	result += "\nResolution: " + metrics.heightPixels + "x" + metrics.widthPixels;
     	result += "\nDPI: " + metrics.densityDpi;
     	
-        double x = Math.pow(metrics.widthPixels  / metrics.xdpi, 2);
+        double x = Math.pow(metrics.widthPixels  / metrics.xdpi, 2);  // TODO glcontext? smaller on tegra - bar?
         double y = Math.pow(metrics.heightPixels / metrics.ydpi, 2);
-        result += "\nSize: " + (int)Math.sqrt(x + y) + "inch";
+        result += "\nSize: " + Math.round(Math.sqrt(x + y)) + "inch";
     	
     	// --- CPU ---
         // TODO Arch (Krait), Model (Qualcomm Snapdragon APQ8064T), bogoMIPS? (/proc/cpuinfo), 

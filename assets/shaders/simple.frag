@@ -1,4 +1,6 @@
 
+precision mediump float;
+
 in vec2 coord;
 in vec3 normal;
 

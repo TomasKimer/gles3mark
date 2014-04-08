@@ -21,7 +21,7 @@ bool GLContextWGL::Create(void* osWnd) {
     int glminor = 3;
     int colorBits = 32;
     int depthBits = 24;
-    int stencilBits = 8;
+    int stencilBits = 0;
     int samples = 0;
 
     

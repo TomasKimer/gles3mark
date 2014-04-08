@@ -8,6 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 // http://stackoverflow.com/questions/2109271/can-any-one-provide-me-example-of-two-line-list-item-in-android
+// TODO own implementation http://www.androidhive.info/2012/02/android-custom-listview-with-image-and-text/
+// or simple? http://stackoverflow.com/questions/6305899/custom-listview-android
 public abstract class TwoLineArrayAdapter<T> extends ArrayAdapter<T> {
 	private int mListItemLayoutResId;
 
