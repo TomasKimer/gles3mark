@@ -8,6 +8,7 @@
 #include "camera.h"
 #include "glhelper.h"
 #include "time.h"
+#include "gltexture.h"
 
 #include <string>
 #include <vector>
@@ -32,11 +33,11 @@ class GLTest {
 
     GLuint VBO, EBO, VAO;
     GLuint VS, FS, Prog;
-    GLuint texture;
     GLuint mvpUniform, textureUniform;
 
     int width, height;
     Mesh* mesh;
+    GLTexture texture;
 
     glm::quat rot;
     Transform testTrans;
@@ -48,10 +49,11 @@ public:
     ~GLTest() {}
         
     bool OnInit(AssetManager* assetManager) {
-        int tgaWidth, tgaHeight;
-        char* tgaData;
+        int tgaWidth, tgaHeight, tgaBpp;
+        std::vector<char> TGAdata;
         try {            
-            tgaData = assetManager->LoadTGA("textures/chair2.tga", &tgaWidth, &tgaHeight);            
+            TGAdata = assetManager->LoadTGA("textures/chair2.tga", tgaWidth, tgaHeight, tgaBpp);
+            texture.FromRawData(TGAdata, tgaWidth, tgaHeight);
             
             AssimpModelImporter* modelImporter = new AssimpModelImporter(*assetManager);
             mesh = modelImporter->Import("chairs.3ds");
@@ -117,13 +119,6 @@ public:
         glBindVertexArray(0);
 
 
-
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tgaWidth, tgaHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, tgaData);
-
         camera.Move(glm::vec3(0, 0, -70.f));
 
         testTrans.Rotate(Transform::Up(), glm::radians(90.0f), Transform::Space::World);
@@ -161,7 +156,7 @@ public:
         glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, glm::value_ptr(mvp));
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        texture.Bind();
         glUniform1i(textureUniform, 0);
         
         glBindVertexArray(VAO);

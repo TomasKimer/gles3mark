@@ -32,6 +32,6 @@ public:
     std::string LoadText(const std::string& fileName) const;
     int ReadAsset(const std::string& fileName, int bytesToRead, void* buffer) const;
 
-    char* LoadTGA(const std::string& fileName, int *width, int *height) const;
+    std::vector<char> LoadTGA(const std::string& fileName, int& width, int& height, int& bpp) const;
 };
 

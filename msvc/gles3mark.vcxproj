@@ -22,7 +22,9 @@
     <ClInclude Include="..\gles3mark_src\glcontext.h" />
     <ClInclude Include="..\gles3mark_src\gles3mark.h" />
     <ClInclude Include="..\gles3mark_src\glhelper.h" />
+    <ClInclude Include="..\gles3mark_src\glinclude.h" />
     <ClInclude Include="..\gles3mark_src\gltest.h" />
+    <ClInclude Include="..\gles3mark_src\gltexture.h" />
     <ClInclude Include="..\gles3mark_src\input.h" />
     <ClInclude Include="..\gles3mark_src\log.h" />
     <ClInclude Include="..\gles3mark_src\mesh.h" />
