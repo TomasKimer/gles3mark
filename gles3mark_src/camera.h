@@ -23,6 +23,8 @@ public:
 
         angleHoriz = 0.0f; // glm::half_pi<float>()
         angleVert = 0.0f;
+
+        UpdateViewMat();
     }
 
     void Move(glm::vec3 vec) {
@@ -34,6 +36,8 @@ public:
         eye += r * vec.x;
 
         eye.y += vec.y; // pouze stoupani ci klesani
+
+        UpdateViewMat();
     }
     
     void Aim(float verticalAngle, float horizontalAngle) {
@@ -57,10 +61,11 @@ public:
         target = glm::vec3(sin(u_phi) * cos(l_phi),
                            cos(u_phi),
                            sin(u_phi) * sin(l_phi));
+
+        UpdateViewMat();
     }
 
-    glm::mat4 GetViewMatrix() {
-        view = glm::lookAt(eye, target + eye, up);
+    glm::mat4& GetViewMatrix() {
         return view;
     }
 
@@ -97,12 +102,16 @@ private:
 
 
     glm::mat4 projection;
-    glm::mat4 view; //
+    glm::mat4 view;
     
 
     glm::vec3 position;
     glm::quat rotation;
     Transform transform;   // TODO, combine with lookAt?
+
+    void UpdateViewMat() {
+        view = glm::lookAt(eye, target + eye, up);
+    }
 
 
     // TODO

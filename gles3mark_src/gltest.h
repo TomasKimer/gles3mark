@@ -142,7 +142,7 @@ public:
     void OnStep(const Time& time) {
         //MVP
         glm::mat4& projection = camera.GetProjectionMatrix();
-        glm::mat4  view       = camera.GetViewMatrix();
+        glm::mat4& view       = camera.GetViewMatrix();
 
         rot = glm::rotate(rot, time.DeltaTime(), glm::vec3(0, 1, 0));
         glm::mat4 model = glm::mat4_cast(rot); //testTrans.GetMatrix(); //        
