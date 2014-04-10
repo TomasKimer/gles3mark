@@ -52,7 +52,7 @@ public:
         int tgaWidth, tgaHeight, tgaBpp;
         std::vector<char> TGAdata;
         try {            
-            TGAdata = assetManager->LoadTGA("textures/chair2.tga", tgaWidth, tgaHeight, tgaBpp);
+            TGAdata = assetManager->LoadTGA("textures/basemap.tga", tgaWidth, tgaHeight, tgaBpp);
             texture.FromRawData(TGAdata, tgaWidth, tgaHeight);
             
             AssimpModelImporter* modelImporter = new AssimpModelImporter(*assetManager);

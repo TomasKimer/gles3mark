@@ -15,13 +15,13 @@ class AssetManager {
 
 #pragma pack(push,x1) // Byte alignment (8-bit)
 #pragma pack(1)
-    typedef struct {
+    struct TGA_HEADER {
         unsigned char IdSize, MapType, ImageType;
         unsigned short PaletteStart, PaletteSize;
         unsigned char PaletteEntryDepth;
         unsigned short X, Y, Width, Height;
         unsigned char ColorDepth, Descriptor;
-    } TGA_HEADER;
+    };
 #pragma pack(pop,x1)
 
 public:
