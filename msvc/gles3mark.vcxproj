@@ -27,13 +27,15 @@
     <ClInclude Include="..\gles3mark\glcontext_wgl.h" />
     <ClInclude Include="..\gles3mark\gles3mark.h" />
     <ClInclude Include="..\gles3mark\glhelper.h" />
-    <ClInclude Include="..\gles3mark\glinclude.h" />
     <ClInclude Include="..\gles3mark\gltest.h" />
     <ClInclude Include="..\gles3mark\gltexture.h" />
     <ClInclude Include="..\gles3mark\input.h" />
     <ClInclude Include="..\gles3mark\log.h" />
     <ClInclude Include="..\gles3mark\mesh.h" />
+    <ClInclude Include="..\gles3mark\glmeshrenderer.h" />
+    <ClInclude Include="..\gles3mark\model.h" />
     <ClInclude Include="..\gles3mark\modelimporter.h" />
+    <ClInclude Include="..\gles3mark\modelimporter_assimp.h" />
     <ClInclude Include="..\gles3mark\time.h" />
     <ClInclude Include="..\gles3mark\transform.h" />
   </ItemGroup>
@@ -47,6 +49,7 @@
     <ClCompile Include="..\gles3mark\gles3mark.cpp" />
     <ClCompile Include="..\gles3mark\glhelper.cpp" />
     <ClCompile Include="..\gles3mark\log.cpp" />
+    <ClCompile Include="..\gles3mark\mesh.cpp" />
     <ClCompile Include="..\win32\gles3mark_dll.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

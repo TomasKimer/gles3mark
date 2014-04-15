@@ -11,7 +11,7 @@
 #endif
 #include <ktx.h>
 
-#include "glinclude.h"
+#include "glhelper.h"
 #include "log.h"
 
 
