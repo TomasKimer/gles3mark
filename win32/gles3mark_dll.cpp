@@ -11,7 +11,7 @@
 #include <windows.h>
 #include <memory>
 
-#include "../gles3mark_src/gles3mark.h"
+#include "../gles3mark/gles3mark.h"
 
 static std::unique_ptr<GLES3Mark> gles3mark;
 

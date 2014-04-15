@@ -46,7 +46,7 @@ public:
                 throw std::runtime_error("Failed to load model: " + fileName + " - " + importer.GetErrorString());
         }
 
-        for (unsigned int i = 9; i < aScene->mNumMeshes; ++i) { // ++i?
+        for (unsigned int i = 9; i < aScene->mNumMeshes; ++i) {
                 const aiMesh* aMesh = aScene->mMeshes[i];
                 //Log::Stream() << "Mesh " << i << " - Vertices: " << mesh->mNumVertices << ", faces: " << mesh->mNumFaces;  // normals, uv
                 

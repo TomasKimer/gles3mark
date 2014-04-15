@@ -9,7 +9,7 @@
 #include <android_native_app_glue.h>
 #include <memory>
 #include <vector>
-#include "../gles3mark_src/gles3mark.h"
+#include "../gles3mark/gles3mark.h"
 
 /**
  * Shared state for our app.

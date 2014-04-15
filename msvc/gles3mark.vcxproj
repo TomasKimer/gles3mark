@@ -11,45 +11,43 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\gles3mark_src\assetfile.h" />
-    <ClInclude Include="..\gles3mark_src\assetmanager.h" />
-    <ClInclude Include="..\gles3mark_src\camera.h" />
-    <ClInclude Include="..\gles3mark_src\fpscounter.h" />
-    <ClInclude Include="..\gles3mark_src\gameobject.h" />
-    <ClInclude Include="..\gles3mark_src\glcontext_egl.h" />
-    <ClInclude Include="..\gles3mark_src\glcontext_wgl.h" />
-    <ClInclude Include="..\gles3mark_src\gl3stub_egl.h" />
-    <ClInclude Include="..\gles3mark_src\glcontext.h" />
-    <ClInclude Include="..\gles3mark_src\gles3mark.h" />
-    <ClInclude Include="..\gles3mark_src\glhelper.h" />
-    <ClInclude Include="..\gles3mark_src\glinclude.h" />
-    <ClInclude Include="..\gles3mark_src\gltest.h" />
-    <ClInclude Include="..\gles3mark_src\gltexture.h" />
-    <ClInclude Include="..\gles3mark_src\input.h" />
-    <ClInclude Include="..\gles3mark_src\log.h" />
-    <ClInclude Include="..\gles3mark_src\mesh.h" />
-    <ClInclude Include="..\gles3mark_src\modelimporter.h" />
-    <ClInclude Include="..\gles3mark_src\time.h" />
-    <ClInclude Include="..\gles3mark_src\transform.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\gles3mark_src\assetfile.cpp" />
-    <ClCompile Include="..\gles3mark_src\assetmanager.cpp" />
-    <ClCompile Include="..\gles3mark_src\camera.cpp" />
-    <ClCompile Include="..\gles3mark_src\glcontext_egl.cpp" />
-    <ClCompile Include="..\gles3mark_src\glcontext_wgl.cpp" />
-    <ClCompile Include="..\gles3mark_src\gl3stub_egl.c" />
-    <ClCompile Include="..\gles3mark_src\gles3mark.cpp" />
-    <ClCompile Include="..\gles3mark_src\glhelper.cpp" />
-    <ClCompile Include="..\gles3mark_src\log.cpp" />
-    <ClCompile Include="..\win32\gles3mark_dll.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\assets\shaders\phong.frag" />
     <None Include="..\assets\shaders\phong.vert" />
     <None Include="..\assets\shaders\simple.frag" />
     <None Include="..\assets\shaders\simple.vert" />
     <None Include="gles3mark_dll.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\gles3mark\camera.h" />
+    <ClInclude Include="..\gles3mark\fpscounter.h" />
+    <ClInclude Include="..\gles3mark\gameobject.h" />
+    <ClInclude Include="..\gles3mark\gl3stub_egl.h" />
+    <ClInclude Include="..\gles3mark\glcontext.h" />
+    <ClInclude Include="..\gles3mark\glcontext_egl.h" />
+    <ClInclude Include="..\gles3mark\glcontext_wgl.h" />
+    <ClInclude Include="..\gles3mark\gles3mark.h" />
+    <ClInclude Include="..\gles3mark\glhelper.h" />
+    <ClInclude Include="..\gles3mark\glinclude.h" />
+    <ClInclude Include="..\gles3mark\gltest.h" />
+    <ClInclude Include="..\gles3mark\gltexture.h" />
+    <ClInclude Include="..\gles3mark\input.h" />
+    <ClInclude Include="..\gles3mark\log.h" />
+    <ClInclude Include="..\gles3mark\mesh.h" />
+    <ClInclude Include="..\gles3mark\modelimporter.h" />
+    <ClInclude Include="..\gles3mark\time.h" />
+    <ClInclude Include="..\gles3mark\transform.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\gles3mark\assetfile.cpp" />
+    <ClCompile Include="..\gles3mark\assetmanager.cpp" />
+    <ClCompile Include="..\gles3mark\camera.cpp" />
+    <ClCompile Include="..\gles3mark\gl3stub_egl.c" />
+    <ClCompile Include="..\gles3mark\glcontext_egl.cpp" />
+    <ClCompile Include="..\gles3mark\glcontext_wgl.cpp" />
+    <ClCompile Include="..\gles3mark\gles3mark.cpp" />
+    <ClCompile Include="..\gles3mark\glhelper.cpp" />
+    <ClCompile Include="..\gles3mark\log.cpp" />
+    <ClCompile Include="..\win32\gles3mark_dll.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{214261FB-404F-4192-B4F3-2449688898F7}</ProjectGuid>

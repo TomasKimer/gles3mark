@@ -3,7 +3,7 @@
  */
 
 #include "baseapp.h"
-#include "../gles3mark_src/log.h"
+#include "../gles3mark/log.h"
 
 
 BaseApp::BaseApp(android_app* _state)
