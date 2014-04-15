@@ -58,7 +58,6 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
 
 public:
     GLES3Mark() : glContext(nullptr), quit(false), score(42), movePointerId(-2), aimPointerId(-2) {
-    	gltest = new GLTest();
         score = (int)glm::linearRand(10.f, 1000.f);
 
         std::random_device rd;
@@ -83,6 +82,7 @@ public:
         glContext = new GlContext();
         glContext->Create(osWnd);
 
+        gltest = new GLTest();
         gltest->OnInit(assetManager);
 
         //Log::Stream() << "C++ ver: " << (long)__cplusplus;

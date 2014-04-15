@@ -49,11 +49,10 @@ public:
     ~GLTest() {}
         
     bool OnInit(AssetManager* assetManager) {
-        int tgaWidth, tgaHeight, tgaBpp;
-        std::vector<char> TGAdata;
         try {            
-            TGAdata = assetManager->LoadTGA("textures/basemap.tga", tgaWidth, tgaHeight, tgaBpp);
-            texture.FromRawData(TGAdata, tgaWidth, tgaHeight);
+            //std::vector<char> KTXdata();
+            texture.FromKTXdata(assetManager->LoadContents("textures/chair512_etc2rgb_mip_slowperc.ktx"));
+            //KTXdata.clear();
             
             AssimpModelImporter* modelImporter = new AssimpModelImporter(*assetManager);
             mesh = modelImporter->Import("chairs.3ds");
@@ -155,8 +154,7 @@ public:
         glUseProgram(Prog);
         glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, glm::value_ptr(mvp));
 
-        glActiveTexture(GL_TEXTURE0);
-        texture.Bind();
+        texture.Bind(GL_TEXTURE0);
         glUniform1i(textureUniform, 0);
         
         glBindVertexArray(VAO);
@@ -165,7 +163,7 @@ public:
 
         //glUseProgram(0);
         //glFlush();
-        assert(glGetError() == GL_NO_ERROR);
+        //assert(glGetError() == GL_NO_ERROR);
     }
 
     void Destroy() {
