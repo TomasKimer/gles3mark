@@ -15,7 +15,7 @@ class GLMeshRenderer {
         glm::vec2 texcoord;     // layout (location=2)
     };
 
-
+    unsigned elementsCount;
 
 public:
      Mesh* mesh;
@@ -24,7 +24,7 @@ public:
         this->mesh = mesh;
         
         // Copy data to graphics card
-        glGenBuffers(1, &VBO);      // TODO neni treba ukladat? - staci ulozit jen VAO -- stejna promenna na vsechny docasne buffery
+        glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         GL_CHECK( glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(VboEntry), nullptr, GL_STATIC_DRAW) );
 
@@ -62,11 +62,13 @@ public:
 
         // unbind VAO
         glBindVertexArray(0);
+
+        elementsCount = mesh->faces.size() * 3;
     }
 
     void Render() {
         glBindVertexArray(VAO);
-        GL_CHECK( glDrawElements(GL_TRIANGLES, mesh->faces.size() * 3, GL_UNSIGNED_INT, nullptr) );  // sizeof house / sizeof house[0]
+        GL_CHECK( glDrawElements(GL_TRIANGLES, elementsCount, GL_UNSIGNED_INT, nullptr) );
         glBindVertexArray(0);
     }
 

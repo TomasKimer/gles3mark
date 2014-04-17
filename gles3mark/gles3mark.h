@@ -153,7 +153,7 @@ public:
             joystickMove.z = static_cast<float>(joystickMoveCenter.y - y);
         }
         else {//if (dx != 0 || dy != 0) {
-            gltest->camera.Aim(-dy * 0.002f, -dx * 0.002f);  // 0.0025
+            gltest->camera.Aim(-dy * 0.005f, -dx * 0.005f);  // 0.0025
         }
     }
     

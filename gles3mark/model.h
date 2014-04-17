@@ -7,7 +7,7 @@
 
 class Model {
 
-       std::vector<Mesh*> meshes;
+    std::vector<Mesh*> meshes;
 
 public:
     ~Model() {

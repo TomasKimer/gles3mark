@@ -30,7 +30,9 @@
     <ClInclude Include="..\gles3mark\gltest.h" />
     <ClInclude Include="..\gles3mark\gltexture.h" />
     <ClInclude Include="..\gles3mark\input.h" />
+    <ClInclude Include="..\gles3mark\light.h" />
     <ClInclude Include="..\gles3mark\log.h" />
+    <ClInclude Include="..\gles3mark\material.h" />
     <ClInclude Include="..\gles3mark\mesh.h" />
     <ClInclude Include="..\gles3mark\glmeshrenderer.h" />
     <ClInclude Include="..\gles3mark\model.h" />
@@ -105,7 +107,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>gles3mark_dll.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Assimp32d.lib;libktxd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;Assimp32d.lib;libktxd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -126,7 +128,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>gles3mark_dll.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Assimp32.lib;libktx.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;Assimp32.lib;libktx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

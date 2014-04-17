@@ -14,8 +14,33 @@
 #include "glhelper.h"
 #include "log.h"
 
+// http://docs.unity3d.com/Documentation/ScriptReference/Texture.html
+// Reflective Shader - cubemap
 
-class GLTexture {
+class Texture {
+protected:    
+    enum class FilterMode {
+        Point,
+        Bilinear,
+        Trilinear    
+    };
+
+    enum class WrapMode {
+        Repeat,
+        Clamp,    
+    };
+
+    //enum class Dimension {}; // 1,2,3d, array
+    
+    int width, height;
+
+    static bool isPowerOfTwo(unsigned x) {
+        return (x != 0) && ((x & (x - 1)) == 0);
+    }
+};
+
+
+class GLTexture : public Texture {
     GLuint textureObject;
     GLenum target;
 
@@ -23,10 +48,6 @@ public:
     GLTexture() {
         glGenTextures(1, &textureObject);    
     }
-
-//    GLTexture(const std::vector<char>& rawData, int width, int height) : GLTexture() {
-//        FromRawData(rawData, width, height);
-//    }
 
     ~GLTexture() {
         glDeleteTextures(1, &textureObject);    
@@ -57,7 +78,6 @@ public:
         		 << "x" << ktxDimension.depth << ", mipmapped: " << (ktxIsMipmapped ? "true" : "false");
     }
 
-
     void FromBitmapData(const std::vector<char>& rawData, int width, int height) {
     	// glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     	// glGenSamplers, glBindSampler, glSamplerParameter, glDeleteSamplers
@@ -65,10 +85,10 @@ public:
     	target = GL_TEXTURE_2D;
 
     	glBindTexture(target, textureObject);
-    	glTexImage2D(target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, reinterpret_cast<const GLvoid*>(&rawData[0])); // GL_BGR not in ES - swizzles?
+    	glTexImage2D(target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, reinterpret_cast<const GLvoid*>(&rawData[0])); // GL_BGR not in ES -> swizzles?
 
     	GLint minFilter = GL_LINEAR;
-    	if (IsPowerOfTwo(width) && IsPowerOfTwo(height)) { // GL_INVALID_OPERATION if lvl 0 w&h is not power of 2 or is compressed internal format
+    	if (isPowerOfTwo(width) && isPowerOfTwo(height)) { // GL_INVALID_OPERATION if lvl 0 w&h is not power of 2 or is compressed internal format
     		glGenerateMipmap(target);
     		minFilter = GL_LINEAR_MIPMAP_LINEAR;
     	}
@@ -80,10 +100,5 @@ public:
     void Bind(GLenum textureUnit = GL_TEXTURE0) {
         glActiveTexture(textureUnit);
         glBindTexture(target, textureObject);
-    }
-
-private:
-    static bool IsPowerOfTwo(unsigned x) {
-        return (x != 0) && ((x & (x - 1)) == 0);
     }
 };

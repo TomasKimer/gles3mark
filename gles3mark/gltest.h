@@ -25,12 +25,13 @@
 class GLTest {
 
     GLuint VS, FS, Prog;
-    GLuint mvpUniform, textureUniform;
+    GLuint mvpUniform, textureUniform, diffuseUniform;
 
     int width, height;
 
     std::vector<GLMeshRenderer> meshRenderers;
     GLTexture texture;
+    std::vector<Material*> materialDatabase;
 
     glm::quat rot;
     Transform testTrans;
@@ -46,9 +47,8 @@ public:
             texture.FromKTXdata(assetManager->LoadContents("textures/chair512_etc2rgb_mip_slowperc.ktx"));
             
             AssimpModelImporter* modelImporter = new AssimpModelImporter(/* *assetManager*/);
-            Model* model = modelImporter->Import(assetManager->LoadContents("models/e112.3ds"));
-
-            
+            std::vector<char> modelData(assetManager->LoadContents("models/e112.3ds"));
+            Model* model = modelImporter->Import(modelData, materialDatabase);
 
             GLHelper::GLInfo();
 
@@ -59,19 +59,20 @@ public:
 
             meshRenderers.resize(model->GetMeshes().size());            
             for (size_t i = 0; i < model->GetMeshes().size(); ++i) {
-                meshRenderers[i].Init(model->GetMeshes()[i]);            
+                Mesh* m = model->GetMeshes()[i];
+                meshRenderers[i].Init(m);
+                m->FreeMemory();
             }
         }
         catch (std::exception &e) {
             Log::E() << "Init exception: " << e.what();
         }
-
-        //glBindFragDataLocation(_programID, 0, "FColor");    -- http://stackoverflow.com/questions/1733838/fragment-shaders-output-variabless    
         
         mvpUniform = glGetUniformLocation(Prog, "mvp");
         textureUniform = glGetUniformLocation(Prog, "tex");
+        diffuseUniform = glGetUniformLocation(Prog, "diffuseColor");
 
-        camera.Move(glm::vec3(0, 0, -70.f));
+        camera.Move(glm::vec3(0, 20, -50.f));
 
         testTrans.Rotate(Transform::Up(), glm::radians(90.0f), Transform::Space::World);
         testTrans.Translate(glm::vec3(0,0,-70));
@@ -97,7 +98,7 @@ public:
         glm::mat4& view       = camera.GetViewMatrix();
 
         rot = glm::rotate(rot, time.DeltaTime(), glm::vec3(0, 1, 0));
-        glm::mat4 model = glm::mat4_cast(rot); //testTrans.GetMatrix(); //        
+        glm::mat4 model = glm::scale(glm::translate(glm::mat4(), glm::vec3(0,0,0)), glm::vec3(0.1f, 0.1f, 0.1f)); //glm::mat4_cast(rot); //testTrans.GetMatrix(); //        
         
         //glm::mat4 mvp = projection * view * model;
 
@@ -113,6 +114,7 @@ public:
         for (GLMeshRenderer &mr : meshRenderers) {
             glm::mat4 mvp = projection * view * model * mr.mesh->matrix;
             glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, glm::value_ptr(mvp));
+            glUniform4fv(diffuseUniform, 1, glm::value_ptr(materialDatabase[mr.mesh->materialID]->diffuseColor)); 
             mr.Render();
         }
 
