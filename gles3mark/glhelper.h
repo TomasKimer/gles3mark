@@ -21,18 +21,10 @@
 #define GL_CHECK(stmt) stmt
 #endif
 
-#ifdef _WIN32
-const std::string SHADER_VERSION("#version 330 core");  // 430?
-#else
-const std::string SHADER_VERSION("#version 300 es");
-#endif
 
 class GLHelper {
 public:
     static void GLInfo();
-
-    static GLuint compileShader(GLenum type, const std::string& source);
-    static GLuint linkShader(std::initializer_list<GLuint> shaders);
 
     // http://stackoverflow.com/questions/11256470/define-a-macro-to-facilitate-opengl-command-debugging
     static void CheckOpenGLError(const char* stmt, const char* fname, int line) {
@@ -43,9 +35,6 @@ public:
         }
     }
 
-    // Info logs contain errors and warnings from shader compilation and linking
-    static std::string getInfoLog(GLuint shaderOrProgram);
-
     static std::string getGlErrorString(GLenum error);
     // TODO https://www.khronos.org/opengles/sdk/docs/man/xhtml/glCheckFramebufferStatus.xml
     // https://github.com/g-truc/ogl-samples/blob/master/framework/test.cpp
@@ -54,8 +43,7 @@ public:
         GL_Exception(const GLenum error = glGetError()) throw()
             : std::runtime_error("OpenGL: " + getGlErrorString(error)) {}
         GL_Exception(const std::string& text, const GLenum error = glGetError()) throw()
-            : std::runtime_error("OpenGL: " + text + " : " + getGlErrorString(error)) {}
-
-       
+            : std::runtime_error("OpenGL: " + text + " : " + getGlErrorString(error))
+        {} 
     };
 };

@@ -20,7 +20,6 @@
   <ItemGroup>
     <ClInclude Include="..\gles3mark\camera.h" />
     <ClInclude Include="..\gles3mark\fpscounter.h" />
-    <ClInclude Include="..\gles3mark\gameobject.h" />
     <ClInclude Include="..\gles3mark\gl3stub_egl.h" />
     <ClInclude Include="..\gles3mark\glcontext.h" />
     <ClInclude Include="..\gles3mark\glcontext_egl.h" />
@@ -28,16 +27,17 @@
     <ClInclude Include="..\gles3mark\gles3mark.h" />
     <ClInclude Include="..\gles3mark\glhelper.h" />
     <ClInclude Include="..\gles3mark\gltest.h" />
-    <ClInclude Include="..\gles3mark\gltexture.h" />
+    <ClInclude Include="..\gles3mark\materialdatabase.h" />
+    <ClInclude Include="..\gles3mark\texture.h" />
     <ClInclude Include="..\gles3mark\input.h" />
     <ClInclude Include="..\gles3mark\light.h" />
     <ClInclude Include="..\gles3mark\log.h" />
     <ClInclude Include="..\gles3mark\material.h" />
     <ClInclude Include="..\gles3mark\mesh.h" />
-    <ClInclude Include="..\gles3mark\glmeshrenderer.h" />
+    <ClInclude Include="..\gles3mark\meshrenderer.h" />
     <ClInclude Include="..\gles3mark\model.h" />
     <ClInclude Include="..\gles3mark\modelimporter.h" />
-    <ClInclude Include="..\gles3mark\modelimporter_assimp.h" />
+    <ClInclude Include="..\gles3mark\shaderprogram.h" />
     <ClInclude Include="..\gles3mark\time.h" />
     <ClInclude Include="..\gles3mark\transform.h" />
   </ItemGroup>
@@ -52,6 +52,8 @@
     <ClCompile Include="..\gles3mark\glhelper.cpp" />
     <ClCompile Include="..\gles3mark\log.cpp" />
     <ClCompile Include="..\gles3mark\mesh.cpp" />
+    <ClCompile Include="..\gles3mark\meshrenderer.cpp" />
+    <ClCompile Include="..\gles3mark\shaderprogram.cpp" />
     <ClCompile Include="..\win32\gles3mark_dll.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

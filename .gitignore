@@ -25,6 +25,11 @@ msvc/Release/
 *.suo
 *.user
 *.opensdf
+# VS profiler
+*.psess
+*.vspx
+*.etl
+
 
 # Local configuration file (sdk path, etc)
 local.properties

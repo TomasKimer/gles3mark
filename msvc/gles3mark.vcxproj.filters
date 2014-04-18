@@ -41,9 +41,6 @@
     <ClInclude Include="..\gles3mark\fpscounter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark\gameobject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\gles3mark\gl3stub_egl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -65,9 +62,6 @@
     <ClInclude Include="..\gles3mark\gltest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark\gltexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\gles3mark\input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -75,9 +69,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gles3mark\mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gles3mark\modelimporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gles3mark\time.h">
@@ -89,16 +80,25 @@
     <ClInclude Include="..\gles3mark\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark\modelimporter_assimp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gles3mark\glmeshrenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\gles3mark\material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gles3mark\light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\shaderprogram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\meshrenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\modelimporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\materialdatabase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -134,6 +134,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gles3mark\gl3stub_egl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gles3mark\shaderprogram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gles3mark\meshrenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,6 +3,18 @@
 #include "mesh.h"
 
 
+void Mesh::TransformData(const glm::mat4& matrix) {    
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        vertices[i] = glm::vec3(matrix * glm::vec4(vertices[i], 1.0f));        
+    }
+    for (size_t i = 0; i < normals.size(); ++i) {
+        normals[i] = glm::vec3(matrix * glm::vec4(normals[i], 0.0f));  // vec4 * matrix?
+    }
+    for (size_t i = 0; i < tangents.size(); ++i) {
+        tangents[i] = glm::vec3(matrix * glm::vec4(tangents[i], 0.0f));        
+    }
+}
+
 void Mesh::MakeTestMesh() {
     vertices = {
         // Walls

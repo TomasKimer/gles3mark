@@ -5,6 +5,7 @@
 #include <string>
 #include <glm/glm.hpp>
 
+#include "meshrenderer.h"
 
 class Mesh {
 public:
@@ -18,16 +19,22 @@ public:
     glm::mat4 matrix;
     unsigned materialID;
 
+    MeshRenderer renderer;
+
 public:
+    Mesh() : materialID(0) {}
+    
     Mesh(const std::vector<glm::vec3>& vertices, const std::vector<glm::ivec3>& faces, const std::vector<glm::vec2>& texCoords,
-         const std::vector<glm::vec3>& normals, const std::vector<glm::vec3>& tangents, unsigned materialId, const std::string& name = std::string()) :
+         const std::vector<glm::vec3>& normals, const std::vector<glm::vec3>& tangents, unsigned materialId = 0, const std::string& name = std::string()) :
          vertices(vertices), faces(faces), texCoords(texCoords), normals(normals), tangents(tangents), materialID(materialId), name(name)
     {}
 
-//    Mesh() {}
-    
-    // Nasobeni matici vynasobi vsechny vertexy meshe
-    Mesh operator* (const glm::mat4& matrix) const {    
+    ~Mesh() {}
+
+    void TransformData(const glm::mat4& matrix);
+
+    void InitRenderer() {
+        renderer.Init(this);
     }
 
     void FreeMemory() {

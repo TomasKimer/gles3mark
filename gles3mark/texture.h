@@ -2,6 +2,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include <stdexcept>
 
 #ifdef _WIN32
@@ -15,8 +16,9 @@
 #include "log.h"
 
 // http://docs.unity3d.com/Documentation/ScriptReference/Texture.html
+// RenderTexture (target) - http://docs.unity3d.com/Documentation/ScriptReference/RenderTexture.html
 // Reflective Shader - cubemap
-
+/*
 class Texture {
 protected:    
     enum class FilterMode {
@@ -29,27 +31,24 @@ protected:
         Repeat,
         Clamp,    
     };
-
     //enum class Dimension {}; // 1,2,3d, array
-    
-    int width, height;
-
-    static bool isPowerOfTwo(unsigned x) {
-        return (x != 0) && ((x & (x - 1)) == 0);
-    }
-};
+};*/
 
 
-class GLTexture : public Texture {
+class Texture { // : public Texture {
     GLuint textureObject;
     GLenum target;
+    int width, height;
 
 public:
-    GLTexture() {
-        glGenTextures(1, &textureObject);    
+    std::string path;
+
+public:
+    Texture(const std::string& path = std::string()) : path(path) {
+        glGenTextures(1, &textureObject);
     }
 
-    ~GLTexture() {
+    ~Texture() {
         glDeleteTextures(1, &textureObject);    
     }
 
@@ -74,8 +73,8 @@ public:
         glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
         glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        Log::V() << "KTX texture loaded: " << ktxDimension.width << "x" << ktxDimension.height
-        		 << "x" << ktxDimension.depth << ", mipmapped: " << (ktxIsMipmapped ? "true" : "false");
+        Log::V() << "KTX texture " + path + " loaded: " << ktxDimension.width << "x" << ktxDimension.height
+        		 /*<< "x" << ktxDimension.depth*/ << ", mipmapped: " << (ktxIsMipmapped ? "true" : "false");
     }
 
     void FromBitmapData(const std::vector<char>& rawData, int width, int height) {
@@ -100,5 +99,10 @@ public:
     void Bind(GLenum textureUnit = GL_TEXTURE0) {
         glActiveTexture(textureUnit);
         glBindTexture(target, textureObject);
+    }
+
+private:
+    static bool isPowerOfTwo(unsigned x) {
+        return (x != 0) && ((x & (x - 1)) == 0);
     }
 };

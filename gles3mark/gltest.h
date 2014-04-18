@@ -4,12 +4,13 @@
 
 #include "log.h"
 #include "assetmanager.h"
-#include "modelimporter_assimp.h"
+#include "modelimporter.h"
 #include "camera.h"
 #include "glhelper.h"
 #include "time.h"
-#include "gltexture.h"
-#include "glmeshrenderer.h"
+#include "texture.h"
+#include "meshrenderer.h"
+#include "shaderprogram.h"
 
 #include <string>
 #include <vector>
@@ -18,23 +19,20 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 
 class GLTest {
 
-    GLuint VS, FS, Prog;
-    GLuint mvpUniform, textureUniform, diffuseUniform;
-
-    int width, height;
-
-    std::vector<GLMeshRenderer> meshRenderers;
-    GLTexture texture;
+    ShaderProgram* shaderProgramSimple;
+    Model* model;
     std::vector<Material*> materialDatabase;
 
+    //GLTexture texture;
     glm::quat rot;
     Transform testTrans;
+
+    int width, height;
     
 public:
     Camera camera;
@@ -43,34 +41,41 @@ public:
     ~GLTest() {}
         
     bool OnInit(AssetManager* assetManager) {
+        GLHelper::GLInfo();
+        
         try {            
-            texture.FromKTXdata(assetManager->LoadContents("textures/chair512_etc2rgb_mip_slowperc.ktx"));
+            //texture.FromKTXdata(assetManager->LoadContents("textures/chair2.ktx"));  // chair512_etc2rgb_mip_slowperc.ktx
             
             AssimpModelImporter* modelImporter = new AssimpModelImporter(/* *assetManager*/);
             std::vector<char> modelData(assetManager->LoadContents("models/e112.3ds"));
-            Model* model = modelImporter->Import(modelData, materialDatabase);
+            model = modelImporter->Import(modelData, materialDatabase);
 
-            GLHelper::GLInfo();
+            for (Material* m : materialDatabase) {
+                if (m->hasTexture) {
+                    std::string ktxPath = m->texture->path.substr(0, m->texture->path.find_last_of(".")) + ".ktx";
+                    std::transform(ktxPath.begin(), ktxPath.end(), ktxPath.begin(), ::tolower);
+                    m->texture->FromKTXdata(assetManager->LoadContents("textures/" + ktxPath));
+                }            
+            }
 
-            VS = GLHelper::compileShader(GL_VERTEX_SHADER, assetManager->LoadText("shaders/simple.vert"));
-            FS = GLHelper::compileShader(GL_FRAGMENT_SHADER, assetManager->LoadText("shaders/simple.frag"));
-
-            Prog = GLHelper::linkShader({ VS, FS });
-
-            meshRenderers.resize(model->GetMeshes().size());            
             for (size_t i = 0; i < model->GetMeshes().size(); ++i) {
                 Mesh* m = model->GetMeshes()[i];
-                meshRenderers[i].Init(m);
+                m->InitRenderer();
                 m->FreeMemory();
             }
+
+            shaderProgramSimple = new ShaderProgram(assetManager->LoadText("shaders/simple.vert"),
+                                                    assetManager->LoadText("shaders/simple.frag"));
+
+            shaderProgramSimple->AddUniform("mvp");
+            shaderProgramSimple->AddUniform("tex");
+            shaderProgramSimple->AddUniform("diffuseColor");
+            shaderProgramSimple->AddUniform("hasTexture");
+
         }
         catch (std::exception &e) {
             Log::E() << "Init exception: " << e.what();
         }
-        
-        mvpUniform = glGetUniformLocation(Prog, "mvp");
-        textureUniform = glGetUniformLocation(Prog, "tex");
-        diffuseUniform = glGetUniformLocation(Prog, "diffuseColor");
 
         camera.Move(glm::vec3(0, 20, -50.f));
 
@@ -98,25 +103,32 @@ public:
         glm::mat4& view       = camera.GetViewMatrix();
 
         rot = glm::rotate(rot, time.DeltaTime(), glm::vec3(0, 1, 0));
-        glm::mat4 model = glm::scale(glm::translate(glm::mat4(), glm::vec3(0,0,0)), glm::vec3(0.1f, 0.1f, 0.1f)); //glm::mat4_cast(rot); //testTrans.GetMatrix(); //        
+        glm::mat4 modelM = glm::scale(glm::translate(glm::mat4(), glm::vec3(0,0,0)), glm::vec3(0.1f, 0.1f, 0.1f)); //glm::mat4_cast(rot); //testTrans.GetMatrix(); //        
         
         //glm::mat4 mvp = projection * view * model;
 
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(Prog);
-        //glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, glm::value_ptr(mvp));
+        shaderProgramSimple->Use();
+        shaderProgramSimple->SetUniform("tex", 0);
 
-        texture.Bind(GL_TEXTURE0);
-        glUniform1i(textureUniform, 0);
-
-        for (GLMeshRenderer &mr : meshRenderers) {
-            glm::mat4 mvp = projection * view * model * mr.mesh->matrix;
-            glUniformMatrix4fv(mvpUniform, 1, GL_FALSE, glm::value_ptr(mvp));
-            glUniform4fv(diffuseUniform, 1, glm::value_ptr(materialDatabase[mr.mesh->materialID]->diffuseColor)); 
-            mr.Render();
+        for (Mesh* m : model->GetMeshes()) {
+            // transform
+            glm::mat4 mvp = projection * view * modelM * m->matrix;
+            shaderProgramSimple->SetUniform("mvp", mvp);
+            
+            // material
+            Material* mat = materialDatabase[m->materialID];
+            shaderProgramSimple->SetUniform("diffuseColor", mat->diffuseColor); 
+            shaderProgramSimple->SetUniform("hasTexture", mat->hasTexture);
+            if (mat->hasTexture)
+                mat->texture->Bind(GL_TEXTURE0);
+            
+            // draw
+            m->renderer.Render();
         }
+
 
         //glUseProgram(0);
         //glFlush();
@@ -128,9 +140,10 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        for (GLMeshRenderer &mr : meshRenderers)
-            mr.Destroy();
+        for (Mesh* m : model->GetMeshes()) {
+            m->renderer.Destroy();
+        }
 
-        glDeleteShader(Prog);
+        delete shaderProgramSimple;
     }
 };
