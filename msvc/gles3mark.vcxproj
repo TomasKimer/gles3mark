@@ -36,7 +36,7 @@
     <ClInclude Include="..\gles3mark\mesh.h" />
     <ClInclude Include="..\gles3mark\meshrenderer.h" />
     <ClInclude Include="..\gles3mark\model.h" />
-    <ClInclude Include="..\gles3mark\modelimporter.h" />
+    <ClInclude Include="..\gles3mark\sceneimporter.h" />
     <ClInclude Include="..\gles3mark\shaderprogram.h" />
     <ClInclude Include="..\gles3mark\time.h" />
     <ClInclude Include="..\gles3mark\transform.h" />

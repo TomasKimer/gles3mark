@@ -20,7 +20,7 @@ public:
     // Shader program? http://docs.unity3d.com/Documentation/ScriptReference/Shader.html
     // Textures? texture database + index? map<path,Texture> ?
     bool hasTexture;
-    Texture *texture;      // The material's texture. - main, normal, ..., another material can have same texture - TextureDatabase - index: path?
+    Texture *texture;      // The material's texture. - main, normal, ..., another material can have same texture - TextureDatabase - index: path?, sharedPtr?
     //ShaderProgram *shader; //The shader used by the material. - only one,            - || -             shader  - ShaderDatabase  - index: -||-?
 
     unsigned id;

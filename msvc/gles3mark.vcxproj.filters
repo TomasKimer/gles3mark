@@ -95,10 +95,10 @@
     <ClInclude Include="..\gles3mark\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark\modelimporter.h">
+    <ClInclude Include="..\gles3mark\materialdatabase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark\materialdatabase.h">
+    <ClInclude Include="..\gles3mark\sceneimporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

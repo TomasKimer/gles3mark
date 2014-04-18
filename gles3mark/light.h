@@ -6,7 +6,7 @@
 
 // http://docs.unity3d.com/Documentation/ScriptReference/Light.html
 class Light {
-
+public:
     enum class Type {
         Directional,
         Point,
@@ -15,12 +15,12 @@ class Light {
     } type;
     
     
-    glm::vec4 position;      // light position for a point/spotlight
+    glm::vec3 position;      // light position for a point/spotlight
     glm::vec3 direction;     // normalized dir. for a directional light
     
-    glm::vec4 ambientColor;
-    glm::vec4 diffuseColor;
-    glm::vec4 specularColor;
+    glm::vec3 ambientColor;
+    glm::vec3 diffuseColor;
+    glm::vec3 specularColor;
     
     glm::vec3 spotDirection;
     glm::vec3 attenuationFactors;

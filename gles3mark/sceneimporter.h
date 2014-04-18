@@ -14,12 +14,13 @@
 #include "log.h"
 #include "model.h"
 #include "material.h"
+#include "light.h"
 
 
-class ModelImporter {
+class SceneImporter {
 public:
-    ModelImporter(/*const AssetManager& assetManager*/) /*: refAssetManager(assetManager)*/ {}
-    virtual ~ModelImporter() = default;
+    SceneImporter(/*const AssetManager& assetManager*/) /*: refAssetManager(assetManager)*/ {}
+    virtual ~SceneImporter() = default;
 
     virtual Model* Import(/*const*/ std::vector<char>& rawModelData, std::vector<Material*>& materialDatabase) = 0;
 
@@ -28,13 +29,13 @@ protected:
 };
 
 
-class AssimpModelImporter : public ModelImporter {
+class AssimpSceneImporter : public SceneImporter {
 public:
-    AssimpModelImporter(/*const AssetManager& assetManager*/): ModelImporter(/*assetManager*/) {
+    AssimpSceneImporter(/*const AssetManager& assetManager*/): SceneImporter(/*assetManager*/) {
         Assimp::DefaultLogger::set(new AssimpLogger());    
     }
 
-    virtual ~AssimpModelImporter() {
+    virtual ~AssimpSceneImporter() {
         Assimp::DefaultLogger::kill();    
     }
 
@@ -67,28 +68,19 @@ public:
             //Log::V() << "Material " << i << " - name: " << name.C_Str() << (path.length > 0 ? (std::string(", texture: ") + path.data) : "");
         }
 
+        for (unsigned int i = 0; i < aScene->mNumLights; ++i) {
+            const aiLight* aLight = aScene->mLights[i];
+            Light* l = LoadLight(aLight);
+        }
+
+        if (aScene->HasTextures  ()) Log::W() << "Has embedded textures.";
+        if (aScene->HasAnimations()) Log::W() << "Has animations.";
+        if (aScene->HasCameras   ()) Log::W() << "Has cameras.";
+
         return model;
     }
 
-
-    static glm::mat4 toGLM(const aiMatrix4x4& m) {
-        return glm::transpose(glm::make_mat4(&m.a1));
-    }
-
-    static glm::vec4 toGLM(const aiColor4D& c) {
-        return glm::make_vec4(&c.r);
-    }
-
 private:
-    class AssimpLogger : public Assimp::Logger {
-        virtual void OnDebug(const char* msg) override {}// Log::D() << "Assimp: " << msg; }
-        virtual void OnInfo (const char* msg) override { Log::V() << "Assimp: " << msg; }
-        virtual void OnWarn (const char* msg) override {}// Log::W() << "Assimp: " << msg; }
-        virtual void OnError(const char* msg) override { Log::E() << "Assimp: " << msg; }
-        virtual bool attachStream (Assimp::LogStream*, unsigned) override { return true; }
-        virtual bool detatchStream(Assimp::LogStream*, unsigned) override { return true; }
-    };
-
     void RecursiveTransform(Model* model, const aiScene *aScene, const aiNode* aNode, glm::mat4 matrix) {
         glm::mat4 m = matrix * toGLM(aNode->mTransformation);      
 
@@ -112,7 +104,7 @@ private:
         // faces
         std::vector<glm::ivec3> faces(aMesh->mNumFaces);
         for (unsigned int j = 0; j < aMesh->mNumFaces; ++j) {
-            std::memcpy(&faces[j].x, aMesh->mFaces[j].mIndices, sizeof(glm::ivec3));  //assert(aMesh->mFaces[0].mNumIndices == 3);
+            faces[j] = glm::make_vec3(aMesh->mFaces[j].mIndices);   //assert(aMesh->mFaces[0].mNumIndices == 3);
         }
 
         // normals
@@ -120,37 +112,39 @@ private:
         if (aMesh->HasNormals())
             std::memcpy(&normals[0].x, &aMesh->mNormals[0], aMesh->mNumVertices * sizeof(glm::vec3));
 
-        // tangents
+        // tangents (and bitangents?)
         std::vector<glm::vec3> tangents(aMesh->mNumVertices, glm::vec3(0));
         if (aMesh->HasTangentsAndBitangents())
-            std::memcpy(&tangents[0].x, &aMesh->mTangents[0], aMesh->mNumVertices * sizeof(glm::vec3)); // TODO bitangents?
+            std::memcpy(&tangents[0].x, &aMesh->mTangents[0], aMesh->mNumVertices * sizeof(glm::vec3));
         
         // texture coordinates
         int texLevel = 0;
         std::vector<glm::vec2> texCoords(aMesh->mNumVertices, glm::vec2(0));
         if (aMesh->HasTextureCoords(texLevel)) {
             for (unsigned int j = 0; j < aMesh->mNumVertices; ++j) {
-                texCoords[j].s = aMesh->mTextureCoords[texLevel][j].x;
-                texCoords[j].t = aMesh->mTextureCoords[texLevel][j].y; 
+                texCoords[j] = glm::make_vec2(&aMesh->mTextureCoords[texLevel][j].x);                
             }
         }
 
         return new Mesh(vertices, faces, texCoords, normals, tangents, materialZeroIndex + aMesh->mMaterialIndex, std::string(aMesh->mName.C_Str()));
     }
 
+    // http://assimp.sourceforge.net/lib_html/materials.html
     Material* LoadMaterial(const aiMaterial* aMat) {
         aiString name;
         if (aMat->Get(AI_MATKEY_NAME, name) != AI_SUCCESS) {
-            Log::W() << "AI_MATKEY_NAME";
+            Log::W() << "no name";
         }
         
         // textures
         aiString path;
-        aMat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
+        if (aMat->GetTexture(aiTextureType_DIFFUSE, 0, &path) != AI_SUCCESS)
+            Log::W() << "no texture";
         
         // colors
         aiColor4D diffuse; //(0.f, 0.f, 0.f, 1.f);
-        aiGetMaterialColor(aMat, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
+        if (aiGetMaterialColor(aMat, AI_MATKEY_COLOR_DIFFUSE, &diffuse) != AI_SUCCESS)
+            Log::W() << "no diffuse";
         
         aiColor4D ambient;
         if (aiGetMaterialColor(aMat, AI_MATKEY_COLOR_AMBIENT, &ambient) != AI_SUCCESS)
@@ -169,4 +163,56 @@ private:
         
         return new Material(toGLM(diffuse), toGLM(ambient), toGLM(specular), toGLM(emissive), shininess, std::string(path.C_Str()));
     }
+
+    Light* LoadLight(const aiLight *aLight) {
+        Log::V() << "Light present: " << aLight->mName.data;
+        
+        Light* light = new Light(); 
+
+        light->diffuseColor  = toGLM(aLight->mColorDiffuse );
+        light->ambientColor  = toGLM(aLight->mColorAmbient );
+        light->specularColor = toGLM(aLight->mColorSpecular);
+
+        light->direction = toGLM(aLight->mDirection);
+        light->position  = toGLM(aLight->mPosition );
+
+        Log::V() << "Position: " << light->position.x << " " << light->position.y << " " << light->position.z;
+        Log::V() << "Direction: " << light->direction.x << " " << light->direction.y << " " << light->direction.z;
+        
+        // TODO mAngleInnerCone, mAngleOuterCone, mAttenuationConstant, mAttenuationLinear, mAttenuationQuadratic
+
+        switch (aLight->mType) {
+            case aiLightSource_DIRECTIONAL:
+                light->type = Light::Type::Directional;
+                break;
+
+            case aiLightSource_POINT:
+                light->type = Light::Type::Point;
+                break;
+
+            case aiLightSource_SPOT:
+                light->type = Light::Type::Spot;
+                break;
+        
+            default:   // aiLightSource_UNDEFINED
+                Log::W() << "Undefined light source type.";
+        }
+    
+        return light;
+    }
+
+    
+    class AssimpLogger : public Assimp::Logger {
+        virtual void OnDebug(const char* msg) override {}// Log::D() << "Assimp: " << msg; }
+        virtual void OnInfo (const char* msg) override { Log::V() << "Assimp: " << msg; }
+        virtual void OnWarn (const char* msg) override {}// Log::W() << "Assimp: " << msg; }
+        virtual void OnError(const char* msg) override { Log::E() << "Assimp: " << msg; }
+        virtual bool attachStream (Assimp::LogStream*, unsigned) override { return true; }
+        virtual bool detatchStream(Assimp::LogStream*, unsigned) override { return true; }
+    };
+
+    static glm::vec3 toGLM(const aiColor3D  & c) { return                glm::make_vec3(&c.r ) ; }
+    static glm::vec3 toGLM(const aiVector3D & v) { return                glm::make_vec3(&v.x ) ; }
+    static glm::vec4 toGLM(const aiColor4D  & c) { return                glm::make_vec4(&c.r ) ; }
+    static glm::mat4 toGLM(const aiMatrix4x4& m) { return glm::transpose(glm::make_mat4(&m.a1)); }
 };

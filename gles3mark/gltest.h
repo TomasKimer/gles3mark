@@ -4,7 +4,7 @@
 
 #include "log.h"
 #include "assetmanager.h"
-#include "modelimporter.h"
+#include "sceneimporter.h"
 #include "camera.h"
 #include "glhelper.h"
 #include "time.h"
@@ -23,6 +23,17 @@
 
 
 class GLTest {
+    // layout (std140) uniform MatrixUniformBlock
+    //struct MatrixUniformBlock {
+    //    glm::mat4 projection;
+    //    glm::mat4 view;
+    //    glm::mat4 model;
+    //} mub;
+    //GLuint matrixUniformBuffer;
+    //glBindBuffer(GL_UNIFORM_BUFFER, matrixUniformBuffer);
+    //glBufferSubData(GL_UNIFORM_BUFFER, offsetof(MatrixUniformBlock, model), sizeof(glm::mat4), glm::value_ptr(mub.model));
+    //glBufferData(GL_UNIFORM_BUFFER, sizeof(MatrixUniformBlock), (void*)&mub, GL_STATIC_DRAW);
+    // ...
 
     ShaderProgram* shaderProgramSimple;
     Model* model;
@@ -41,12 +52,11 @@ public:
     ~GLTest() {}
         
     bool OnInit(AssetManager* assetManager) {
-        GLHelper::GLInfo();
-        
+        GLHelper::GLInfo();        
         try {            
             //texture.FromKTXdata(assetManager->LoadContents("textures/chair2.ktx"));  // chair512_etc2rgb_mip_slowperc.ktx
             
-            AssimpModelImporter* modelImporter = new AssimpModelImporter(/* *assetManager*/);
+            AssimpSceneImporter* modelImporter = new AssimpSceneImporter(/* *assetManager*/);
             std::vector<char> modelData(assetManager->LoadContents("models/e112.3ds"));
             model = modelImporter->Import(modelData, materialDatabase);
 
