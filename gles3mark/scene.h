@@ -6,11 +6,12 @@
 #include "assetmanager.h"
 #include "sceneimporter.h"
 #include "camera.h"
-#include "glhelper.h"
+#include "glerror.h"
 #include "time.h"
 #include "texture.h"
 #include "meshrenderer.h"
 #include "shaderprogram.h"
+#include "glquery.h"
 
 #include <string>
 #include <vector>
@@ -22,7 +23,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 
-class GLTest {
+class Scene {
     // layout (std140) uniform MatrixUniformBlock
     //struct MatrixUniformBlock {
     //    glm::mat4 projection;
@@ -35,7 +36,8 @@ class GLTest {
     //glBufferData(GL_UNIFORM_BUFFER, sizeof(MatrixUniformBlock), (void*)&mub, GL_STATIC_DRAW);
     // ...
 
-    ShaderProgram* shaderProgramSimple;
+    ShaderProgram* firstPassProgram;
+    ShaderProgram* secondPassProgram;
     Model* model;
     std::vector<Material*> materialDatabase;
 
@@ -48,11 +50,11 @@ class GLTest {
 public:
     Camera camera;
     
-    GLTest()  {}
-    ~GLTest() {}
+    Scene()  {}
+    ~Scene() {}
         
     bool OnInit(AssetManager* assetManager) {
-        GLHelper::GLInfo();        
+
         try {            
             //texture.FromKTXdata(assetManager->LoadContents("textures/chair2.ktx"));  // chair512_etc2rgb_mip_slowperc.ktx
             
@@ -68,19 +70,21 @@ public:
                 }            
             }
 
-            for (size_t i = 0; i < model->GetMeshes().size(); ++i) {
-                Mesh* m = model->GetMeshes()[i];
+            for (Mesh* m : model->GetMeshes()) {
                 m->InitRenderer();
                 m->FreeMemory();
             }
 
-            shaderProgramSimple = new ShaderProgram(assetManager->LoadText("shaders/simple.vert"),
-                                                    assetManager->LoadText("shaders/simple.frag"));
+            firstPassProgram = new ShaderProgram(assetManager->LoadText("shaders/firstpass.vert"),
+                                                 assetManager->LoadText("shaders/firstpass.frag"));
 
-            shaderProgramSimple->AddUniform("mvp");
-            shaderProgramSimple->AddUniform("tex");
-            shaderProgramSimple->AddUniform("diffuseColor");
-            shaderProgramSimple->AddUniform("hasTexture");
+            firstPassProgram->AddUniform("mvp");
+            firstPassProgram->AddUniform("tex");
+            firstPassProgram->AddUniform("diffuseColor");
+            firstPassProgram->AddUniform("hasTexture");
+
+            secondPassProgram = new ShaderProgram(assetManager->LoadText("shaders/secondpass.vert"),
+                                                  assetManager->LoadText("shaders/secondpass.frag"));
 
         }
         catch (std::exception &e) {
@@ -120,18 +124,18 @@ public:
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shaderProgramSimple->Use();
-        shaderProgramSimple->SetUniform("tex", 0);
+        firstPassProgram->Use();
+        firstPassProgram->SetUniform("tex", 0);
 
         for (Mesh* m : model->GetMeshes()) {
             // transform
             glm::mat4 mvp = projection * view * modelM * m->matrix;
-            shaderProgramSimple->SetUniform("mvp", mvp);
+            firstPassProgram->SetUniform("mvp", mvp);
             
             // material
             Material* mat = materialDatabase[m->materialID];
-            shaderProgramSimple->SetUniform("diffuseColor", mat->diffuseColor); 
-            shaderProgramSimple->SetUniform("hasTexture", mat->hasTexture);
+            firstPassProgram->SetUniform("diffuseColor", mat->diffuseColor); 
+            firstPassProgram->SetUniform("hasTexture", mat->hasTexture);
             if (mat->hasTexture)
                 mat->texture->Bind(GL_TEXTURE0);
             
@@ -154,6 +158,7 @@ public:
             m->renderer.Destroy();
         }
 
-        delete shaderProgramSimple;
+        delete firstPassProgram;
+        delete secondPassProgram;
     }
 };

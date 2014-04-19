@@ -4,11 +4,11 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include "glcontext_wgl.h"
-typedef GLContextWGL GlContext;
+#include "rendercontext_wgl.h"
+typedef RenderContextWGL RenderContextT;
 #else
-#include "glcontext_egl.h"
-typedef GLContextEGL GlContext;
+#include "rendercontext_egl.h"
+typedef RenderContextEGL RenderContextT;
 #endif
 
 #include <string>
@@ -17,11 +17,12 @@ typedef GLContextEGL GlContext;
 #include <thread>
 
 #include "assetmanager.h"
-#include "gltest.h"
+#include "scene.h"
 #include "log.h"
 #include "input.h"
 #include "time.h"
 #include "fpscounter.h"
+#include "glquery.h"
 
 #include <random>
 #include <glm/gtc/random.hpp>
@@ -34,7 +35,7 @@ public:
     virtual void OnResize(int w, int h) = 0;
     virtual bool OnStep() = 0;
     virtual std::string GetResultXML() = 0;
-    virtual GlContext* GetGLContext() = 0;  // TODO
+    virtual RenderContextT* GetContext() = 0;  // TODO
 };
 
 
@@ -42,8 +43,8 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
 
     AssetManager* assetManager;
     Input inputManager;
-	GlContext* glContext;
-    GLTest* gltest;
+	RenderContextT* glContext;
+    Scene* scene;
     Time time;
     FPSCounter fpsCounter;
 
@@ -61,34 +62,42 @@ public:
         score = (int)glm::linearRand(10.f, 1000.f);
 
         std::random_device rd;
-        //std::minstd_rand generator(rd()); 
-        std::uniform_int_distribution<> dist(10, 1000);
-        score = dist(rd); // generator(dist)
+        std::mt19937 mt(rd());
+        std::uniform_int_distribution<unsigned> dist(10, 1000);
+        score = dist(mt);
     }
 
     ~GLES3Mark() {
     	if (glContext) {
     		glContext->Destroy();
+            //delete glContext;
     		glContext = nullptr;
     	}
     }
     
-    GlContext* GetGLContext() override { return glContext; }
+    RenderContextT* GetContext() override { return glContext; }
 
     bool OnInit(void* osWnd, void* ioContext = nullptr) override {
     	assetManager = new AssetManager(ioContext);
 
-        // init gl here
-        glContext = new GlContext();
+        // init GL context
+        glContext = new RenderContextT();
         glContext->Create(osWnd);
 
-        gltest = new GLTest();
-        gltest->OnInit(assetManager);
+        // display some GL info
+        GLQuery::LogInfo();
+        Log::D() << "Max render buffer size: " << GLQuery::MaxRenderBufferSize();
+        Log::D() << "Max texture size: " << GLQuery::MaxTextureSize();
+        glm::ivec2 maxDims = GLQuery::MaxViewportDims();
+        Log::D() << "Max viewport dims: " << maxDims.x << "x" << maxDims.y;
 
-        //Log::Stream() << "C++ ver: " << (long)__cplusplus;
-        
-        
+
+        scene = new Scene();
+        scene->OnInit(assetManager);
        
+        
+        //Log::Stream() << "C++ ver: " << (long)__cplusplus;
+
         //std::atomic<bool> ready (false);
         Log::V() << "Concurrent threads supported: " << std::thread::hardware_concurrency();
         int outParam;
@@ -109,11 +118,11 @@ public:
                 break;
 
             case Input::KeyCode::Return:
-                gltest->camera.Reset();
+                scene->camera.Reset();
                 break;
 
             case Input::KeyCode::Space:
-                gltest->camera.DebugDump();
+                scene->camera.DebugDump();
                 break;
         }
     }
@@ -153,7 +162,7 @@ public:
             joystickMove.z = static_cast<float>(joystickMoveCenter.y - y);
         }
         else {//if (dx != 0 || dy != 0) {
-            gltest->camera.Aim(-dy * 0.005f, -dx * 0.005f);  // 0.0025
+            scene->camera.Aim(-dy * 0.005f, -dx * 0.005f);  // 0.0025
         }
     }
     
@@ -161,7 +170,7 @@ public:
         if (glContext)
             glContext->Resize(w, h, false);
 
-        gltest->OnResize(w, h);
+        scene->OnResize(w, h);
 
         Log::V() << "Resize: " << w << ", " << h;
     }
@@ -182,10 +191,10 @@ public:
 
         OnProcessInput();
         //if (joystickMove.x != 0.f || joystickMove.z != 0.f)
-        gltest->camera.Move(joystickMove * time.DeltaTime());
+        scene->camera.Move(joystickMove * time.DeltaTime());
 
 
-        gltest->OnStep(time);
+        scene->OnStep(time);
 
         //std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
@@ -209,7 +218,7 @@ private:
         float x = -((-1.0f * inputManager.IsKeyDown(Input::KeyCode::A)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::D))) * step;
         float z =  ((-1.0f * inputManager.IsKeyDown(Input::KeyCode::S)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::W))) * step;
         
-        gltest->camera.Move(glm::vec3(x, 0, z));
+        scene->camera.Move(glm::vec3(x, 0, z));
     }
 
     void OnDestroy() {

@@ -2,19 +2,19 @@
 
 #pragma once
 
-#include "glcontext.h"
+#include "rendercontext.h"
 
 #include <windows.h>
 
-class GLContextWGL : public GLContext {
+class RenderContextWGL : public RenderContext {
     
     HWND    window;
     HGLRC   wglContext;
     HDC     gdiDc;
 
 public:
-    GLContextWGL(): window(nullptr), wglContext(nullptr), gdiDc(nullptr) {};
-    virtual ~GLContextWGL() {};
+    RenderContextWGL(): window(nullptr), wglContext(nullptr), gdiDc(nullptr) {};
+    virtual ~RenderContextWGL() {};
 
     virtual bool Create(void* osWnd) override;
     virtual void Destroy() override;    

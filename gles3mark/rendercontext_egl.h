@@ -3,19 +3,19 @@
 #pragma once
 
 #include <EGL/egl.h>
-#include "glcontext.h"
+#include "rendercontext.h"
 
 //TODO Unify HWND/ANativeWindow? - #include <EGL/eglplatform.h>, EGL for WIN?
 
-class GLContextEGL : public GLContext {
+class RenderContextEGL : public RenderContext {
 	 EGLDisplay display;
 	 EGLSurface surface;
 	 EGLContext context;
 	 ANativeWindow* window;
 
 public:
-    GLContextEGL() {};
-    virtual ~GLContextEGL() {};
+    RenderContextEGL() {};
+    virtual ~RenderContextEGL() {};
 
     /**
      * Initialize an EGL context for the current display.

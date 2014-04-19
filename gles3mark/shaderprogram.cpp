@@ -2,6 +2,7 @@
 #include <cassert>
 
 #include "shaderprogram.h"
+#include "log.h"
 
 #ifdef _WIN32
 const std::string SHADER_VERSION("#version 330 core");  // 430?
@@ -21,7 +22,8 @@ GLuint ShaderProgram::compileShader(GLenum type, const std::string& source) {
     glCompileShader(shader);
 
     std::string infoLog(getInfoLog(shader));
-    Log::V() << "Compile shader: " << (infoLog[0] == 0 ? "OK" : infoLog);
+    if (infoLog[0] != 0)
+        Log::W() << "Compile shader: " << infoLog;
 
     int compileStatus;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
@@ -48,7 +50,8 @@ GLuint ShaderProgram::linkShader(std::initializer_list<GLuint> shaders) {  // si
     glLinkProgram(program);
 
     std::string infoLog(getInfoLog(program));
-    Log::V() << "Link shaders: " << (infoLog[0] == 0 ? "OK" : infoLog);
+    if (infoLog[0] != 0)
+        Log::W() << "Link shaders: " << infoLog;
     
     int linkStatus;
     glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);

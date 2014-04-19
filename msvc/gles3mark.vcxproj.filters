@@ -33,6 +33,18 @@
     <None Include="..\assets\shaders\phong.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="..\assets\shaders\firstpass.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\assets\shaders\firstpass.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\assets\shaders\secondpass.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\assets\shaders\secondpass.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\gles3mark\camera.h">
@@ -44,22 +56,7 @@
     <ClInclude Include="..\gles3mark\gl3stub_egl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark\glcontext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gles3mark\glcontext_egl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gles3mark\glcontext_wgl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\gles3mark\gles3mark.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gles3mark\glhelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gles3mark\gltest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gles3mark\input.h">
@@ -101,6 +98,30 @@
     <ClInclude Include="..\gles3mark\sceneimporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\gles3mark\glquery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\rendercontext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\rendercontext_egl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\rendercontext_wgl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\framebuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\glinclude.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\glerror.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gles3mark\assetfile.cpp">
@@ -119,9 +140,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gles3mark\gles3mark.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gles3mark\glhelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gles3mark\log.cpp">

@@ -1,11 +1,11 @@
 
 #pragma once
 
-class GLContext {
+class RenderContext {
 
 public:
-    GLContext(): mWidth(0), mHeight(0) {};
-    virtual ~GLContext() = default;
+    RenderContext(): mWidth(0), mHeight(0) {};
+    virtual ~RenderContext() = default;
     
     virtual bool Create(void* osWnd) = 0;
     virtual void Destroy() = 0;

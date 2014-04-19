@@ -5,13 +5,13 @@
 
 #include <stdexcept>
 
-#include "glcontext_wgl.h"
+#include "rendercontext_wgl.h"
 #include "log.h"
 
 static bool InitGLEW();
 static HGLRC CreateBasicContext(HDC);
 
-bool GLContextWGL::Create(void* osWnd) {
+bool RenderContextWGL::Create(void* osWnd) {
     window = static_cast<HWND>(osWnd);
 
     int glmajor = 3;
@@ -169,7 +169,7 @@ static HGLRC CreateBasicContext(HDC hdc) {
     return context;
 }
 
-void GLContextWGL::Destroy() {
+void RenderContextWGL::Destroy() {
     if (wglContext) {
         wglMakeCurrent(nullptr, nullptr);
         wglDeleteContext(wglContext);
@@ -180,7 +180,7 @@ void GLContextWGL::Destroy() {
     }
 }
 
-void GLContextWGL::Resize(int w, int h, bool vsync) {
+void RenderContextWGL::Resize(int w, int h, bool vsync) {
     mWidth = w;
     mHeight = h;
 
@@ -188,7 +188,7 @@ void GLContextWGL::Resize(int w, int h, bool vsync) {
         wglSwapIntervalEXT(vsync ? 1 : 0);
 }
 
-void GLContextWGL::Swap() {
+void RenderContextWGL::Swap() {
     //wglMakeCurrent(gdiDc, wglContext);
     SwapBuffers(gdiDc);
 }

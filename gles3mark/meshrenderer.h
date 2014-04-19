@@ -3,7 +3,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "glhelper.h"
+#include "glinclude.h"
 
 class Mesh;
 

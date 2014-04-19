@@ -173,7 +173,7 @@ void BaseApp::HandleCommand(int32_t cmd) {
 			//	gles3mark = new GLES3Mark();
 			gles3mark = std::unique_ptr<GLES3Mark>(new GLES3Mark()); // gles3mark = std::make_unique<GLES3Mark>();
 			gles3mark->OnInit(state->window, state->activity->assetManager);
-			gles3mark->OnResize(gles3mark->GetGLContext()->GetWidth(), gles3mark->GetGLContext()->GetHeight());
+			gles3mark->OnResize(gles3mark->GetContext()->GetWidth(), gles3mark->GetContext()->GetHeight());
 			//glContext->Create(state->window);
 			animating = true;
 

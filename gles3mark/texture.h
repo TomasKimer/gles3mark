@@ -12,7 +12,7 @@
 #endif
 #include <ktx.h>
 
-#include "glhelper.h"
+#include "glinclude.h"
 #include "log.h"
 
 // http://docs.unity3d.com/Documentation/ScriptReference/Texture.html

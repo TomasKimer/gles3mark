@@ -1,13 +1,13 @@
 #ifdef ANDROID
 
-#include "glcontext_egl.h"
+#include "rendercontext_egl.h"
 #include "gl3stub_egl.h"
 #include "log.h"
 
 /**
  * Initialize an EGL context for the current display.
  */
-bool GLContextEGL::Create(void* osWnd) {
+bool RenderContextEGL::Create(void* osWnd) {
 	window = reinterpret_cast<ANativeWindow*>(osWnd);
 
 //	eglBindAPI(EGL_OPENGL_ES_API);
@@ -90,14 +90,14 @@ bool GLContextEGL::Create(void* osWnd) {
 	return true; //0
 }
 
-bool GLContextEGL::HasDisplay() {
+bool RenderContextEGL::HasDisplay() {
 	return display != nullptr;
 }
 
 /**
  * Tear down the EGL context currently associated with the display.
  */
-void GLContextEGL::Destroy() {
+void RenderContextEGL::Destroy() {
 	if (display != EGL_NO_DISPLAY) {
 		eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 		if (context != EGL_NO_CONTEXT) {
@@ -113,13 +113,13 @@ void GLContextEGL::Destroy() {
 	surface = EGL_NO_SURFACE;
 }
 
-void GLContextEGL::Resize(int w, int h, bool vsync) {
+void RenderContextEGL::Resize(int w, int h, bool vsync) {
 	mWidth = w;
 	mHeight = h;
 
 	eglSwapInterval(display, (int)vsync);  	// Turn off vsync - 0
 }
-void GLContextEGL::Swap() /*override*/ {
+void RenderContextEGL::Swap() /*override*/ {
 	eglSwapBuffers(display, surface);
 }
 

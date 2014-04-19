@@ -2,6 +2,7 @@
 
 #include "meshrenderer.h"
 #include "mesh.h"
+#include "glerror.h"
 
 void MeshRenderer::Init(Mesh* mesh) {
     this->owner = mesh;

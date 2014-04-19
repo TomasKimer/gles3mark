@@ -11,8 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\assets\shaders\firstpass.frag" />
+    <None Include="..\assets\shaders\firstpass.vert" />
     <None Include="..\assets\shaders\phong.frag" />
     <None Include="..\assets\shaders\phong.vert" />
+    <None Include="..\assets\shaders\secondpass.frag" />
+    <None Include="..\assets\shaders\secondpass.vert" />
     <None Include="..\assets\shaders\simple.frag" />
     <None Include="..\assets\shaders\simple.vert" />
     <None Include="gles3mark_dll.def" />
@@ -20,13 +24,16 @@
   <ItemGroup>
     <ClInclude Include="..\gles3mark\camera.h" />
     <ClInclude Include="..\gles3mark\fpscounter.h" />
+    <ClInclude Include="..\gles3mark\framebuffer.h" />
     <ClInclude Include="..\gles3mark\gl3stub_egl.h" />
-    <ClInclude Include="..\gles3mark\glcontext.h" />
-    <ClInclude Include="..\gles3mark\glcontext_egl.h" />
-    <ClInclude Include="..\gles3mark\glcontext_wgl.h" />
+    <ClInclude Include="..\gles3mark\glinclude.h" />
+    <ClInclude Include="..\gles3mark\rendercontext.h" />
+    <ClInclude Include="..\gles3mark\rendercontext_egl.h" />
+    <ClInclude Include="..\gles3mark\rendercontext_wgl.h" />
     <ClInclude Include="..\gles3mark\gles3mark.h" />
-    <ClInclude Include="..\gles3mark\glhelper.h" />
-    <ClInclude Include="..\gles3mark\gltest.h" />
+    <ClInclude Include="..\gles3mark\glerror.h" />
+    <ClInclude Include="..\gles3mark\glquery.h" />
+    <ClInclude Include="..\gles3mark\scene.h" />
     <ClInclude Include="..\gles3mark\materialdatabase.h" />
     <ClInclude Include="..\gles3mark\texture.h" />
     <ClInclude Include="..\gles3mark\input.h" />
@@ -49,7 +56,6 @@
     <ClCompile Include="..\gles3mark\glcontext_egl.cpp" />
     <ClCompile Include="..\gles3mark\glcontext_wgl.cpp" />
     <ClCompile Include="..\gles3mark\gles3mark.cpp" />
-    <ClCompile Include="..\gles3mark\glhelper.cpp" />
     <ClCompile Include="..\gles3mark\log.cpp" />
     <ClCompile Include="..\gles3mark\mesh.cpp" />
     <ClCompile Include="..\gles3mark\meshrenderer.cpp" />

@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "glhelper.h"
+#include "glinclude.h"
 
 class ShaderProgram {
     GLuint vertexShader, fragmentShader, shaderProgram;
@@ -15,7 +15,6 @@ class ShaderProgram {
     std::map<std::string, GLuint> uniforms;
 
 public:
-
     ShaderProgram(const std::string& vertexSrc, const std::string& fragmentSrc) {
         vertexShader   = compileShader(GL_VERTEX_SHADER, vertexSrc);
         fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentSrc);
