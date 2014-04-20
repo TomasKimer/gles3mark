@@ -22,7 +22,7 @@ void App::OnStartup() {
     BaseApp::OnStartup();
     
     dll.DllInit(GetHWND());
-    dll.DllResize(width, height);
+    //dll.DllResize(width, height);
 }
 
 void App::OnQuit() {

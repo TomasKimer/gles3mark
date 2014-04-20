@@ -12,6 +12,8 @@
 #include "meshrenderer.h"
 #include "shaderprogram.h"
 #include "glquery.h"
+#include "framebuffer.h"
+#include "quadrenderer.h"
 
 #include <string>
 #include <vector>
@@ -38,8 +40,15 @@ class Scene {
 
     ShaderProgram* firstPassProgram;
     ShaderProgram* secondPassProgram;
+    ShaderProgram* screenQuadProgram;
     Model* model;
+    QuadRenderer quadRenderer;
     std::vector<Material*> materialDatabase;
+    
+    Framebuffer framebuffer;
+    Texture diffuseTex, positionTex, normalTex;
+    RenderBuffer depthRenderbuf;
+
 
     //GLTexture texture;
     glm::quat rot;
@@ -53,7 +62,7 @@ public:
     Scene()  {}
     ~Scene() {}
         
-    bool OnInit(AssetManager* assetManager) {
+    bool OnInit(AssetManager* assetManager, int width, int height) {
 
         try {            
             //texture.FromKTXdata(assetManager->LoadContents("textures/chair2.ktx"));  // chair512_etc2rgb_mip_slowperc.ktx
@@ -77,14 +86,30 @@ public:
 
             firstPassProgram = new ShaderProgram(assetManager->LoadText("shaders/firstpass.vert"),
                                                  assetManager->LoadText("shaders/firstpass.frag"));
-
             firstPassProgram->AddUniform("mvp");
             firstPassProgram->AddUniform("tex");
             firstPassProgram->AddUniform("diffuseColor");
             firstPassProgram->AddUniform("hasTexture");
 
-            secondPassProgram = new ShaderProgram(assetManager->LoadText("shaders/secondpass.vert"),
-                                                  assetManager->LoadText("shaders/secondpass.frag"));
+
+            screenQuadProgram = new ShaderProgram(assetManager->LoadText("shaders/screenquad.vert"),
+                                                  assetManager->LoadText("shaders/screenquad.frag"));
+            screenQuadProgram->AddUniform("tex");
+
+
+            depthRenderbuf.InitStorage(GL_DEPTH_COMPONENT24, width, height);
+            diffuseTex.InitStorage(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, width, height);
+            positionTex.InitStorage(GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT, width, height); // GL_RGB16F
+            normalTex.InitStorage(GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT, width, height);
+
+            framebuffer.Bind();
+            framebuffer.Attach(depthRenderbuf, GL_DEPTH_ATTACHMENT);
+            framebuffer.Attach(diffuseTex, GL_COLOR_ATTACHMENT0);
+            framebuffer.Attach(positionTex, GL_COLOR_ATTACHMENT1);
+            framebuffer.Attach(normalTex, GL_COLOR_ATTACHMENT2);
+            framebuffer.ActiveColorAttachments(std::vector<GLenum>{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
+            framebuffer.CheckCompleteness();
+            framebuffer.Unbind();
 
         }
         catch (std::exception &e) {
@@ -121,7 +146,7 @@ public:
         
         //glm::mat4 mvp = projection * view * model;
 
-        
+        framebuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         firstPassProgram->Use();
@@ -142,6 +167,15 @@ public:
             // draw
             m->renderer.Render();
         }
+
+        framebuffer.Unbind();
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        screenQuadProgram->Use();
+        screenQuadProgram->SetUniform("tex", 0);
+        diffuseTex.Bind();
+        quadRenderer.Render(0.0f, 0.0f, 2.0f);
 
 
         //glUseProgram(0);

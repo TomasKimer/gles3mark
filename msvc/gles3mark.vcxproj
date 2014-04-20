@@ -15,6 +15,8 @@
     <None Include="..\assets\shaders\firstpass.vert" />
     <None Include="..\assets\shaders\phong.frag" />
     <None Include="..\assets\shaders\phong.vert" />
+    <None Include="..\assets\shaders\screenquad.frag" />
+    <None Include="..\assets\shaders\screenquad.vert" />
     <None Include="..\assets\shaders\secondpass.frag" />
     <None Include="..\assets\shaders\secondpass.vert" />
     <None Include="..\assets\shaders\simple.frag" />
@@ -27,12 +29,15 @@
     <ClInclude Include="..\gles3mark\framebuffer.h" />
     <ClInclude Include="..\gles3mark\gl3stub_egl.h" />
     <ClInclude Include="..\gles3mark\glinclude.h" />
+    <ClInclude Include="..\gles3mark\quadrenderer.h" />
+    <ClInclude Include="..\gles3mark\renderbuffer.h" />
     <ClInclude Include="..\gles3mark\rendercontext.h" />
     <ClInclude Include="..\gles3mark\rendercontext_egl.h" />
     <ClInclude Include="..\gles3mark\rendercontext_wgl.h" />
     <ClInclude Include="..\gles3mark\gles3mark.h" />
     <ClInclude Include="..\gles3mark\glerror.h" />
     <ClInclude Include="..\gles3mark\glquery.h" />
+    <ClInclude Include="..\gles3mark\rendertarget.h" />
     <ClInclude Include="..\gles3mark\scene.h" />
     <ClInclude Include="..\gles3mark\materialdatabase.h" />
     <ClInclude Include="..\gles3mark\texture.h" />

@@ -80,6 +80,11 @@ bool RenderContextWGL::Create(void* osWnd) {
         return false;
     }
 
+    RECT rect;
+    GetClientRect(window, &rect);
+    mWidth = rect.right - rect.left;
+    mHeight = rect.bottom - rect.top;
+
     return true;
 }
 

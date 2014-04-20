@@ -8,9 +8,11 @@ uniform mat4 mvp;
 
 out vec2 coord;
 out vec3 normal;
+out vec3 position;
 
 void main() {
 	gl_Position = mvp*vec4(vertexPosition,1);
 	coord = vertexTextureCoord;
 	normal = vertexNormal;
+	position = vertexPosition;
 }

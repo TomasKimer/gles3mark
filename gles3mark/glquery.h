@@ -18,22 +18,23 @@
 class GLQuery {
 public:
 
-    enum class Info {
+    enum class IntInfo { // + specialize?
     
     };
 
 
-    static GLint MaxRenderBufferSize() { return Get<GLint>(GL_MAX_RENDERBUFFER_SIZE); }  // min 2048
-    static GLint MaxTextureSize() { return Get<GLint>(GL_MAX_TEXTURE_SIZE); }            // min 2048
-    static glm::ivec2 MaxViewportDims() {
+    static GLint MAX_RENDERBUFFER_SIZE() { return Get<GLint>(GL_MAX_RENDERBUFFER_SIZE); }  // min 2048
+    static GLint MAX_TEXTURE_SIZE() { return Get<GLint>(GL_MAX_TEXTURE_SIZE); }            // min 2048
+    static GLint MAX_SAMPLES() { return Get<GLint>(GL_MAX_SAMPLES); }
+    static glm::ivec2 MAX_VIEWPORT_DIMS() {
         std::vector<GLint> ints = Get<GLint>(GL_MAX_VIEWPORT_DIMS, 2);
         return glm::ivec2(ints[0], ints[1]);
     }
 
-    static std::string Vendor() { return GetString(GL_VENDOR); }
-    static std::string Renderer() { return GetString(GL_RENDERER); }
-    static std::string Version() { return GetString(GL_VERSION); }
-    static std::string ShadingLanguageVersion() { return GetString(GL_SHADING_LANGUAGE_VERSION); }
+    static std::string VENDOR() { return GetString(GL_VENDOR); }
+    static std::string RENDERER() { return GetString(GL_RENDERER); }
+    static std::string VERSION() { return GetString(GL_VERSION); }
+    static std::string SHADING_LANGUAGE_VERSION() { return GetString(GL_SHADING_LANGUAGE_VERSION); }
     
     static std::vector<std::string> Extensions() {
         GLint count = Get<GLint>(GL_NUM_EXTENSIONS);
@@ -51,10 +52,10 @@ public:
     }
 
     static void LogInfo() {
-        Log::Msg("GL_VENDOR: "                   + Vendor());
-        Log::Msg("GL_RENDERER: "                 + Renderer());
-        Log::Msg("GL_VERSION: "                  + Version());
-        Log::Msg("GL_SHADING_LANGUAGE_VERSION: " + ShadingLanguageVersion());
+        Log::Msg("GL_VENDOR: "                   + VENDOR());
+        Log::Msg("GL_RENDERER: "                 + RENDERER());
+        Log::Msg("GL_VERSION: "                  + VERSION());
+        Log::Msg("GL_SHADING_LANGUAGE_VERSION: " + SHADING_LANGUAGE_VERSION());
     }
 
 

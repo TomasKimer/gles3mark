@@ -12,14 +12,15 @@
 #endif
 #include <ktx.h>
 
-#include "glinclude.h"
+#include "glquery.h"
+#include "rendertarget.h"
 #include "log.h"
 
 // http://docs.unity3d.com/Documentation/ScriptReference/Texture.html
 // RenderTexture (target) - http://docs.unity3d.com/Documentation/ScriptReference/RenderTexture.html
 // Reflective Shader - cubemap
 /*
-class Texture {
+class Texture { // : public RenderTarget?
 protected:    
     enum class FilterMode {
         Point,
@@ -35,10 +36,11 @@ protected:
 };*/
 
 
-class Texture { // : public Texture {
+class Texture : public RenderTarget { 
+    friend class Framebuffer;
+    
     GLuint textureObject;
     GLenum target;
-    int width, height;
 
 public:
     std::string path;
@@ -46,10 +48,22 @@ public:
 public:
     Texture(const std::string& path = std::string()) : path(path) {
         glGenTextures(1, &textureObject);
+        maxSize = GLQuery::MAX_TEXTURE_SIZE();
     }
 
     ~Texture() {
         glDeleteTextures(1, &textureObject);    
+    }
+
+    void InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLsizei width, GLsizei height, GLint level = 0) {
+        target = GL_TEXTURE_2D;
+        this->width = width;
+        this->height = height;
+
+        glBindTexture(target, textureObject);
+        glTexImage2D(target, level, internalFormat, width, height, 0, format, type, nullptr);
+        glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
     }
 
     void FromKTXdata(const std::vector<char>& ktxData) {
@@ -60,7 +74,10 @@ public:
         KTX_error_code ktxError = ktxLoadTextureM(&ktxData[0], ktxData.size(), &textureObject, &target,
                                                   &ktxDimension, &ktxIsMipmapped, &ktxGLerror, 0, nullptr);
 
-        if (ktxError != KTX_SUCCESS && ktxGLerror != GL_NO_ERROR)
+        width = ktxDimension.width;
+        height = ktxDimension.height;
+
+        if (ktxError != KTX_SUCCESS || ktxGLerror != GL_NO_ERROR)
         	throw std::runtime_error("Failed to load texture with libktx.");
 
         if (target != GL_TEXTURE_2D)
@@ -73,8 +90,11 @@ public:
         glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
         glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        Log::V() << "KTX texture " + path + " loaded: " << ktxDimension.width << "x" << ktxDimension.height
+        Log::V() << "KTX texture " + path + " loaded: " << width << "x" << height
         		 /*<< "x" << ktxDimension.depth*/ << ", mipmapped: " << (ktxIsMipmapped ? "true" : "false");
+
+        if (!isPowerOfTwo(width) || !isPowerOfTwo(height))
+            Log::W() << "Non-power of two ETC textures are not supported on all devices.";
     }
 
     void FromBitmapData(const std::vector<char>& rawData, int width, int height) {
@@ -99,6 +119,10 @@ public:
     void Bind(GLenum textureUnit = GL_TEXTURE0) {
         glActiveTexture(textureUnit);
         glBindTexture(target, textureObject);
+    }
+
+    GLuint GetGLid() const {
+        return textureObject;
     }
 
 private:

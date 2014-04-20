@@ -86,14 +86,14 @@ public:
 
         // display some GL info
         GLQuery::LogInfo();
-        Log::D() << "Max render buffer size: " << GLQuery::MaxRenderBufferSize();
-        Log::D() << "Max texture size: " << GLQuery::MaxTextureSize();
-        glm::ivec2 maxDims = GLQuery::MaxViewportDims();
+        Log::D() << "Max render buffer size: " << GLQuery::MAX_RENDERBUFFER_SIZE() << ", max samples: " << GLQuery::MAX_SAMPLES();
+        Log::D() << "Max texture size: " << GLQuery::MAX_TEXTURE_SIZE();
+        glm::ivec2 maxDims = GLQuery::MAX_VIEWPORT_DIMS();
         Log::D() << "Max viewport dims: " << maxDims.x << "x" << maxDims.y;
 
 
         scene = new Scene();
-        scene->OnInit(assetManager);
+        scene->OnInit(assetManager, glContext->GetWidth(), glContext->GetHeight());
        
         
         //Log::Stream() << "C++ ver: " << (long)__cplusplus;
@@ -104,6 +104,8 @@ public:
         std::thread t(doSomeWork, 5, std::ref(outParam));
         t.join();
         Log::V() << "thread joined, out param: " << outParam;
+
+        OnResize(glContext->GetWidth(), glContext->GetHeight()); 
 
         return true;
     }
