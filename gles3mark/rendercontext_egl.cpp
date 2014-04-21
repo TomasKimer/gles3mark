@@ -71,6 +71,11 @@ bool RenderContextEGL::Create(void* osWnd) {
 	eglQuerySurface(display, surface, EGL_HEIGHT, &h);
 	Log::V() << "EGL surface size: " << w << "x" << h;
 
+	EGLint minSwapInterval, maxSwapInterval;
+	eglGetConfigAttrib(display, config, EGL_MIN_SWAP_INTERVAL, &minSwapInterval);
+	eglGetConfigAttrib(display, config, EGL_MAX_SWAP_INTERVAL, &maxSwapInterval);
+	Log::V() << "EGL swap interval - min: " << minSwapInterval << ", max: " << maxSwapInterval;
+
     if (!gl3stubInit())
         return false; //throw std::runtime_error("GL stub init failed");
 

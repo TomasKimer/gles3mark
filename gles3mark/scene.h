@@ -55,11 +55,12 @@ class Scene {
     Transform testTrans;
 
     int width, height;
+    int renderWidth, renderHeight;
     
 public:
     Camera camera;
     
-    Scene()  {}
+    Scene(): renderWidth(1280), renderHeight(720)  {}
     ~Scene() {}
         
     bool OnInit(AssetManager* assetManager, int width, int height) {
@@ -97,10 +98,10 @@ public:
             screenQuadProgram->AddUniform("tex");
 
 
-            depthRenderbuf.InitStorage(GL_DEPTH_COMPONENT24, width, height);
-            diffuseTex.InitStorage(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, width, height);
-            positionTex.InitStorage(GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT, width, height); // GL_RGB16F
-            normalTex.InitStorage(GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT, width, height);
+            depthRenderbuf.InitStorage(GL_DEPTH_COMPONENT24, renderWidth, renderHeight);
+            diffuseTex.InitStorage(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, renderWidth, renderHeight);
+            positionTex.InitStorage(GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT, renderWidth, renderHeight); // GL_RGB16F
+            normalTex.InitStorage(GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT, renderWidth, renderHeight);
 
             framebuffer.Bind();
             framebuffer.Attach(depthRenderbuf, GL_DEPTH_ATTACHMENT);
@@ -129,10 +130,10 @@ public:
     }
 
     void OnResize(int w, int h) {
-    	glViewport(0, 0, w, h);
+    	//glViewport(0, 0, w, h);
     	width = w;
     	height = h;
-        camera.Perspective(glm::radians(60.0f), static_cast<float>(width) / height, 1.0f, 1000.0f);
+        camera.Perspective(glm::radians(60.0f), static_cast<float>(renderWidth) / renderHeight, 1.0f, 1000.0f);
         //camera.Orthographic(0.0f, static_cast<float>(w), static_cast<float>(h), 0.0f, 1.0f, 1000.0f);
     }
 
@@ -146,7 +147,10 @@ public:
         
         //glm::mat4 mvp = projection * view * model;
 
+        
         framebuffer.Bind();
+        glViewport(0, 0, renderWidth, renderHeight);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         firstPassProgram->Use();
@@ -169,7 +173,8 @@ public:
         }
 
         framebuffer.Unbind();
-        
+        glViewport(0, 0, width, height);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         screenQuadProgram->Use();
@@ -194,5 +199,6 @@ public:
 
         delete firstPassProgram;
         delete secondPassProgram;
+        delete screenQuadProgram;
     }
 };

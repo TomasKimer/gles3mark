@@ -60,7 +60,7 @@ void BaseApp::Run() {
 				Log::Msg("LOOPER DESTROY REQUESTED"); // Quit our app stuff here
 
 				//animating = false;
-				//showToast("Exitting");
+				//showToast("Exiting");
 
 				// detach from current thread (when thread exists) - else error: "native thread exited without detaching"
 				state->activity->vm->DetachCurrentThread();
@@ -93,9 +93,10 @@ void BaseApp::Run() {
 /**
  * Process the next input event.
  */
+// TODO float !!!
 int32_t BaseApp::HandleInput(AInputEvent* event) {
 	if (quit)
-		return 0;
+		return 1;
 
 	if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
 
@@ -148,7 +149,7 @@ int32_t BaseApp::HandleInput(AInputEvent* event) {
 			break;
 		}
 
-		return 1;
+		return 1;  // event handled
 	}
 
 	return 0;

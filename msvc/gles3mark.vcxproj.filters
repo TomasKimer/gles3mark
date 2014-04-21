@@ -148,12 +148,6 @@
     <ClCompile Include="..\gles3mark\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\gles3mark\glcontext_egl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gles3mark\glcontext_wgl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\gles3mark\gles3mark.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -173,6 +167,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gles3mark\meshrenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gles3mark\rendercontext_egl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gles3mark\rendercontext_wgl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -58,8 +58,8 @@
     <ClCompile Include="..\gles3mark\assetmanager.cpp" />
     <ClCompile Include="..\gles3mark\camera.cpp" />
     <ClCompile Include="..\gles3mark\gl3stub_egl.c" />
-    <ClCompile Include="..\gles3mark\glcontext_egl.cpp" />
-    <ClCompile Include="..\gles3mark\glcontext_wgl.cpp" />
+    <ClCompile Include="..\gles3mark\rendercontext_egl.cpp" />
+    <ClCompile Include="..\gles3mark\rendercontext_wgl.cpp" />
     <ClCompile Include="..\gles3mark\gles3mark.cpp" />
     <ClCompile Include="..\gles3mark\log.cpp" />
     <ClCompile Include="..\gles3mark\mesh.cpp" />

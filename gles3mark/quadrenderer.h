@@ -4,7 +4,7 @@
 #include "glinclude.h"
 //#include "shaderprogram.h"
 
-// TODO Mesh + MeshRenderer
+// TODO Mesh + MeshRenderer?
 class QuadRenderer {
     GLuint smallQuad, smallQuadTex, VAO;
 
@@ -13,21 +13,27 @@ public:
         // Init data for texture quads
         GLfloat vertattribs[] = { 1.0,-1.0, 1.0,1.0, -1.0,-1.0, -1.0,1.0 };
         GLfloat texattribs[] = { 1.0,0.0, 1.0,1.0, 0.0,0.0, 0.0,1.0 };
-
-        glGenVertexArrays(1, &VAO);  // TODO VAO + UBO pro kazdy mesh?
-        glBindVertexArray(VAO);
-
+        
         glGenBuffers(1, &smallQuad);
         glBindBuffer(GL_ARRAY_BUFFER, smallQuad);
         glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), &vertattribs, GL_DYNAMIC_DRAW);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(0);
-        
-        //also texcoords
+
         glGenBuffers(1, &smallQuadTex);
         glBindBuffer(GL_ARRAY_BUFFER, smallQuadTex);
         glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), &texattribs, GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        
+
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+        
+        glBindBuffer(GL_ARRAY_BUFFER, smallQuad);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0); // bind attributes to index
+       
+        //also texcoords
+        glBindBuffer(GL_ARRAY_BUFFER, smallQuadTex);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0); 
+
+        glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);    
 
         glBindVertexArray(0);
@@ -51,11 +57,6 @@ public:
 
         glBindBuffer(GL_ARRAY_BUFFER, smallQuad);
         glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), &vertattribs, GL_DYNAMIC_DRAW);   // update vertex data
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);  // bind attributes to index
-
-        glBindBuffer(GL_ARRAY_BUFFER, smallQuadTex);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         glBindVertexArray(0);

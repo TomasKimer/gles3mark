@@ -36,7 +36,10 @@ bool BaseApp::SetupWindow(int w, int h) {
     winSize.bottom = height;
     AdjustWindowRect(&winSize, WS_OVERLAPPEDWINDOW, false);
 
-    hWnd = CreateWindow(className.c_str(), windowTitle.c_str(), WS_OVERLAPPEDWINDOW,
+    DWORD dwStyleResizable = WS_OVERLAPPEDWINDOW;
+    DWORD dwStyleNonResizable = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+
+    hWnd = CreateWindow(className.c_str(), windowTitle.c_str(), dwStyleResizable, // dwStyleNonResizabl
         CW_USEDEFAULT, CW_USEDEFAULT,
         winSize.right - winSize.left,
         winSize.bottom - winSize.top,

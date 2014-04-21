@@ -170,7 +170,7 @@ public:
     
     void OnResize(int w, int h) override {
         if (glContext)
-            glContext->Resize(w, h, false);
+            glContext->Resize(w, h, true);
 
         scene->OnResize(w, h);
 
@@ -194,7 +194,6 @@ public:
         OnProcessInput();
         //if (joystickMove.x != 0.f || joystickMove.z != 0.f)
         scene->camera.Move(joystickMove * time.DeltaTime());
-
 
         scene->OnStep(time);
 
