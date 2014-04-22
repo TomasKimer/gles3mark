@@ -165,7 +165,7 @@ private:
     }
 
     Light* LoadLight(const aiLight *aLight) {
-        Log::V() << "Light present: " << aLight->mName.data;
+        Log::D() << "Light present: " << aLight->mName.data;
         
         Light* light = new Light(); 
 
@@ -176,8 +176,8 @@ private:
         light->direction = toGLM(aLight->mDirection);
         light->position  = toGLM(aLight->mPosition );
 
-        Log::V() << "Position: " << light->position.x << " " << light->position.y << " " << light->position.z;
-        Log::V() << "Direction: " << light->direction.x << " " << light->direction.y << " " << light->direction.z;
+        Log::D() << "Position: " << light->position.x << " " << light->position.y << " " << light->position.z;
+        Log::D() << "Direction: " << light->direction.x << " " << light->direction.y << " " << light->direction.z;
         
         // TODO mAngleInnerCone, mAngleOuterCone, mAttenuationConstant, mAttenuationLinear, mAttenuationQuadratic
 

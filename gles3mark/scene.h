@@ -122,7 +122,7 @@ public:
         testTrans.Rotate(Transform::Up(), glm::radians(90.0f), Transform::Space::World);
         testTrans.Translate(glm::vec3(0,0,-70));
          
-        glEnable(GL_DEPTH_TEST); // glDepthFunc(GL_LESS);
+        //glEnable(GL_DEPTH_TEST); // glDepthFunc(GL_LESS);
         glEnable(GL_CULL_FACE);
         glClearColor(0.5f, 0.5f, 1.f, 1.f);
         
@@ -152,6 +152,7 @@ public:
         glViewport(0, 0, renderWidth, renderHeight);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
 
         firstPassProgram->Use();
         firstPassProgram->SetUniform("tex", 0);
@@ -176,11 +177,18 @@ public:
         glViewport(0, 0, width, height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDisable(GL_DEPTH_TEST);
 
         screenQuadProgram->Use();
         screenQuadProgram->SetUniform("tex", 0);
         diffuseTex.Bind();
         quadRenderer.Render(0.0f, 0.0f, 2.0f);
+
+        normalTex.Bind();
+        quadRenderer.Render(0.0f, 0.0f, 0.5f);
+
+        positionTex.Bind();
+        quadRenderer.Render(1.5f, 0.0f, 0.5f);
 
 
         //glUseProgram(0);

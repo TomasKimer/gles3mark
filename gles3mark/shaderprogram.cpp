@@ -36,7 +36,7 @@ GLuint ShaderProgram::compileShader(GLenum type, const std::string& source) {
     return shader;
 }
 
-GLuint ShaderProgram::linkShader(std::initializer_list<GLuint> shaders) {  // size_t count, ...
+GLuint ShaderProgram::linkShader(std::initializer_list<GLuint> shaders) {
     GLuint program = glCreateProgram();
     if (program == 0)
         throw std::runtime_error("glCreateProgram failed");

@@ -24,12 +24,7 @@ BaseApp::BaseApp(android_app* _state)
 		Log::Stream() << "State loaded: x: " << savedState.x << ", y: " << savedState.y;
 	}
 
-	if (state->activity->vm->AttachCurrentThread(&env, nullptr) == 0) {
-		thiz = state->activity->clazz;
-		clazz = env->GetObjectClass(thiz);
-	} else {
-		Log::Msg("AttachCurrentThread Failed");
-	}
+	jniLink = new JNILink(state);
 
 	//state->activity->internalDataPath;
 }
@@ -63,7 +58,7 @@ void BaseApp::Run() {
 				//showToast("Exiting");
 
 				// detach from current thread (when thread exists) - else error: "native thread exited without detaching"
-				state->activity->vm->DetachCurrentThread();
+				delete jniLink;
 
 				return; // return the main, so we get back to our java activity which called the nativeactivity
 			}
@@ -76,10 +71,7 @@ void BaseApp::Run() {
 			// Drawing is throttled to the screen update rate, so there is no need to do timing here.
 			if (!OnIdle()) {
 				quit = true;
-				jmethodID finishMe = env->GetMethodID(clazz, "FinishMe", "(Ljava/lang/String;)V");  // "(I)V" - int
-				jstring jniText = env->NewStringUTF(gles3mark->GetResultXML().c_str());
-				env->CallVoidMethod(thiz, finishMe, jniText);
-				env->DeleteLocalRef(jniText);
+				OnQuit();
 			}
 		}
 
@@ -115,7 +107,7 @@ int32_t BaseApp::HandleInput(AInputEvent* event) {
 		case AMOTION_EVENT_ACTION_DOWN:
 		case AMOTION_EVENT_ACTION_POINTER_DOWN:
 
-			gles3mark->OnTouchDown(x, y, pointerId);  // bool? if false return 0?
+			OnTouchDown(x, y, pointerId);  // bool? if false return 0?
 
 			touchDragPoints[pointerId].x = x;
 			touchDragPoints[pointerId].y = y;
@@ -126,7 +118,7 @@ int32_t BaseApp::HandleInput(AInputEvent* event) {
 		case AMOTION_EVENT_ACTION_POINTER_UP:
 		case AMOTION_EVENT_ACTION_CANCEL:
 
-			gles3mark->OnTouchUp(x, y, pointerId);
+			OnTouchUp(x, y, pointerId);
 
 			break;
 
@@ -141,7 +133,7 @@ int32_t BaseApp::HandleInput(AInputEvent* event) {
 				int dx = x - touchDragPoints[pointerId].x;
 				int dy = y - touchDragPoints[pointerId].y;
 
-				gles3mark->OnTouchDragged(x, y, dx, dy, pointerId);
+				OnTouchDragged(x, y, dx, dy, pointerId);
 
 				touchDragPoints[pointerId].x = x;
 				touchDragPoints[pointerId].y = y;
@@ -172,9 +164,9 @@ void BaseApp::HandleCommand(int32_t cmd) {
 		if (state->window) {
 			//if (!gles3mark)
 			//	gles3mark = new GLES3Mark();
-			gles3mark = std::unique_ptr<GLES3Mark>(new GLES3Mark()); // gles3mark = std::make_unique<GLES3Mark>();
-			gles3mark->OnInit(state->window, state->activity->assetManager);
-			//gles3mark->OnResize(gles3mark->GetContext()->GetWidth(), gles3mark->GetContext()->GetHeight());
+			OnInit();
+
+    		//gles3mark->OnResize(gles3mark->GetContext()->GetWidth(), gles3mark->GetContext()->GetHeight());
 			//glContext->Create(state->window);
 			animating = true;
 
@@ -191,7 +183,7 @@ void BaseApp::HandleCommand(int32_t cmd) {
 	case APP_CMD_TERM_WINDOW:   //The window is being hidden or closed, clean it up.
 		Log::Msg("APP_CMD_TERM_WINDOW");
 		//glContext->Destroy();
-		gles3mark.reset();
+		OnDestroy();
 		animating = false;
 		break;
 
@@ -230,20 +222,12 @@ void BaseApp::HandleCommand(int32_t cmd) {
 		break;
 
 	/**
-	 * Command from main thread: the AInputQueue has changed.  Upon processing
-	 * this command, android_app->inputQueue will be updated to the new queue
-	 * (or NULL).
-	 */
-	case APP_CMD_INPUT_CHANGED:
-		Log::Msg("APP_CMD_INPUT_CHANGED");
-		break;
-
-	/**
 	 * Command from main thread: the current ANativeWindow has been resized.
 	 * Please redraw with its new size.
 	 */
 	case APP_CMD_WINDOW_RESIZED:
 		Log::Msg("APP_CMD_WINDOW_RESIZED");
+		OnResize(-1, -1);
 		break;
 
 	/**
@@ -253,6 +237,15 @@ void BaseApp::HandleCommand(int32_t cmd) {
 	 */
 	case APP_CMD_WINDOW_REDRAW_NEEDED:
 		Log::Msg("APP_CMD_WINDOW_REDRAW_NEEDED");
+		break;
+
+	/**
+	 * Command from main thread: the AInputQueue has changed.  Upon processing
+	 * this command, android_app->inputQueue will be updated to the new queue
+	 * (or NULL).
+	 */
+	case APP_CMD_INPUT_CHANGED:
+		Log::Msg("APP_CMD_INPUT_CHANGED");
 		break;
 
 	/**
@@ -334,11 +327,11 @@ int32_t BaseApp::handle_input(android_app* app, AInputEvent* event) {
 }
 
 // JNI is running the equivalent of the following Java code: activity.showToastAlert(text);
-bool BaseApp::showToast(const char* text) {
-	jmethodID showToastAlert = env->GetMethodID(clazz, "showToastAlert", "(Ljava/lang/String;)V");
-	jstring jniText = env->NewStringUTF(text);
-	env->CallVoidMethod(thiz, showToastAlert, jniText);
-	env->DeleteLocalRef(jniText);
+bool BaseApp::showToast(const std::string& text) {
+	jmethodID showToastAlert = jniLink->GetMethodID("showToastAlert", JNI_STRING_SIGNATURE);
+	jstring jniText = jniLink->NewStringUTF(text);
+	jniLink->CallVoidMethod(showToastAlert, jniText);
+	jniLink->DeleteLocalRef(jniText);
 
 	// Check nvidia's own native_app_glue implementation for encapsulation
 /*		jstring jniText = mApp->appThreadEnv->NewStringUTF(text);   				        EXCEPTION_RETURN(mApp->appThreadEnv);
@@ -348,4 +341,3 @@ bool BaseApp::showToast(const char* text) {
 */
 	return true;
 }
-

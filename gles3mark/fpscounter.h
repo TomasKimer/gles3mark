@@ -44,8 +44,10 @@ public:
     float JustUpdated() const { return justUpdated; }
 
     friend std::ostream& operator << (std::ostream& o, const FPSCounter& v) {
-        o << "C: " << std::setw(7) << std::fixed << std::setprecision(4) << v.Current() << ", A: " <<
-            std::setw(7) << v.Average() << ", B: " << std::setw(7) << v.Best() << ", W: " << std::setw(7) << v.Worst();
+        o <<   "C: " << std::setw(7) << v.Current();  // std::fixed << std::setprecision(4)
+//        << ", A: " << std::setw(7) << v.Average();
+//        << ", B: " << std::setw(7) << v.Best()
+//        << ", W: " << std::setw(7) << v.Worst();
         return o;
     }
 

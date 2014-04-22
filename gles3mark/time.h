@@ -11,12 +11,11 @@
 
 // http://stackoverflow.com/questions/14391327/how-to-get-duration-as-int-millis-and-float-seconds-from-chrono
 
-// TODO Diff BEST, WORST, AVG, like FPS (SPF is better metric)
 class Time {
     typedef std::chrono::high_resolution_clock Clock;
     
 public:
-    Time() {
+    Time(): average(0.f), best(9999.f), worst(0.f) {
         start = previous = Clock::now();
     }
 
@@ -33,18 +32,32 @@ public:
     void Update() {
         current = Clock::now();
         elapsed = current - previous;
-        //total = current - start;
-        previous = current;
+        //total = current - start; 
+        previous = current;                
+
+        //if (RealTimeSinceStartup() > 1.5f) {
+        //    fElapsed = elapsed.count();
+        //    if (fElapsed < best ) best  = fElapsed;
+        //    if (fElapsed > worst) worst = fElapsed;
+        //    if (average == 0.0f)
+        //            average = fElapsed;
+        //        else
+        //            average = (average + fElapsed) / 2.0f;
+        //}       
     }
 
     friend std::ostream& operator << (std::ostream& o, const Time& v) {
-        o << "D: " << std::setw(3) << v.DeltaTime() * 1000 << " ms";
+        o <<   "C: " << std::setw(3) << std::fixed << std::setprecision(4) << v.DeltaTime() * 1000;
+//        << ", A: " << std::setw(3) << std::fixed << std::setprecision(4) << v.average  * 1000
+//        << ", B: " << std::setw(3) << v.best     * 1000
+//        << ", W: " << std::setw(3) << v.worst    * 1000;
         return o;
     }
 
 private:
     Clock::time_point start, current, previous;
     std::chrono::duration<float> elapsed; // total;
+    float average, best, worst, fElapsed; // DeltaTime statictics
 };
 
 

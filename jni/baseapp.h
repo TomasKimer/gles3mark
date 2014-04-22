@@ -7,67 +7,50 @@
 #pragma once
 
 #include <android_native_app_glue.h>
-#include <memory>
 #include <vector>
-#include "../gles3mark/gles3mark.h"
+
+#include "jnilink.h"
 
 /**
- * Shared state for our app.
+ * Shared state for the app.
  */
 class BaseApp {
-	android_app*			   state;
-	std::unique_ptr<GLES3Mark> gles3mark;
-
-	JNIEnv 			*env; // game thread env (vs main thread env: state->activity->env)
-	jobject			thiz;
-	jclass			clazz;
-
-	bool			animating;
-	bool			quit;
-
-	/**
-	 * Our saved state data.
-	 */
-	struct Point {
+	struct Point { 	// saved state data.
 		int x, y;
 		Point():x(0),y(0){}
 	} savedState;
 
+	std::vector<Point>      touchDragPoints;
+	bool					animating;
+	bool					quit;
 
-	/**
-	 * Process the next main command.
-	 */
+	// Process the next main command.
 	static void handle_cmd(android_app* app, int32_t cmd);
 
-	/**
-	 * Process the next main command.
-	 */
+	// Process the next main command.
 	void HandleCommand(int32_t cmd);
 
-	/**
-	 * Process the next input event.
-	 */
+	// Process the next input event.
 	static int32_t handle_input(android_app* app, AInputEvent* event);
 
-	/**
-	 * Process the next input event.
-	 */
+	// Process the next input event.
 	int32_t HandleInput(AInputEvent* event);
 
 protected:
-	//int score;
-	std::vector<Point> touchDragPoints;
+	android_app*		    state;
+	JNILink 				*jniLink;
 
-	virtual void OnStartup() {}
-	virtual void OnQuit()   {}
+	virtual void OnInit() {}
+	virtual void OnQuit() {}
+	virtual void OnDestroy() {}
 	virtual void OnResize(int w, int h) {}
-	virtual bool OnIdle() {
-		//if (!glContext->HasDisplay()) return;
-		return gles3mark->OnStep();
-	}
+	virtual bool OnIdle() { return true; }
+	virtual void OnTouchDown(int x, int y, int pointerId) {}
+	virtual void OnTouchUp(int x, int y, int pointerId) {}
+	virtual void OnTouchDragged(int x, int y, int dx, int dy, int pointerId) {}
 
-	// JNI is running the equivalent of the following Java code: activity.showToastAlert(text);
-	bool showToast(const char* text);
+	//int score;
+	bool showToast(const std::string& text);
 
 public:
 	BaseApp(android_app* _state);
@@ -77,4 +60,3 @@ public:
 };
 
 #endif
-

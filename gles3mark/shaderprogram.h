@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -12,19 +12,23 @@
 #include "glinclude.h"
 
 class ShaderProgram {
-    GLuint vertexShader, fragmentShader, shaderProgram;
+    GLuint shaderProgram;
 
-    std::map<std::string, GLuint> uniforms;
+    std::unordered_map<std::string, GLuint> uniforms;
 
 public:
     ShaderProgram(const std::string& vertexSrc, const std::string& fragmentSrc) {
-        vertexShader   = compileShader(GL_VERTEX_SHADER, vertexSrc);
-        fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentSrc);
+        GLuint vertexShader   = compileShader(GL_VERTEX_SHADER, vertexSrc);
+        GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentSrc);
 
         shaderProgram = linkShader({vertexShader, fragmentShader});
 
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
+    }
+
+    ShaderProgram(GLuint vertexShader, GLuint fragmentShader) {
+        shaderProgram = linkShader({vertexShader, fragmentShader});
     }
     
     ~ShaderProgram() {
@@ -49,9 +53,9 @@ public:
     void SetUniform(const std::string& s, const glm::vec4& v) { glUniform4fv      (uniforms[s], 1,           glm::value_ptr(v)); }
     void SetUniform(const std::string& s, const glm::mat4& m) { glUniformMatrix4fv(uniforms[s], 1, GL_FALSE, glm::value_ptr(m)); }
 
+    static GLuint compileShader(GLenum type, const std::string& source);    
 
 protected:
-    static GLuint compileShader(GLenum type, const std::string& source);
     static GLuint linkShader(std::initializer_list<GLuint> shaders);
     static std::string getInfoLog(GLuint shaderOrProgram);
 };

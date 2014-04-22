@@ -6,7 +6,7 @@
 #include <windows.h>
 #endif
 
-#include <map>
+#include <map> // unordered_
 
 class Input {
 public:
@@ -54,7 +54,7 @@ public:
     }
 
 private:
-    std::map<KeyCode, bool> activeKeys;
+    std::map<KeyCode, bool> activeKeys; // unordered_
 };
 
 

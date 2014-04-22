@@ -85,11 +85,16 @@ public:
         glContext->Create(osWnd);
 
         // display some GL info
-        GLQuery::LogInfo();
+        Log::V() << "GL_VENDOR: "                   + GLQuery::VENDOR();
+        Log::V() << "GL_RENDERER: "                 + GLQuery::RENDERER();
+        Log::V() << "GL_VERSION: "                  + GLQuery::VERSION();
+        Log::V() << "GL_SHADING_LANGUAGE_VERSION: " + GLQuery::SHADING_LANGUAGE_VERSION();
+
         Log::D() << "Max render buffer size: " << GLQuery::MAX_RENDERBUFFER_SIZE() << ", max samples: " << GLQuery::MAX_SAMPLES();
         Log::D() << "Max texture size: " << GLQuery::MAX_TEXTURE_SIZE();
         glm::ivec2 maxDims = GLQuery::MAX_VIEWPORT_DIMS();
         Log::D() << "Max viewport dims: " << maxDims.x << "x" << maxDims.y;
+        Log::D() << "Max color attachments: " << GLQuery::MAX_COLOR_ATTACHMENTS();
 
 
         scene = new Scene();
@@ -170,11 +175,11 @@ public:
     
     void OnResize(int w, int h) override {
         if (glContext)
-            glContext->Resize(w, h, true);
+            glContext->Resize(w, h, false);
 
         scene->OnResize(w, h);
 
-        Log::V() << "Resize: " << w << ", " << h;
+        Log::V() << "Resize: " << w << "x" << h;
     }
 
    
@@ -188,7 +193,7 @@ public:
         if (time.RealTimeSinceStartup() > 1.5f) {
             fpsCounter.Update(time.DeltaTime());
             if (fpsCounter.JustUpdated())
-                Log::V() << time << ", FPS " << fpsCounter;
+                Log::V() << "SPF [ms] " << time << " | FPS " << fpsCounter;
         }
 
         OnProcessInput();

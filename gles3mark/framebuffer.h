@@ -50,8 +50,8 @@ public:
         glDrawBuffers(activeAttachments.size(), &activeAttachments[0]);
     }
 
-    void Bind() {
-        glBindFramebuffer(GL_FRAMEBUFFER, fb);
+    void Bind(GLenum target = GL_FRAMEBUFFER) {
+        glBindFramebuffer(target, fb);
     }
 
     void Unbind() {
@@ -62,7 +62,7 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    //glInvalidateFramebuffer, glInvalidateSubFramebuffer, glBlitFramebuffer
+    //glInvalidateFramebuffer, glInvalidateSubFramebuffer, glBlitFramebuffer, glReadBuffer, glDrawBuffer, (glReadPixels)
 
 
     bool CheckCompleteness() {

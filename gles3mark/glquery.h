@@ -24,16 +24,18 @@ public:
 
 
     static GLint MAX_RENDERBUFFER_SIZE() { return Get<GLint>(GL_MAX_RENDERBUFFER_SIZE); }  // min 2048
-    static GLint MAX_TEXTURE_SIZE() { return Get<GLint>(GL_MAX_TEXTURE_SIZE); }            // min 2048
-    static GLint MAX_SAMPLES() { return Get<GLint>(GL_MAX_SAMPLES); }
+    static GLint MAX_TEXTURE_SIZE()      { return Get<GLint>(GL_MAX_TEXTURE_SIZE     ); }  // min 2048
+    static GLint MAX_SAMPLES()           { return Get<GLint>(GL_MAX_SAMPLES          ); }
+    static GLint MAX_COLOR_ATTACHMENTS() { return Get<GLint>(GL_MAX_COLOR_ATTACHMENTS); }  // min 4
+
     static glm::ivec2 MAX_VIEWPORT_DIMS() {
         std::vector<GLint> ints = Get<GLint>(GL_MAX_VIEWPORT_DIMS, 2);
         return glm::ivec2(ints[0], ints[1]);
     }
 
-    static std::string VENDOR() { return GetString(GL_VENDOR); }
-    static std::string RENDERER() { return GetString(GL_RENDERER); }
-    static std::string VERSION() { return GetString(GL_VERSION); }
+    static std::string VENDOR()                   { return GetString(GL_VENDOR                  ); }
+    static std::string RENDERER()                 { return GetString(GL_RENDERER                ); }
+    static std::string VERSION()                  { return GetString(GL_VERSION                 ); }
     static std::string SHADING_LANGUAGE_VERSION() { return GetString(GL_SHADING_LANGUAGE_VERSION); }
     
     static std::vector<std::string> Extensions() {
