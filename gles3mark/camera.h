@@ -8,13 +8,17 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "log.h"
+#include <ostream>
 #include "transform.h"
 
 class Camera {
 public:
-    Camera() { Reset(); };
+    Camera() {
+        Reset();
+    };
+
     ~Camera() {};
+
 
     void Reset() {
         up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -24,7 +28,7 @@ public:
         angleHoriz = 0.0f; // glm::half_pi<float>()
         angleVert = 0.0f;
 
-        UpdateViewMat();
+        LookAt(eye, target + eye);
     }
 
     void Move(glm::vec3 vec) {
@@ -37,7 +41,7 @@ public:
 
         eye.y += vec.y; // pouze stoupani ci klesani
 
-        UpdateViewMat();
+        LookAt(eye, target + eye);
     }
     
     void Aim(float verticalAngle, float horizontalAngle) {
@@ -53,8 +57,6 @@ public:
         if (angleVert <= -f_pi_2)
             angleVert = -f_pi_2 + 0.0001f;
 
-        //Log::V() << angleVert << " " << angleHoriz;
-
         float l_phi = f_pi_2 - angleHoriz; // uhly sferickych souradnic jsou velke a male fi
         float u_phi = f_pi_2 - angleVert;
 
@@ -62,7 +64,7 @@ public:
                            cos(u_phi),
                            sin(u_phi) * sin(l_phi));
 
-        UpdateViewMat();
+        LookAt(eye, target + eye);
     }
 
     glm::mat4& GetViewMatrix() {
@@ -74,21 +76,44 @@ public:
     }
 
     void Perspective(float fovy, float aspect, float zNear, float zFar) {
+        ortographic = false;
+        nearClipPlane = zNear;
+        farClipPlane = zFar;
+        fovY = fovy;
+        this->aspect = aspect;        
+        
         projection = glm::perspective(fovy, aspect, zNear, zFar);
     }
 
     void Orthographic(float left, float right, float bottom, float top, float zNear, float zFar) {
+        ortographic = true;
+        nearClipPlane = zNear;
+        farClipPlane = zFar;
+        
         projection = glm::ortho(left, right, bottom, top, zNear, zFar);
     }
-    
-    glm::vec3 GetEye()    { return eye; }
-    glm::vec3 GetTarget() { return target; }
 
-    void DebugDump() {    // friend std::ostream& operator << (std::ostream& o, const Camera& v) {  ??
-        Log::V("----------- Camera Debug Dump ------------------");
-        Log::V() << "pos "    << eye.x    << " " << eye.y    << " " << eye.z;
-        Log::V() << "target " << target.x << " " << target.y << " " << target.z;
-        Log::V() << "up  "    << up.x     << " " << up.y     << " " << up.z;
+    void LookAt(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up = glm::vec3(0.f, 1.f, 0.f)) {
+        view = glm::lookAt(eye, target, up);
+    }
+
+    glm::vec3& GetEye()    { return eye; }
+    glm::vec3& GetTarget() { return target; }
+
+    //void SetPosition(const glm::vec3& pos) {
+    //    eye = pos;
+    //}
+
+    //void SetDirection(const glm::vec3& dir) {
+    //    target = dir;
+    //}
+
+
+    friend std::ostream& operator << (std::ostream& o, const Camera& c) {
+        o << "pos "    << c.eye.x    << " " << c.eye.y    << " " << c.eye.z    << '\n'
+          << "target " << c.target.x << " " << c.target.y << " " << c.target.z << '\n'
+          << "up  "    << c.up.x     << " " << c.up.y     << " " << c.up.z;
+        return o;
     }
 
 private:
@@ -109,13 +134,8 @@ private:
     glm::quat rotation;
     Transform transform;   // TODO, combine with lookAt?
 
-    void UpdateViewMat() {
-        view = glm::lookAt(eye, target + eye, up);
-    }
-
-
-    // TODO
     float nearClipPlane, farClipPlane;
     float aspect, fovY;
     glm::vec4 backgroundColor; // TODO Color class
+    bool ortographic;
 };

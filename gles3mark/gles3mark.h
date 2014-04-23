@@ -23,6 +23,7 @@ typedef RenderContextEGL RenderContextT;
 #include "time.h"
 #include "fpscounter.h"
 #include "glquery.h"
+#include "benchmarkstatistics.h"
 
 #include <random>
 #include <glm/gtc/random.hpp>
@@ -47,6 +48,7 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
     Scene* scene;
     Time time;
     FPSCounter fpsCounter;
+    BenchmarkStatistics benchStats;
 
     bool quit;
     unsigned int score;
@@ -112,6 +114,8 @@ public:
 
         OnResize(glContext->GetWidth(), glContext->GetHeight()); 
 
+        benchStats.Start();
+
         return true;
     }
 
@@ -129,7 +133,7 @@ public:
                 break;
 
             case Input::KeyCode::Space:
-                scene->camera.DebugDump();
+                Log::V() << scene->camera;
                 break;
         }
     }
@@ -168,7 +172,7 @@ public:
             joystickMove.x = static_cast<float>(joystickMoveCenter.x - x);
             joystickMove.z = static_cast<float>(joystickMoveCenter.y - y);
         }
-        else {//if (dx != 0 || dy != 0) {
+        else if (dx != 0 || dy != 0) {
             scene->camera.Aim(-dy * 0.005f, -dx * 0.005f);  // 0.0025
         }
     }
@@ -196,9 +200,11 @@ public:
                 Log::V() << "SPF [ms] " << time << " | FPS " << fpsCounter;
         }
 
+        benchStats.OnFrame(time.DeltaTime());
+
         OnProcessInput();
-        //if (joystickMove.x != 0.f || joystickMove.z != 0.f)
-        scene->camera.Move(joystickMove * time.DeltaTime());
+        if (joystickMove.x != 0.f || joystickMove.z != 0.f)
+            scene->camera.Move(joystickMove * time.DeltaTime());
 
         scene->OnStep(time);
 
@@ -224,10 +230,14 @@ private:
         float x = -((-1.0f * inputManager.IsKeyDown(Input::KeyCode::A)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::D))) * step;
         float z =  ((-1.0f * inputManager.IsKeyDown(Input::KeyCode::S)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::W))) * step;
         
-        scene->camera.Move(glm::vec3(x, 0, z));
+        if (x != 0.f || z != 0.f)
+            scene->camera.Move(glm::vec3(x, 0, z));
     }
 
     void OnDestroy() {
+        benchStats.End();
+        score = benchStats.GetFrameCount();
+        
         // vs destructor?
     }
 

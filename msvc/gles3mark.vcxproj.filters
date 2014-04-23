@@ -137,6 +137,12 @@
     <ClInclude Include="..\gles3mark\quadrenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\gles3mark\keyframeanimation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gles3mark\benchmarkstatistics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gles3mark\assetfile.cpp">

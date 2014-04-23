@@ -14,6 +14,7 @@
 #include "glquery.h"
 #include "framebuffer.h"
 #include "quadrenderer.h"
+#include "keyframeanimation.h"
 
 #include <string>
 #include <vector>
@@ -48,6 +49,8 @@ class Scene {
     Framebuffer framebuffer;
     Texture diffuseTex, positionTex, normalTex;
     RenderBuffer depthRenderbuf;
+
+    KeyFrameAnimation cameraAnim;
 
 
     //GLTexture texture;
@@ -119,6 +122,28 @@ public:
 
         camera.Move(glm::vec3(0, 20, -50.f));
 
+        //cameraAnim.AddKeyFrame(KeyFrame(camera.GetEye(), camera.GetTarget(), 0));
+        
+        int j = 1;
+        for (float i = -glm::pi<float>() / 2.f; i < 2*glm::pi<float>() - glm::pi<float>() / 2.f; i += (2*glm::pi<float>() / 72.0f)) {
+            float x = 50 * glm::cos((float)i);
+            float z = 50 * glm::sin((float)i);
+
+            Log::V() << x << " " << z;
+            
+            cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(x, 20+5*glm::sin(i*2), z), camera.GetTarget(), j*0.1f));        
+            j++;
+        }
+        
+        
+      /*cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(50, 20, 0), camera.GetTarget(), 3));
+        cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(0, 20, 50), camera.GetTarget(), 6));
+        cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(-50, 20, 0), camera.GetTarget(), 9));
+        cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(0, 20, -50), camera.GetTarget(), 12));*/
+
+
+
+
         testTrans.Rotate(Transform::Up(), glm::radians(90.0f), Transform::Space::World);
         testTrans.Translate(glm::vec3(0,0,-70));
          
@@ -138,6 +163,9 @@ public:
     }
 
     void OnStep(const Time& time) {
+        cameraAnim.Update(time.DeltaTime());
+        camera.LookAt(cameraAnim.GetCurrentPosition(), cameraAnim.GetCurrentDirection());
+        
         //MVP
         glm::mat4& projection = camera.GetProjectionMatrix();
         glm::mat4& view       = camera.GetViewMatrix();

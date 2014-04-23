@@ -24,11 +24,13 @@
     <None Include="gles3mark_dll.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\gles3mark\benchmarkstatistics.h" />
     <ClInclude Include="..\gles3mark\camera.h" />
     <ClInclude Include="..\gles3mark\fpscounter.h" />
     <ClInclude Include="..\gles3mark\framebuffer.h" />
     <ClInclude Include="..\gles3mark\gl3stub_egl.h" />
     <ClInclude Include="..\gles3mark\glinclude.h" />
+    <ClInclude Include="..\gles3mark\keyframeanimation.h" />
     <ClInclude Include="..\gles3mark\quadrenderer.h" />
     <ClInclude Include="..\gles3mark\renderbuffer.h" />
     <ClInclude Include="..\gles3mark\rendercontext.h" />
