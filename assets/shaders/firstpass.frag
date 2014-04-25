@@ -15,7 +15,7 @@ layout (location=2) out vec3 outNormal;
 
 void main() {
 	if (hasTexture)
-		fragColor = texture(tex, coord) * diffuseColor; // vec4(1,0,0,1);   vec4(normal, 1) * 
+		fragColor = texture(tex, coord); // * diffuseColor; // vec4(1,0,0,1);   vec4(normal, 1) * 
 	else
 		fragColor = diffuseColor;
 	

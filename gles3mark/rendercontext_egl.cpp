@@ -54,6 +54,8 @@ bool RenderContextEGL::Create(void* osWnd) {
 
 	EGLSurface surface = eglCreateWindowSurface(display, config, window, nullptr);
 
+	//eglSurfaceAttrib(display, surface, EGL_SWAP_BEHAVIOR, EGL_BUFFER_PRESERVED); // EGL_BUFFER_DESTROYED
+
 	EGLint contextAttrs[] = {
 			EGL_CONTEXT_CLIENT_VERSION, 3,
 			EGL_NONE };

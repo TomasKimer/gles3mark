@@ -51,7 +51,7 @@ class Scene {
     RenderBuffer depthRenderbuf;
 
     KeyFrameAnimation cameraAnim;
-
+    bool freeCamera;
 
     //GLTexture texture;
     glm::quat rot;
@@ -63,7 +63,7 @@ class Scene {
 public:
     Camera camera;
     
-    Scene(): renderWidth(1280), renderHeight(720)  {}
+    Scene(): renderWidth(1280), renderHeight(720), freeCamera(false)  {}
     ~Scene() {}
         
     bool OnInit(AssetManager* assetManager, int width, int height) {
@@ -72,14 +72,14 @@ public:
             //texture.FromKTXdata(assetManager->LoadContents("textures/chair2.ktx"));  // chair512_etc2rgb_mip_slowperc.ktx
             
             AssimpSceneImporter* modelImporter = new AssimpSceneImporter(/* *assetManager*/);
-            std::vector<char> modelData(assetManager->LoadContents("models/e112.3ds"));
+            std::vector<char> modelData(assetManager->LoadContents("models/e112max.dae")); // e112.3ds
             model = modelImporter->Import(modelData, materialDatabase);
 
             for (Material* m : materialDatabase) {
                 if (m->hasTexture) {
                     std::string ktxPath = m->texture->path.substr(0, m->texture->path.find_last_of(".")) + ".ktx";
                     std::transform(ktxPath.begin(), ktxPath.end(), ktxPath.begin(), ::tolower);
-                    m->texture->FromKTXdata(assetManager->LoadContents("textures/" + ktxPath));
+                    m->texture->FromKTXdata(assetManager->LoadContents("textures/" + ktxPath)); //test/rgb-reference.ktx
                 }            
             }
 
@@ -129,7 +129,7 @@ public:
             float x = 50 * glm::cos((float)i);
             float z = 50 * glm::sin((float)i);
 
-            Log::V() << x << " " << z;
+            //Log::V() << x << " " << z;
             
             cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(x, 20+5*glm::sin(i*2), z), camera.GetTarget(), j*0.1f));        
             j++;
@@ -163,8 +163,10 @@ public:
     }
 
     void OnStep(const Time& time) {
-        cameraAnim.Update(time.DeltaTime());
-        camera.LookAt(cameraAnim.GetCurrentPosition(), cameraAnim.GetCurrentDirection());
+        if (!freeCamera) {
+            cameraAnim.Update(time.DeltaTime());
+            camera.LookAt(cameraAnim.GetCurrentPosition(), cameraAnim.GetCurrentDirection());
+        }
         
         //MVP
         glm::mat4& projection = camera.GetProjectionMatrix();
@@ -218,9 +220,16 @@ public:
         positionTex.Bind();
         quadRenderer.Render(1.5f, 0.0f, 0.5f);
 
-
-        //glUseProgram(0);
         //glFlush();
+#ifdef _ANDROID
+        glFinish();  //- not causing delay on swaping egl context
+#endif
+        // eglSwapBuffers performs an implicit flush operation on the context (glFlush for an OpenGL ES or OpenGL context,
+        // vgFlush for an OpenVG context) bound to surface before swapping. Subsequent client API commands may be issued on
+        // that context immediately after calling eglSwapBuffers, but are not executed until the buffer exchange is completed.
+
+        // FENCE - http://permalink.gmane.org/gmane.comp.lib.cairo/24458
+
         //assert(glGetError() == GL_NO_ERROR);
     }
 
