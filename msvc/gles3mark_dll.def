@@ -1,9 +1,10 @@
 LIBRARY gles3mark
 ;DESCRIPTION "gles3mark DLL"
 EXPORTS
-	DLL_init @1
-	DLL_resize @2
-	DLL_step @3
-	DLL_keyDown @4
-	DLL_keyUp @5
-	DLL_mouseMove @6
+	DLL_preInit @1
+	DLL_init @2
+	DLL_resize @3
+	DLL_step @4
+	DLL_keyDown @5
+	DLL_keyUp @6
+	DLL_mouseMove @7

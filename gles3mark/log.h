@@ -17,6 +17,14 @@
 #include <fstream>
 #include <sstream>
 
+#include "logconsole.h"
+
+#ifdef _WIN32
+typedef LogConsoleWin LogConsoleT;
+#else
+typedef LogConsole LogConsoleT;
+#endif
+
 /**
  * Event logging.
  */
@@ -71,20 +79,22 @@ private:
     Log() {}
     void logMsg(const std::string & msg, Severity severity);
 
+    LogConsoleT console;
+
 public:
     ~Log();
-    static void       Create (const std::string & filename);
+    static void       Create(const std::string& filename = "app.log");
     static void       Destroy();
-    static void       Msg(const std::string & msg, Severity severity = Severity::Verbose);
+    static void       Msg(const std::string& msg, Severity severity = Severity::Verbose);
     static LogStream  Stream(Severity severity = Severity::Verbose);
 
     
     // --- shortcuts ---
-    static void       V(const std::string & msg) { Msg(msg, Severity::Verbose); }
-    static void       D(const std::string & msg) { Msg(msg, Severity::Debug); }
-    static void       I(const std::string & msg) { Msg(msg, Severity::Info); }
-    static void       W(const std::string & msg) { Msg(msg, Severity::Warn); }
-    static void       E(const std::string & msg) { Msg(msg, Severity::Error); }
+    static void       V(const std::string& msg) { Msg(msg, Severity::Verbose); }
+    static void       D(const std::string& msg) { Msg(msg, Severity::Debug); }
+    static void       I(const std::string& msg) { Msg(msg, Severity::Info); }
+    static void       W(const std::string& msg) { Msg(msg, Severity::Warn); }
+    static void       E(const std::string& msg) { Msg(msg, Severity::Error); }
        
     static LogStream  V() { return Stream(Severity::Verbose); }
     static LogStream  D() { return Stream(Severity::Debug  ); }

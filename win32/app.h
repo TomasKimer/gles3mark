@@ -1,10 +1,10 @@
 
 #pragma once
 
-#include "baseapp.h"
-
 #include <string>
 #include <stdexcept>
+
+#include "baseapp.h"
 
 const std::string DLLPATH("gles3mark.dll");
 
@@ -12,6 +12,7 @@ class App : public BaseApp {
 
     class DLL {
         // DLL Imported functions
+        using DLLPreInitT   = void(*)(                  );
         using DLLInitT      = void(*)(HWND              );   // typedef void(*DLLInitT  )(HWND    );
         using DLLResizeT    = void(*)(int, int          );   // typedef void(*DLLResizeT)(int, int);
         using DLLStepT      = bool(*)(                  );   // typedef bool(*DLLStepT  )(        );
@@ -21,6 +22,7 @@ class App : public BaseApp {
 
         HINSTANCE   dllHandle;
     public:
+        DLLPreInitT   DllPreInit;
         DLLInitT      DllInit;
         DLLResizeT    DllResize;
         DLLStepT      DllStep;

@@ -63,7 +63,7 @@ class Scene {
 public:
     Camera camera;
     
-    Scene(): renderWidth(1280), renderHeight(720), freeCamera(false)  {}
+    Scene(): renderWidth(1280), renderHeight(720), freeCamera(true)  {}
     ~Scene() {}
         
     bool OnInit(AssetManager* assetManager, int width, int height) {

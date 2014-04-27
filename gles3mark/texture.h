@@ -121,10 +121,6 @@ public:
         glBindTexture(target, textureObject);
     }
 
-    GLuint GetGLid() const {
-        return textureObject;
-    }
-
 private:
     static bool isPowerOfTwo(unsigned x) {
         return (x != 0) && ((x & (x - 1)) == 0);

@@ -43,7 +43,7 @@ public:
         //std::vector<char> rawModelData = refAssetManager.LoadContents("models/" + fileName);
         
         Assimp::Importer aImporter;
-        const aiScene* aScene = aImporter.ReadFileFromMemory(&rawModelData[0], rawModelData.size(), aiProcessPreset_TargetRealtime_Quality);
+        const aiScene* aScene = aImporter.ReadFileFromMemory(&rawModelData[0], rawModelData.size(), aiProcessPreset_TargetRealtime_Quality | aiProcess_FlipUVs);
         if (!aScene) {
             throw std::runtime_error(std::string("Failed to load model: ") + aImporter.GetErrorString());
         }
@@ -56,7 +56,6 @@ public:
             const aiMesh* aMesh = aScene->mMeshes[i];
             Mesh* m = LoadMesh(aMesh, materialZeroIndex); 
             model->AddMesh(m);
-            // Log::Stream() << "Mesh " << i << " - Vertices: " << mesh->mNumVertices << ", faces: " << mesh->mNumFaces;  // normals, uv            
         }
 
         RecursiveTransform(model, aScene, aScene->mRootNode, glm::mat4());
@@ -65,7 +64,6 @@ public:
             const aiMaterial* aMat = aScene->mMaterials[i];            
             Material* m = LoadMaterial(aMat);            
             materialDatabase.push_back(m);            
-            //Log::V() << "Material " << i << " - name: " << name.C_Str() << (path.length > 0 ? (std::string(", texture: ") + path.data) : "");
         }
 
         for (unsigned int i = 0; i < aScene->mNumLights; ++i) {

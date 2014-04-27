@@ -16,6 +16,10 @@ static const char* TAG = "gles3mark log";
 #include <iostream>
 #endif
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 Log* Log::mInstance = nullptr;
 
 Log::~Log(void) {
@@ -24,7 +28,7 @@ Log::~Log(void) {
         mInstance->mOutput.close();
 }
 
-void Log::Create(const std::string & filename = "app.log") {
+void Log::Create(const std::string& filename) {
     if (!mInstance) {
         mInstance = new Log();
 #ifndef ANDROID
@@ -63,21 +67,29 @@ void Log::logMsg(const std::string & msg, Severity severity) {
     std::stringstream timestamp;
     timestamp << std::put_time(std::localtime(&in_time_t), "%X") << "  ";  // %Y-%m-%d %X
 
+    unsigned short color = LogConsole::WHITE;
+
     std::string sseverity;
     switch (severity) {
         case Severity::Debug:
             sseverity = "Debug: ";
+            color = LogConsole::LIGHTBLUE;
             break;
         case Severity::Info:
             sseverity = "Info: ";
+            color = LogConsole::LIGHTGREEN;
             break;
         case Severity::Warn:
             sseverity = "Warning: ";
+            color = LogConsole::MAGENTA;
             break;
         case Severity::Error:
             sseverity = "ERROR: ";
+            color = LogConsole::LIGHTRED;
             break;
     }
+
+    console.SetAttrib(color);
 
     std::cerr << timestamp.str() << sseverity << msg << '\n';    //OutputDebugString(msg.c_str());
     if (mOutput.is_open() /*&& severity == Severity::Verbose*/) {

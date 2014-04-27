@@ -13,7 +13,6 @@
   <ItemGroup>
     <ClInclude Include="..\win32\app.h" />
     <ClInclude Include="..\win32\baseapp.h" />
-    <ClInclude Include="..\win32\console.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\win32\app.cpp" />

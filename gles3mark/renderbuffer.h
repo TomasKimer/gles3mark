@@ -40,12 +40,6 @@ public:
 
 
 
-    GLuint GetGLid() const {
-        return rb;
-    }
-
-
-
 
 
 

@@ -21,9 +21,6 @@
     <ClInclude Include="..\win32\baseapp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\win32\console.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\win32\app.cpp">

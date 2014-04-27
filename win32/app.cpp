@@ -1,14 +1,10 @@
 
 
-#include "app.h"
-#include "console.h"
 #include <sstream>
 
-void App::OnStartup() {
-//#ifdef _DEBUG
-    DebugConsole::RedirectIOToConsole();
-//#endif
+#include "app.h"
 
+void App::OnStartup() {
     try {
         dll.Init(DLLPATH);
     }
@@ -17,6 +13,8 @@ void App::OnStartup() {
         Exit(1);
         return;
     }
+
+    dll.DllPreInit();
     
     // Create window
     BaseApp::OnStartup();
@@ -60,6 +58,7 @@ void App::DLL::Init(const std::string& path) {
         throw std::runtime_error("LoadLibrary failed : " + path + "\nCode: " + ss.str());
     }        
 
+    DllPreInit   = reinterpret_cast<DLLPreInitT  >(GetProcAddress(dllHandle, "DLL_preInit"  ));
     DllInit      = reinterpret_cast<DLLInitT     >(GetProcAddress(dllHandle, "DLL_init"     ));
     DllResize    = reinterpret_cast<DLLResizeT   >(GetProcAddress(dllHandle, "DLL_resize"   ));
     DllStep      = reinterpret_cast<DLLStepT     >(GetProcAddress(dllHandle, "DLL_step"     ));
@@ -67,7 +66,7 @@ void App::DLL::Init(const std::string& path) {
     DllKeyUp     = reinterpret_cast<DLLKeyUpT    >(GetProcAddress(dllHandle, "DLL_keyUp"    ));
     DllMouseMove = reinterpret_cast<DLLMouseMoveT>(GetProcAddress(dllHandle, "DLL_mouseMove"));
 
-    if (!DllInit || !DllResize || !DllStep || !DllKeyDown || !DllKeyUp || !DllMouseMove) {
+    if (!DllPreInit || !DllInit || !DllResize || !DllStep || !DllKeyDown || !DllKeyUp || !DllMouseMove) {
         FreeLibrary(dllHandle);
         throw std::runtime_error("GetProcAddress failed!");
     }

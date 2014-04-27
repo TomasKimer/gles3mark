@@ -61,6 +61,8 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
 
 public:
     GLES3Mark() : glContext(nullptr), quit(false), score(42), movePointerId(-2), aimPointerId(-2) {
+        //Log::Create();
+        
         score = (int)glm::linearRand(10.f, 1000.f);
 
         std::random_device rd;
@@ -112,7 +114,7 @@ public:
         t.join();
         Log::V() << "thread joined, out param: " << outParam;
 
-        OnResize(glContext->GetWidth(), glContext->GetHeight()); 
+        OnResize(glContext->GetWidth(), glContext->GetHeight()); // TODO
 
         benchStats.Start();
 
@@ -179,11 +181,11 @@ public:
     
     void OnResize(int w, int h) override {
         if (glContext)
+        {
             glContext->Resize(w, h, false);
-
-        scene->OnResize(w, h);
-
-        Log::V() << "Resize: " << w << "x" << h;
+            scene->OnResize(w, h);            
+        }
+        Log::V() << "Resize: " << w << "x" << h; // TODO
     }
 
    

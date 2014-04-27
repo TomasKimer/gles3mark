@@ -15,8 +15,11 @@
 
 static std::unique_ptr<GLES3Mark> gles3mark;
 
-void DLL_init(HWND hWnd) {
+void DLL_preInit() {
     gles3mark = std::make_unique<GLES3Mark>();  // gles3mark = std::unique_ptr<GLES3Mark>(new GLES3Mark());
+}
+
+void DLL_init(HWND hWnd) {
     gles3mark->OnInit((void*)hWnd);
 }
 
