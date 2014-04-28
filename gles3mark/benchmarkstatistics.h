@@ -2,38 +2,41 @@
 
 #pragma once
 
-
+#include "fpscounter.h"
 
 class BenchmarkStatistics {
+    friend class JSONStatsBuilder;
 
     unsigned frameCount;
-    float deltaBest, deltaWorst, deltaMean;
+    float deltaBest, deltaWorst, deltaMean, deltaStdDev;
+    float deltaAcc;
+    float fpsBest, fpsWorst, fpsMean, fpsStdDev;
+
+    unsigned score;
     bool running;
 
 public:
-    BenchmarkStatistics() {
-    
+    BenchmarkStatistics(): score(0) {    
     }
 
-    void Start() {
+    void StartMeasure() {
         running = true;
         frameCount = 0;
-
+        deltaAcc = 0.f;
     }
 
 
     void OnFrame(float deltaTime) {
         if (!running) return;
-    
+
+        deltaAcc += deltaTime;    
         frameCount++;
     }
 
-    void End() {
+    void EndMeasure() {
         running = false;
-    }
-
-    unsigned GetFrameCount() {
-        return frameCount;
-    
+        
+        score = frameCount;
+        deltaMean = deltaAcc / frameCount;
     }
 };

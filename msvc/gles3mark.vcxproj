@@ -43,6 +43,7 @@
     <ClInclude Include="..\gles3mark\rendertarget.h" />
     <ClInclude Include="..\gles3mark\scene.h" />
     <ClInclude Include="..\gles3mark\materialdatabase.h" />
+    <ClInclude Include="..\gles3mark\statsbuilder_json.h" />
     <ClInclude Include="..\gles3mark\texture.h" />
     <ClInclude Include="..\gles3mark\input.h" />
     <ClInclude Include="..\gles3mark\light.h" />

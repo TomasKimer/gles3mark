@@ -24,6 +24,7 @@ typedef RenderContextEGL RenderContextT;
 #include "fpscounter.h"
 #include "glquery.h"
 #include "benchmarkstatistics.h"
+#include "statsbuilder_json.h"
 
 #include <random>
 #include <glm/gtc/random.hpp>
@@ -36,7 +37,7 @@ public:
     virtual void OnResize(int w, int h) = 0;
     virtual bool OnStep() = 0;
     virtual std::string GetResultXML() = 0;
-    virtual RenderContextT* GetContext() = 0;  // TODO
+    virtual const RenderContextT* GetContext() = 0;  // TODO
 };
 
 
@@ -50,8 +51,7 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
     FPSCounter fpsCounter;
     BenchmarkStatistics benchStats;
 
-    bool quit;
-    unsigned int score;
+    bool quit, vsync;
     
     // multitouch controls
     glm::vec3 joystickMove;
@@ -60,15 +60,14 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
 
 
 public:
-    GLES3Mark() : glContext(nullptr), quit(false), score(42), movePointerId(-2), aimPointerId(-2) {
-        //Log::Create();
+    GLES3Mark() : glContext(nullptr), quit(false), vsync(false), movePointerId(-2), aimPointerId(-2) {
+        //Log::Create();  // TODO
         
-        score = (int)glm::linearRand(10.f, 1000.f);
-
+        /*score = (int)glm::linearRand(10.f, 1000.f);
         std::random_device rd;
         std::mt19937 mt(rd());
         std::uniform_int_distribution<unsigned> dist(10, 1000);
-        score = dist(mt);
+        score = dist(mt);*/
     }
 
     ~GLES3Mark() {
@@ -79,7 +78,7 @@ public:
     	}
     }
     
-    RenderContextT* GetContext() override { return glContext; }
+    const RenderContextT* GetContext() override { return glContext; }
 
     bool OnInit(void* osWnd, void* ioContext = nullptr) override {
     	assetManager = new AssetManager(ioContext);
@@ -116,7 +115,7 @@ public:
 
         OnResize(glContext->GetWidth(), glContext->GetHeight()); // TODO
 
-        benchStats.Start();
+        benchStats.StartMeasure();
 
         return true;
     }
@@ -182,7 +181,7 @@ public:
     void OnResize(int w, int h) override {
         if (glContext)
         {
-            glContext->Resize(w, h, false);
+            glContext->Resize(w, h, vsync);
             scene->OnResize(w, h);            
         }
         Log::V() << "Resize: " << w << "x" << h; // TODO
@@ -208,7 +207,8 @@ public:
         if (joystickMove.x != 0.f || joystickMove.z != 0.f)
             scene->camera.Move(joystickMove * time.DeltaTime());
 
-        scene->OnStep(time);
+        if (!scene->OnStep(time))
+            quit = true;
 
         //std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
@@ -218,10 +218,8 @@ public:
     }
 
     std::string GetResultXML() override {
-        std::stringstream ss;
-        ss << score;
-        
-        return ss.str();
+        JSONStatsBuilder jsb;
+        return jsb.GetResultJSON(benchStats);
     }
 
 
@@ -237,8 +235,10 @@ private:
     }
 
     void OnDestroy() {
-        benchStats.End();
-        score = benchStats.GetFrameCount();
+        benchStats.EndMeasure();
+
+        //score = benchStats.GetFrameCount();
+        //scene->Destroy();
         
         // vs destructor?
     }

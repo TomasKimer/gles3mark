@@ -162,7 +162,7 @@ public:
         //camera.Orthographic(0.0f, static_cast<float>(w), static_cast<float>(h), 0.0f, 1.0f, 1000.0f);
     }
 
-    void OnStep(const Time& time) {
+    bool OnStep(const Time& time) {
         if (!freeCamera) {
             cameraAnim.Update(time.DeltaTime());
             camera.LookAt(cameraAnim.GetCurrentPosition(), cameraAnim.GetCurrentDirection());
@@ -231,6 +231,8 @@ public:
         // FENCE - http://permalink.gmane.org/gmane.comp.lib.cairo/24458
 
         //assert(glGetError() == GL_NO_ERROR);
+
+        return true;
     }
 
     void Destroy() {
