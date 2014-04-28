@@ -20,6 +20,23 @@ static const char* TAG = "gles3mark log";
 #include <windows.h>
 #endif
 
+Log::LogStream::LogStream(const LogStream& ls) {    
+    mCache.str(ls.mCache.str());
+    mSeverity = ls.mSeverity;
+}
+
+Log::LogStream::~LogStream() {                
+    if (mCache.tellp() > 0)  // flush on destroy
+        mInstance->logMsg(mCache.str(), mSeverity);
+}
+
+Log::LogStream& Log::LogStream::operator<< (const Flush& v) {
+    mInstance->logMsg(mCache.str(), mSeverity);
+    mCache.str("");
+    return *this;            
+}
+
+
 Log* Log::mInstance = nullptr;
 
 Log::~Log(void) {

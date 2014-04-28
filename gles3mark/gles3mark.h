@@ -1,5 +1,4 @@
 
-
 #pragma once
 
 #ifdef _WIN32
@@ -15,6 +14,8 @@ typedef RenderContextEGL RenderContextT;
 #include <stdexcept>
 //#include <atomic>
 #include <thread>
+#include <random>
+#include <glm/gtc/random.hpp>
 
 #include "assetmanager.h"
 #include "scene.h"
@@ -25,9 +26,6 @@ typedef RenderContextEGL RenderContextT;
 #include "glquery.h"
 #include "benchmarkstatistics.h"
 #include "statsbuilder_json.h"
-
-#include <random>
-#include <glm/gtc/random.hpp>
 
 
 class IGLES3MarkLib {
@@ -62,12 +60,6 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
 public:
     GLES3Mark() : glContext(nullptr), quit(false), vsync(false), movePointerId(-2), aimPointerId(-2) {
         //Log::Create();  // TODO
-        
-        /*score = (int)glm::linearRand(10.f, 1000.f);
-        std::random_device rd;
-        std::mt19937 mt(rd());
-        std::uniform_int_distribution<unsigned> dist(10, 1000);
-        score = dist(mt);*/
     }
 
     ~GLES3Mark() {
@@ -80,173 +72,48 @@ public:
     
     const RenderContextT* GetContext() override { return glContext; }
 
-    bool OnInit(void* osWnd, void* ioContext = nullptr) override {
-    	assetManager = new AssetManager(ioContext);
+    bool OnInit(void* osWnd, void* ioContext = nullptr) override;
 
-        // init GL context
-        glContext = new RenderContextT();
-        glContext->Create(osWnd);
+    void OnKeyDown(Input::KeyCode keyCode) override;   // TODO rename to keyPress
 
-        // display some GL info
-        Log::V() << "GL_VENDOR: "                   + GLQuery::VENDOR();
-        Log::V() << "GL_RENDERER: "                 + GLQuery::RENDERER();
-        Log::V() << "GL_VERSION: "                  + GLQuery::VERSION();
-        Log::V() << "GL_SHADING_LANGUAGE_VERSION: " + GLQuery::SHADING_LANGUAGE_VERSION();
+    void OnKeyUp(Input::KeyCode keyCode) override;  
 
-        Log::D() << "Max render buffer size: " << GLQuery::MAX_RENDERBUFFER_SIZE() << ", max samples: " << GLQuery::MAX_SAMPLES();
-        Log::D() << "Max texture size: " << GLQuery::MAX_TEXTURE_SIZE();
-        glm::ivec2 maxDims = GLQuery::MAX_VIEWPORT_DIMS();
-        Log::D() << "Max viewport dims: " << maxDims.x << "x" << maxDims.y;
-        Log::D() << "Max color attachments: " << GLQuery::MAX_COLOR_ATTACHMENTS();
+    void OnTouchDown(int screenX, int screenY, int pointer = -1, Input::Button button = Input::Button::Default) override;
 
+    void OnTouchUp(int screenX, int screenY, int pointer = -1, Input::Button button = Input::Button::Default) override;
 
-        scene = new Scene();
-        scene->OnInit(assetManager, glContext->GetWidth(), glContext->GetHeight());
-       
-        
-        //Log::Stream() << "C++ ver: " << (long)__cplusplus;
-
-        //std::atomic<bool> ready (false);
-        Log::V() << "Concurrent threads supported: " << std::thread::hardware_concurrency();
-        int outParam;
-        std::thread t(doSomeWork, 5, std::ref(outParam));
-        t.join();
-        Log::V() << "thread joined, out param: " << outParam;
-
-        OnResize(glContext->GetWidth(), glContext->GetHeight()); // TODO
-
-        benchStats.StartMeasure();
-
-        return true;
-    }
-
-
-    void OnKeyDown(Input::KeyCode keyCode) override {   // TODO rename to keyPress
-        inputManager.RegisterKeyDown(keyCode);
-        
-        switch (keyCode) {
-            case Input::KeyCode::Escape:
-                quit = true;
-                break;
-
-            case Input::KeyCode::Return:
-                scene->camera.Reset();
-                break;
-
-            case Input::KeyCode::Space:
-                Log::V() << scene->camera;
-                break;
-        }
-    }
-
-    void OnKeyUp(Input::KeyCode keyCode) override {
-        inputManager.RegisterKeyUp(keyCode);
-    }    
-
-    void OnTouchDown(int screenX, int screenY, int pointer = -1, Input::Button button = Input::Button::Default) override {
-        if (pointer == -1) return;
-        
-        if (screenX > 0 && screenX < 100 && screenY > 0 && screenY < 100)
-            quit = true;
-
-        if (screenX < glContext->GetWidth() / 2) {
-            movePointerId = pointer;
-            joystickMoveCenter = glm::ivec2(screenX, screenY);
-        }
-        else {
-            aimPointerId = pointer;
-        }
-    }
-
-    void OnTouchUp(int screenX, int screenY, int pointer = -1, Input::Button button = Input::Button::Default) override {
-        if (pointer == movePointerId) {
-            joystickMove = glm::vec3(0);
-            movePointerId = -1;
-        }
-        else if (pointer == aimPointerId) {
-            aimPointerId = -1;
-        }
-    }
-
-    void OnTouchDragged(int x, int y, int dx, int dy, int pointer = -1) override {
-        if (pointer == movePointerId) {
-            joystickMove.x = static_cast<float>(joystickMoveCenter.x - x);
-            joystickMove.z = static_cast<float>(joystickMoveCenter.y - y);
-        }
-        else if (dx != 0 || dy != 0) {
-            scene->camera.Aim(-dy * 0.005f, -dx * 0.005f);  // 0.0025
-        }
-    }
+    void OnTouchDragged(int x, int y, int dx, int dy, int pointer = -1) override;
     
-    void OnResize(int w, int h) override {
-        if (glContext)
-        {
-            glContext->Resize(w, h, vsync);
-            scene->OnResize(w, h);            
-        }
-        Log::V() << "Resize: " << w << "x" << h; // TODO
-    }
-
+    void OnResize(int w, int h) override;
    
-    bool OnStep() override {  // TODO return Exit Code
-        if (quit) {
-            OnDestroy();
-            return false;
-        }
-        
-        time.Update();
-        if (time.RealTimeSinceStartup() > 1.5f) {
-            fpsCounter.Update(time.DeltaTime());
-            if (fpsCounter.JustUpdated())
-                Log::V() << "SPF [ms] " << time << " | FPS " << fpsCounter;
-        }
+    bool OnStep() override;  // TODO return Exit Code
 
-        benchStats.OnFrame(time.DeltaTime());
-
-        OnProcessInput();
-        if (joystickMove.x != 0.f || joystickMove.z != 0.f)
-            scene->camera.Move(joystickMove * time.DeltaTime());
-
-        if (!scene->OnStep(time))
-            quit = true;
-
-        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-        glContext->Swap();
-
-        return true;
-    }
 
     std::string GetResultXML() override {
         JSONStatsBuilder jsb;
-        return jsb.GetResultJSON(benchStats);
+        return jsb.BuildBenchStatsInfo(benchStats).BuildGLinfo().Build();  //jsb.GetResultJSON(benchStats);
     }
 
 
 private:
-    void OnProcessInput() {
-        float step = time.DeltaTime() * 100.0f;
+    void OnProcessInput();
 
-        float x = -((-1.0f * inputManager.IsKeyDown(Input::KeyCode::A)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::D))) * step;
-        float z =  ((-1.0f * inputManager.IsKeyDown(Input::KeyCode::S)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::W))) * step;
-        
-        if (x != 0.f || z != 0.f)
-            scene->camera.Move(glm::vec3(x, 0, z));
-    }
+    void OnDestroy();
 
-    void OnDestroy() {
-        benchStats.EndMeasure();
 
-        //score = benchStats.GetFrameCount();
-        //scene->Destroy();
-        
-        // vs destructor?
-    }
+
 
     static void doSomeWork(int param, int& outParam) {
         Log::V() << "thread test: hello from thread, param: " << param;
         outParam = 42;
         return;
+    }
+
+    static unsigned randTest() {        
+        std::random_device rd;
+        std::mt19937 mt(rd());
+        std::uniform_int_distribution<unsigned> dist(10, 1000);
+        return dist(mt);  // (unsigned)glm::linearRand(10.f, 1000.f);
     }
 
 

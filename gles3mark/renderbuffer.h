@@ -16,8 +16,8 @@ class RenderBuffer : public RenderTarget {
 public:
     RenderBuffer() {
         glGenRenderbuffers(1, &rb);
-        maxSize = GLQuery::MAX_RENDERBUFFER_SIZE();
-        maxSamples = GLQuery::MAX_SAMPLES();
+        maxSize = GLQuery::Get<GLint>(GL_MAX_RENDERBUFFER_SIZE);
+        maxSamples = GLQuery::Get<GLint>(GL_MAX_SAMPLES);
     }
 
     ~RenderBuffer() {
@@ -36,11 +36,4 @@ public:
     /*void Bind() {
         glBindRenderbuffer(GL_RENDERBUFFER, rb);
     }*/
-
-
-
-
-
-
-
 };

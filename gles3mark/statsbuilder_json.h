@@ -9,6 +9,8 @@
 #include "benchmarkstatistics.h"
 
 // http://cs.wikipedia.org/wiki/Builder
+// http://developer.android.com/reference/android/os/StrictMode.ThreadPolicy.Builder.html
+// JSONStats* st = (new JSONStatsBuilder()).BuildBenchStatsInfo().BuildGLinfo().Build();
 class JSONStatsBuilder {
     std::stringstream result;
 
@@ -20,9 +22,13 @@ public:
         return result.str();    
     }
 
+    std::string Build() {
+        return result.str();
+    }
+
 
     JSONStatsBuilder& BuildGLinfo() {
-        result << GLQuery::RENDERER();
+        result << 42;//GLQuery::RENDERER();
 
         return *this;
     }

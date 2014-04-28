@@ -42,28 +42,16 @@ private:
     class LogStream {
     public:            
         LogStream() {}            
-        LogStream(const LogStream& ls) {    
-            mCache.str(ls.mCache.str());
-            mSeverity = ls.mSeverity;
-        }
-        
-        ~LogStream() {                
-            if (mCache.tellp() > 0)  // flush on destroy
-                mInstance->logMsg(mCache.str(), mSeverity);
-        }
+        LogStream(const LogStream& ls);        
+        ~LogStream();
 
         struct Flush {};  // indicates end of stream
-    
+        LogStream& operator<< (const Flush& v);
+        
         template <typename T>
         LogStream& operator<< (const T& v) {
             mCache << v;
             return *this;
-        }
-            
-        LogStream& operator<< (const Flush& v) {
-            mInstance->logMsg(mCache.str(), mSeverity);
-            mCache.str("");
-            return *this;            
         }
 
         void SetSeverity(Severity severity) { mSeverity = severity; }
@@ -73,11 +61,11 @@ private:
         Severity mSeverity;
     } mStream;
 
-    static Log* mInstance;
-    std::ofstream mOutput;
-    
     Log() {}
     void logMsg(const std::string & msg, Severity severity);
+    
+    static Log* mInstance;
+    std::ofstream mOutput;
 
     LogConsoleT console;
 
@@ -87,7 +75,6 @@ public:
     static void       Destroy();
     static void       Msg(const std::string& msg, Severity severity = Severity::Verbose);
     static LogStream  Stream(Severity severity = Severity::Verbose);
-
     
     // --- shortcuts ---
     static void       V(const std::string& msg) { Msg(msg, Severity::Verbose); }
