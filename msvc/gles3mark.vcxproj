@@ -35,6 +35,7 @@
     <ClInclude Include="..\gles3mark\gl3stub_egl.h" />
     <ClInclude Include="..\gles3mark\glinclude.h" />
     <ClInclude Include="..\gles3mark\keyframeanimation.h" />
+    <ClInclude Include="..\gles3mark\modelrenderer.h" />
     <ClInclude Include="..\gles3mark\quadrenderer.h" />
     <ClInclude Include="..\gles3mark\renderbuffer.h" />
     <ClInclude Include="..\gles3mark\rendercontext.h" />

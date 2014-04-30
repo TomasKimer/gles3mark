@@ -5,7 +5,7 @@
 #include "glerror.h"
 
 void MeshRenderer::Init(Mesh* mesh) {
-    this->owner = mesh;
+    //this->owner = mesh;
     
     // Copy data to graphics card
     glGenBuffers(1, &VBO);
@@ -35,9 +35,9 @@ void MeshRenderer::Init(Mesh* mesh) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
     // setup vertex shader attribute bindings (connecting current <position and tc> buffer to associated 'in' variable in vertex shader)
-    GL_CHECK( glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (GLvoid*)offsetof(VboEntry, pos     )) );
-    GL_CHECK( glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (GLvoid*)offsetof(VboEntry, normal  )) );
-    GL_CHECK( glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (GLvoid*)offsetof(VboEntry, texcoord)) );
+    GL_CHECK( glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (const GLvoid*)offsetof(VboEntry, pos     )) );
+    GL_CHECK( glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (const GLvoid*)offsetof(VboEntry, normal  )) );
+    GL_CHECK( glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (const GLvoid*)offsetof(VboEntry, texcoord)) );
 
     // enable vertex buffers
     glEnableVertexAttribArray(0);
@@ -53,6 +53,34 @@ void MeshRenderer::Init(Mesh* mesh) {
 void MeshRenderer::Render() {
     glBindVertexArray(VAO);
     GL_CHECK( glDrawElements(GL_TRIANGLES, elementsCount, GL_UNSIGNED_INT, nullptr) );
+    glBindVertexArray(0);
+}
+
+void MeshRenderer::InitInstanceData(const std::vector<glm::mat4>& data) {
+    instanceCount = data.size();
+    
+    glGenBuffers(1, &instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, instanceCount * sizeof(glm::mat4), &data[0], GL_STATIC_DRAW);  
+    
+    glBindVertexArray(VAO);
+    
+    int matLoc = 3;
+    for (unsigned i = 0; i < 4; ++i) {
+        glEnableVertexAttribArray(matLoc + i);
+        glVertexAttribPointer(matLoc + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (const GLvoid*)(sizeof(glm::vec4) * i));
+        glVertexAttribDivisor(matLoc + i, 1);
+    }
+
+    glBindVertexArray(0);
+}
+
+void MeshRenderer::RenderInstanced(int count) {
+    if (count == -1)
+        count = instanceCount;
+    
+    glBindVertexArray(VAO);
+    GL_CHECK( glDrawElementsInstanced(GL_TRIANGLES, elementsCount, GL_UNSIGNED_INT, nullptr, count) );
     glBindVertexArray(0);
 }
 

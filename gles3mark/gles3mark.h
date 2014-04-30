@@ -59,7 +59,7 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
     int  aimPointerId;
 
 public:
-    GLES3Mark() : quit(false), vsync(false), consoleOnTop(false), movePointerId(-2), aimPointerId(-2) {
+    GLES3Mark() : quit(false), vsync(false), consoleOnTop(true), movePointerId(-2), aimPointerId(-2) {
         if (!consoleOnTop)
             Log::Create();
     }

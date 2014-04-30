@@ -24,6 +24,7 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
         std::vector<GLint> maxDims = GLQuery::Get<GLint>(GL_MAX_VIEWPORT_DIMS, 2);
         Log::D() << "Max viewport dims: " << maxDims[0] << "x" << maxDims[1];
         Log::D() << "Max color attachments: " << GLQuery::Get<GLint>(GL_MAX_COLOR_ATTACHMENTS); // min 4
+        Log::D() << "Max vertex attributes: " << GLQuery::Get<GLint>(GL_MAX_VERTEX_ATTRIBS);
         
         //Log::D() << "C++ ver: " << (long)__cplusplus;
 

@@ -47,7 +47,7 @@ class Scene {  // public Screen?
     QuadRenderer quadRenderer;
     std::vector<Material*> materialDatabase;
 
-    void RenderModel(Model* model, const glm::mat4& modelM);
+    void RenderModel(Model* model, const glm::mat4& modelM, unsigned instanceCount = 1);
     
     Framebuffer framebuffer;
     Texture diffuseTex, positionTex, normalTex;

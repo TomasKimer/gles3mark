@@ -158,6 +158,9 @@
     <ClInclude Include="..\gles3mark\loadingscreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\gles3mark\modelrenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gles3mark\assetfile.cpp">

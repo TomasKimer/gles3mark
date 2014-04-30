@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <vector>
 #include <glm/glm.hpp>
 #include "glinclude.h"
 
@@ -16,11 +17,18 @@ class MeshRenderer {
     };
 
     GLuint VBO, EBO, VAO;
-    Mesh* owner;
+    //Mesh* owner;
     unsigned elementsCount;
+
+    GLuint instanceVBO;         // layout (location=3)
+    unsigned instanceCount;
 
 public:
     void Init(Mesh* mesh);
     void Render();
     void Destroy();
+
+    //template <typename T>
+    void InitInstanceData(const std::vector<glm::mat4>& data);
+    void RenderInstanced(int count = -1);
 };

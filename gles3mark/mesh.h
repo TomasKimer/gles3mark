@@ -8,7 +8,8 @@
 #include "meshrenderer.h"
 
 class Mesh {
-public:
+    friend class MeshRenderer;
+
     std::vector<glm::vec3 > vertices;
     std::vector<glm::ivec3> faces;
     std::vector<glm::vec2 > texCoords;
@@ -16,12 +17,12 @@ public:
     std::vector<glm::vec3 > tangents;    
 
     std::string name;
-    glm::mat4 matrix;
-    unsigned materialID;
-
-    MeshRenderer renderer;
 
 public:
+    MeshRenderer renderer;
+    glm::mat4 matrix;
+    unsigned materialID;
+    
     Mesh() : materialID(0) {}
     
     Mesh(const std::vector<glm::vec3>& vertices, const std::vector<glm::ivec3>& faces, const std::vector<glm::vec2>& texCoords,

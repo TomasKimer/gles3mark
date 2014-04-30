@@ -31,16 +31,74 @@ bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int h
         m->InitRenderer();
         m->FreeMemory();
     }
+
+    glm::mat4 scale(glm::scale(glm::mat4(), glm::vec3(0.1f)));
+
+    std::vector<glm::mat4> chairsInstanceData;/* = {
+        glm::translate(scale, glm::vec3(-740, 19, -70)),
+        glm::translate(scale, glm::vec3(-740, 39, -170)),
+        glm::translate(scale, glm::vec3(-740, 59, -270)),
+        glm::translate(scale, glm::vec3(-740, 79, -370)),
+        glm::translate(scale, glm::vec3(-740, 99, -470)),
+    };*/
+    glm::mat4 rows[] = {
+        glm::translate(scale, glm::vec3(-740, 19, -70)),
+        glm::translate(scale, glm::vec3(-740, 39, -170)),
+        glm::translate(scale, glm::vec3(-740, 59, -270)),
+        glm::translate(scale, glm::vec3(-740, 79, -370)),
+        glm::translate(scale, glm::vec3(-740, 99, -470))
+    };
+    
+    for (unsigned int rowI = 0; rowI < 5; rowI++)
+    {
+        int offsetX = 0; // posunuti zidle na radku
+        for (unsigned int i = 0; i < 13; i++)
+        {				
+            if (i == 3 || i == 10)
+                offsetX += 100;
+            glm::mat4 col = glm::translate(/*chairsInstanceData*/rows[rowI], glm::vec3(offsetX, 0, 0));
+            chairsInstanceData.push_back(col);
+            offsetX += 105;
+        }		
+    }
+
+
+
     for (Mesh* m : modelChairs->GetMeshes()) {
         m->InitRenderer();
+        m->renderer.InitInstanceData(chairsInstanceData);
         m->FreeMemory();
     }
+
+     std::vector<glm::mat4> deskMidInstanceData = {
+         glm::translate(scale, glm::vec3(-365, 13, -43)),
+         glm::translate(scale, glm::vec3(-365, 33, -143)),
+         glm::translate(scale, glm::vec3(-365, 53, -243)),
+         glm::translate(scale, glm::vec3(-365, 73, -343)),
+         glm::translate(scale, glm::vec3(-365, 93, -443)),       
+     };
     for (Mesh* m : modelDeskMid->GetMeshes()) {
         m->InitRenderer();
+        m->renderer.InitInstanceData(deskMidInstanceData);
         m->FreeMemory();
     }
+
+    std::vector<glm::mat4> deskSideInstanceData = {
+        glm::translate(scale, glm::vec3(-785,  20, -15)),
+        glm::translate(scale, glm::vec3(-785,  40, -115)),
+        glm::translate(scale, glm::vec3(-785,  60, -215)),
+        glm::translate(scale, glm::vec3(-785,  80, -315)),
+        glm::translate(scale, glm::vec3(-785, 100, -415)),
+
+        glm::translate(scale, glm::vec3(465,  20, -15)),
+        glm::translate(scale, glm::vec3(465,  40, -115)),
+        glm::translate(scale, glm::vec3(465,  60, -215)),
+        glm::translate(scale, glm::vec3(465,  80, -315)),
+        glm::translate(scale, glm::vec3(465, 100, -415)),
+    };
     for (Mesh* m : modelDeskSide->GetMeshes()) {
         m->InitRenderer();
+        m->renderer.InitInstanceData(deskSideInstanceData);
         m->FreeMemory();
     }
 
@@ -52,6 +110,7 @@ bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int h
     firstPassProgram->AddUniform("tex");
     firstPassProgram->AddUniform("diffuseColor");
     firstPassProgram->AddUniform("hasTexture");
+    firstPassProgram->AddUniform("isInstanced");
 
 
     screenQuadProgram = new ShaderProgram(assetManager->LoadText("shaders/screenquad.vert"),
@@ -116,7 +175,7 @@ void Scene::OnResize(int w, int h) {
     //camera.Orthographic(0.0f, static_cast<float>(w), static_cast<float>(h), 0.0f, 1.0f, 1000.0f);
 }
 
-void Scene::RenderModel(Model* model, const glm::mat4& modelM) {
+void Scene::RenderModel(Model* model, const glm::mat4& modelM, unsigned instanceCount) {
     for (Mesh* m : model->GetMeshes()) {
         //if (i == 5 || i == 7) continue;  // chair realTime_quality bad mesh
 
@@ -133,7 +192,14 @@ void Scene::RenderModel(Model* model, const glm::mat4& modelM) {
             mat->texture->Bind(GL_TEXTURE0);
         
         // draw
-        m->renderer.Render();
+        if (instanceCount != 1) {
+            firstPassProgram->SetUniform("isInstanced", true); 
+            m->renderer.RenderInstanced();
+        }
+        else {            
+            firstPassProgram->SetUniform("isInstanced", false); 
+            m->renderer.Render();
+        }
     }
 }
 
@@ -165,9 +231,9 @@ bool Scene::OnStep(const Time& time) {
     firstPassProgram->SetUniform("view", view);
 
     RenderModel(modelE112, modelM);
-    RenderModel(modelChairs, glm::translate(modelM, glm::vec3(-740, 19, -70)));
-    RenderModel(modelDeskMid, glm::translate(modelM, glm::vec3(-365, 13, -43)));
-    RenderModel(modelDeskSide, glm::translate(modelM, glm::vec3(-785, 20, -15)));
+    RenderModel(modelChairs,   glm::mat4(), 0);
+    RenderModel(modelDeskMid,  glm::mat4(), 0);
+    RenderModel(modelDeskSide, glm::mat4(), 0);
 
     //for (Mesh* m : modelE112->GetMeshes()) {
     //    //if (i == 5 || i == 7) continue;
