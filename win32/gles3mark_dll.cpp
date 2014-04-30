@@ -19,8 +19,8 @@ void DLL_preInit() {
     gles3mark = std::make_unique<GLES3Mark>();  // gles3mark = std::unique_ptr<GLES3Mark>(new GLES3Mark());
 }
 
-void DLL_init(HWND hWnd) {
-    gles3mark->OnInit((void*)hWnd);
+bool DLL_init(HWND hWnd) {
+    return gles3mark->OnInit((void*)hWnd);
 }
 
 void DLL_resize(int width, int height) {

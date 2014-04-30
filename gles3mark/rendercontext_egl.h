@@ -20,17 +20,17 @@ public:
     /**
      * Initialize an EGL context for the current display.
      */
-    virtual bool Create(void* osWnd) /*override*/;
+    virtual bool Create(void* osWnd) override;
 
     bool HasDisplay();
 
     /**
      * Tear down the EGL context currently associated with the display.
      */
-    virtual void Destroy() /*override*/;
+    virtual void Destroy() override;
 
-    virtual void Resize(int w, int h, bool vsync) /*override*/;
-    virtual void Swap() /*override*/;
+    virtual void Resize(int w, int h, bool vsync) override;
+    virtual void Swap() override;
 };
 
 #endif

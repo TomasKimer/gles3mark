@@ -6,7 +6,7 @@ Model* AssimpSceneImporter::Import(std::vector<char>& rawModelData, std::vector<
     //std::vector<char> rawModelData = refAssetManager.LoadContents("models/" + fileName);
     
     Assimp::Importer aImporter;
-    const aiScene* aScene = aImporter.ReadFileFromMemory(&rawModelData[0], rawModelData.size(), aiProcessPreset_TargetRealtime_Quality | aiProcess_FlipUVs);
+    const aiScene* aScene = aImporter.ReadFileFromMemory(&rawModelData[0], rawModelData.size(), aiProcessPreset_TargetRealtime_Fast /*aiProcessPreset_TargetRealtime_Quality*/ | aiProcess_FlipUVs);
     if (!aScene) {
         throw std::runtime_error(std::string("Failed to load model: ") + aImporter.GetErrorString());
     }
@@ -122,7 +122,7 @@ Material* AssimpSceneImporter::LoadMaterial(const aiMaterial* aMat) {
     float shininess = 0.0f;
     aiGetMaterialFloat(aMat, AI_MATKEY_SHININESS, &shininess);
     
-    return new Material(toGLM(diffuse), toGLM(ambient), toGLM(specular), toGLM(emissive), shininess, std::string(path.C_Str()));
+    return new Material(toGLM(diffuse), toGLM(ambient), toGLM(specular), toGLM(emissive), shininess, std::string(path.C_Str()), std::string(name.C_Str()));
 }
 
 Light* AssimpSceneImporter::LoadLight(const aiLight *aLight) {

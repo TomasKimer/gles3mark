@@ -10,6 +10,7 @@ typedef RenderContextWGL RenderContextT;
 typedef RenderContextEGL RenderContextT;
 #endif
 
+#include <memory>
 #include <string>
 #include <stdexcept>
 //#include <atomic>
@@ -35,42 +36,41 @@ public:
     virtual void OnResize(int w, int h) = 0;
     virtual bool OnStep() = 0;
     virtual std::string GetResultXML() = 0;
-    virtual const RenderContextT* GetContext() = 0;  // TODO
+    virtual const std::unique_ptr<RenderContextT>& GetContext() = 0;  // TODO
 };
 
 
 class GLES3Mark : public IGLES3MarkLib, public IInputListener {
 
-    AssetManager* assetManager;
+    std::unique_ptr<AssetManager> assetManager;
     Input inputManager;
-	RenderContextT* glContext;
-    Scene* scene;
+	std::unique_ptr<RenderContextT> glContext;
+    std::unique_ptr<Scene> scene;
     Time time;
     FPSCounter fpsCounter;
     BenchmarkStatistics benchStats;
 
-    bool quit, vsync;
+    bool quit, vsync, consoleOnTop;
     
     // multitouch controls
-    glm::vec3 joystickMove;
+    glm::vec3  joystickMove;
     glm::ivec2 joystickMoveCenter;
-    int movePointerId, aimPointerId;
-
+    int movePointerId;
+    int  aimPointerId;
 
 public:
-    GLES3Mark() : glContext(nullptr), quit(false), vsync(false), movePointerId(-2), aimPointerId(-2) {
-        //Log::Create();  // TODO
+    GLES3Mark() : quit(false), vsync(false), consoleOnTop(false), movePointerId(-2), aimPointerId(-2) {
+        if (!consoleOnTop)
+            Log::Create();
     }
 
     ~GLES3Mark() {
     	if (glContext) {
     		glContext->Destroy();
-            //delete glContext;
-    		glContext = nullptr;
     	}
     }
     
-    const RenderContextT* GetContext() override { return glContext; }
+    const std::unique_ptr<RenderContextT>& GetContext() override { return glContext; }
 
     bool OnInit(void* osWnd, void* ioContext = nullptr) override;
 
@@ -102,6 +102,14 @@ private:
 
 
 
+    static void threadTest() {
+        //std::atomic<bool> ready (false);
+        Log::V() << "Concurrent threads supported: " << std::thread::hardware_concurrency();
+        int outParam;
+        std::thread t(doSomeWork, 5, std::ref(outParam));
+        t.join();
+        Log::V() << "thread joined, out param: " << outParam;
+    }
 
     static void doSomeWork(int param, int& outParam) {
         Log::V() << "thread test: hello from thread, param: " << param;

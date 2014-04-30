@@ -30,36 +30,6 @@ int AssetManager::ReadAsset(const std::string& fileName, int bytesToRead, void* 
     return bytesRead;
 }
 
-std::vector<char> AssetManager::LoadTGA(const std::string& fileName, int& width, int& height, int& bpp) const {
-    AssetFile fp;
-    fp.Open(fileName);
-
-    TGA_HEADER Header;
-    int bytesRead = fp.Read(sizeof (TGA_HEADER), &Header);
-
-    width = Header.Width;
-    height = Header.Height;
-    bpp = (int)Header.ColorDepth;
-
-    if (Header.ColorDepth != 8 && Header.ColorDepth != 24 && Header.ColorDepth != 32) {
-        fp.Close();
-        throw std::runtime_error("Unsupported TGA color depth");
-    }
-
-    int bytesToRead = Header.Width * Header.Height * Header.ColorDepth / 8;  // sizeof char
-    std::vector<char> buffer(bytesToRead); // Allocate the image data buffer
-
-    bytesRead = fp.Read(bytesToRead, &buffer[0]);
-
-    if (bytesRead != bytesToRead)
-        throw std::runtime_error("Incomplete TGA image data");
-
-    fp.Close();
-
-    return buffer;
-}
-
-
 // Load whole file and return it as std::string
 /*
 std::string AssetManager LoadText(const std::string& fileName) {

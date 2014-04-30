@@ -24,8 +24,11 @@
     <None Include="gles3mark_dll.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\gles3mark\assetfile.h" />
+    <ClInclude Include="..\gles3mark\assetmanager.h" />
     <ClInclude Include="..\gles3mark\benchmarkstatistics.h" />
     <ClInclude Include="..\gles3mark\camera.h" />
+    <ClInclude Include="..\gles3mark\loadingscreen.h" />
     <ClInclude Include="..\gles3mark\logconsole.h" />
     <ClInclude Include="..\gles3mark\fpscounter.h" />
     <ClInclude Include="..\gles3mark\framebuffer.h" />

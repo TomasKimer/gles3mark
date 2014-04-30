@@ -246,5 +246,8 @@ int BaseApp::Run() {
         }
     }
 
+    if (exitCode != 0) // TODO
+        system("pause");
+
     return exitCode;
 }

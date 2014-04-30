@@ -24,12 +24,13 @@ public:
     //ShaderProgram *shader; //The shader used by the material. - only one,            - || -             shader  - ShaderDatabase  - index: -||-?
 
     unsigned id;
+    std::string name;
 
 public:
     Material(const glm::vec4& diffuse, const glm::vec4& ambient, const glm::vec4& specular,
-             const glm::vec4& emissive, float shininess, const std::string& texturePath = std::string()) :
+             const glm::vec4& emissive, float shininess, const std::string& texturePath = std::string(), const std::string& name = std::string()) :
              diffuseColor(diffuse), ambientColor(ambient), specularColor(specular),
-             emissiveColor(emissive), shininess(shininess), texture(nullptr)
+             emissiveColor(emissive), shininess(shininess), texture(nullptr), name(name)
     {
         hasTexture = !texturePath.empty();
 

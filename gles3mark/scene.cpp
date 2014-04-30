@@ -1,59 +1,78 @@
 
 #include "scene.h"
 
-bool Scene::OnInit(AssetManager* assetManager, int width, int height) {
+bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int height) {
 
-    try {            
-        //texture.FromKTXdata(assetManager->LoadContents("textures/chair2.ktx"));  // chair512_etc2rgb_mip_slowperc.ktx
-        
-        AssimpSceneImporter* modelImporter = new AssimpSceneImporter(/* *assetManager*/);
-        std::vector<char> modelData(assetManager->LoadContents("models/e112max.dae")); // e112.3ds
-        model = modelImporter->Import(modelData, materialDatabase);
+    //texture.FromKTXdata(assetManager->LoadContents("textures/chair2.ktx"));  // chair512_etc2rgb_mip_slowperc.ktx
+    
+    AssimpSceneImporter* modelImporter = new AssimpSceneImporter(/* *assetManager*/);
+    
+    std::vector<char> modelData(assetManager->LoadContents("models/e112max.dae")); // e112.3ds
+    modelE112 = modelImporter->Import(modelData, materialDatabase);
 
-        for (Material* m : materialDatabase) {
-            if (m->hasTexture) {
-                std::string ktxPath = m->texture->path.substr(0, m->texture->path.find_last_of(".")) + ".ktx";
-                std::transform(ktxPath.begin(), ktxPath.end(), ktxPath.begin(), ::tolower);
-                m->texture->FromKTXdata(assetManager->LoadContents("textures/" + ktxPath)); //test/rgb-reference.ktx
-            }            
-        }
+    modelData = assetManager->LoadContents("models/chairs.dae");
+    modelChairs = modelImporter->Import(modelData, materialDatabase);
 
-        for (Mesh* m : model->GetMeshes()) {
-            m->InitRenderer();
-            m->FreeMemory();
-        }
+    modelData = assetManager->LoadContents("models/desk-mid.dae");
+    modelDeskMid = modelImporter->Import(modelData, materialDatabase);
 
-        firstPassProgram = new ShaderProgram(assetManager->LoadText("shaders/firstpass.vert"),
-                                             assetManager->LoadText("shaders/firstpass.frag"));
-        firstPassProgram->AddUniform("mvp");
-        firstPassProgram->AddUniform("tex");
-        firstPassProgram->AddUniform("diffuseColor");
-        firstPassProgram->AddUniform("hasTexture");
+    modelData = assetManager->LoadContents("models/desk-side.dae");
+    modelDeskSide = modelImporter->Import(modelData, materialDatabase);
 
-
-        screenQuadProgram = new ShaderProgram(assetManager->LoadText("shaders/screenquad.vert"),
-                                              assetManager->LoadText("shaders/screenquad.frag"));
-        screenQuadProgram->AddUniform("tex");
-
-
-        depthRenderbuf.InitStorage(GL_DEPTH_COMPONENT24, renderWidth, renderHeight);
-        diffuseTex.InitStorage(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, renderWidth, renderHeight);
-        positionTex.InitStorage(GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT, renderWidth, renderHeight); // GL_RGB16F
-        normalTex.InitStorage(GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT, renderWidth, renderHeight);
-
-        framebuffer.Bind();
-        framebuffer.Attach(depthRenderbuf, GL_DEPTH_ATTACHMENT);
-        framebuffer.Attach(diffuseTex, GL_COLOR_ATTACHMENT0);
-        framebuffer.Attach(positionTex, GL_COLOR_ATTACHMENT1);
-        framebuffer.Attach(normalTex, GL_COLOR_ATTACHMENT2);
-        framebuffer.ActiveColorAttachments(std::vector<GLenum>{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
-        framebuffer.CheckCompleteness();
-        framebuffer.Unbind();
-
+    for (Material* m : materialDatabase) {
+        if (m->hasTexture) {
+            std::string ktxPath = m->texture->path.substr(0, m->texture->path.find_last_of(".")) + ".ktx";
+            std::transform(ktxPath.begin(), ktxPath.end(), ktxPath.begin(), ::tolower);
+            m->texture->FromKTXdata(assetManager->LoadContents("textures/" + ktxPath)); //test/rgb-reference.ktx
+        }            
     }
-    catch (std::exception &e) {
-        Log::E() << "Init exception: " << e.what();
+
+    for (Mesh* m : modelE112->GetMeshes()) {
+        m->InitRenderer();
+        m->FreeMemory();
     }
+    for (Mesh* m : modelChairs->GetMeshes()) {
+        m->InitRenderer();
+        m->FreeMemory();
+    }
+    for (Mesh* m : modelDeskMid->GetMeshes()) {
+        m->InitRenderer();
+        m->FreeMemory();
+    }
+    for (Mesh* m : modelDeskSide->GetMeshes()) {
+        m->InitRenderer();
+        m->FreeMemory();
+    }
+
+    firstPassProgram = new ShaderProgram(assetManager->LoadText("shaders/firstpass.vert"),
+                                         assetManager->LoadText("shaders/firstpass.frag"));
+    firstPassProgram->AddUniform("model");
+    firstPassProgram->AddUniform("view");
+    firstPassProgram->AddUniform("projection");
+    firstPassProgram->AddUniform("tex");
+    firstPassProgram->AddUniform("diffuseColor");
+    firstPassProgram->AddUniform("hasTexture");
+
+
+    screenQuadProgram = new ShaderProgram(assetManager->LoadText("shaders/screenquad.vert"),
+                                          assetManager->LoadText("shaders/screenquad.frag"));
+    screenQuadProgram->AddUniform("tex");
+
+
+    depthRenderbuf.InitStorage(GL_DEPTH_COMPONENT24, renderWidth, renderHeight);
+    diffuseTex.InitStorage(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, renderWidth, renderHeight);
+    positionTex.InitStorage(GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT, renderWidth, renderHeight); // GL_RGB16F
+    normalTex.InitStorage(GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT, renderWidth, renderHeight);
+
+    framebuffer.Bind();
+    framebuffer.Attach(depthRenderbuf, GL_DEPTH_ATTACHMENT);
+    framebuffer.Attach(diffuseTex, GL_COLOR_ATTACHMENT0);
+    framebuffer.Attach(positionTex, GL_COLOR_ATTACHMENT1);
+    framebuffer.Attach(normalTex, GL_COLOR_ATTACHMENT2);
+    framebuffer.ActiveColorAttachments(std::vector<GLenum>{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
+    framebuffer.CheckCompleteness();
+    framebuffer.Unbind();
+
 
     camera.Move(glm::vec3(0, 20, -50.f));
 
@@ -97,6 +116,27 @@ void Scene::OnResize(int w, int h) {
     //camera.Orthographic(0.0f, static_cast<float>(w), static_cast<float>(h), 0.0f, 1.0f, 1000.0f);
 }
 
+void Scene::RenderModel(Model* model, const glm::mat4& modelM) {
+    for (Mesh* m : model->GetMeshes()) {
+        //if (i == 5 || i == 7) continue;  // chair realTime_quality bad mesh
+
+        // transform
+        //glm::mat4 mvp = projection * view * modelM * m->matrix;
+
+        firstPassProgram->SetUniform("model", modelM * m->matrix);
+        
+        // material
+        Material* mat = materialDatabase[m->materialID];
+        firstPassProgram->SetUniform("diffuseColor", mat->diffuseColor); 
+        firstPassProgram->SetUniform("hasTexture", mat->hasTexture);
+        if (mat->hasTexture)
+            mat->texture->Bind(GL_TEXTURE0);
+        
+        // draw
+        m->renderer.Render();
+    }
+}
+
 bool Scene::OnStep(const Time& time) {
     if (!freeCamera) {
         cameraAnim.Update(time.DeltaTime());
@@ -108,7 +148,7 @@ bool Scene::OnStep(const Time& time) {
     glm::mat4& view       = camera.GetViewMatrix();
 
     rot = glm::rotate(rot, time.DeltaTime(), glm::vec3(0, 1, 0));
-    glm::mat4 modelM = glm::scale(glm::translate(glm::mat4(), glm::vec3(0,0,0)), glm::vec3(0.1f, 0.1f, 0.1f)); //glm::mat4_cast(rot); //testTrans.GetMatrix(); //        
+    glm::mat4 modelM = glm::scale(glm::mat4(), glm::vec3(0.1f, 0.1f, 0.1f)); //glm::mat4_cast(rot); //testTrans.GetMatrix(); //        
     
     //glm::mat4 mvp = projection * view * model;
 
@@ -121,22 +161,33 @@ bool Scene::OnStep(const Time& time) {
 
     firstPassProgram->Use();
     firstPassProgram->SetUniform("tex", 0);
+    firstPassProgram->SetUniform("projection", projection);
+    firstPassProgram->SetUniform("view", view);
 
-    for (Mesh* m : model->GetMeshes()) {
-        // transform
-        glm::mat4 mvp = projection * view * modelM * m->matrix;
-        firstPassProgram->SetUniform("mvp", mvp);
-        
-        // material
-        Material* mat = materialDatabase[m->materialID];
-        firstPassProgram->SetUniform("diffuseColor", mat->diffuseColor); 
-        firstPassProgram->SetUniform("hasTexture", mat->hasTexture);
-        if (mat->hasTexture)
-            mat->texture->Bind(GL_TEXTURE0);
-        
-        // draw
-        m->renderer.Render();
-    }
+    RenderModel(modelE112, modelM);
+    RenderModel(modelChairs, glm::translate(modelM, glm::vec3(-740, 19, -70)));
+    RenderModel(modelDeskMid, glm::translate(modelM, glm::vec3(-365, 13, -43)));
+    RenderModel(modelDeskSide, glm::translate(modelM, glm::vec3(-785, 20, -15)));
+
+    //for (Mesh* m : modelE112->GetMeshes()) {
+    //    //if (i == 5 || i == 7) continue;
+
+    //    // transform
+    //    //glm::mat4 mvp = projection * view * modelM * m->matrix;
+    //    firstPassProgram->SetUniform("projection", projection);
+    //    firstPassProgram->SetUniform("view", view);
+    //    firstPassProgram->SetUniform("model", modelM * m->matrix);
+    //    
+    //    // material
+    //    Material* mat = materialDatabase[m->materialID];
+    //    firstPassProgram->SetUniform("diffuseColor", mat->diffuseColor); 
+    //    firstPassProgram->SetUniform("hasTexture", mat->hasTexture);
+    //    if (mat->hasTexture)
+    //        mat->texture->Bind(GL_TEXTURE0);
+    //    
+    //    // draw
+    //    m->renderer.Render();
+    //}
 
     framebuffer.Unbind();
     glViewport(0, 0, width, height);
@@ -175,9 +226,9 @@ void Scene::Destroy() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    for (Mesh* m : model->GetMeshes()) {
-        m->renderer.Destroy();
-    }
+    //for (Mesh* m : model->GetMeshes()) {
+    //    m->renderer.Destroy();
+    //}
 
     delete firstPassProgram;
     delete secondPassProgram;

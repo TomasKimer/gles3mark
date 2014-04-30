@@ -23,8 +23,8 @@ void App::OnStartup() {
     //dll.DllResize(width, height);
 }
 
-void App::OnQuit() {
-    BaseApp::OnQuit();
+void App::OnQuit(int code) {
+    BaseApp::OnQuit(code);
     dll.Free();
 }
 

@@ -16,6 +16,7 @@
 #include "quadrenderer.h"
 #include "keyframeanimation.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <cassert>
@@ -26,7 +27,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 
-class Scene {
+class Scene {  // public Screen?
     // layout (std140) uniform MatrixUniformBlock
     //struct MatrixUniformBlock {
     //    glm::mat4 projection;
@@ -42,17 +43,18 @@ class Scene {
     ShaderProgram* firstPassProgram;
     ShaderProgram* secondPassProgram;
     ShaderProgram* screenQuadProgram;
-    Model* model;
+    Model *modelE112, *modelChairs, *modelDeskMid, *modelDeskSide;
     QuadRenderer quadRenderer;
     std::vector<Material*> materialDatabase;
+
+    void RenderModel(Model* model, const glm::mat4& modelM);
     
     Framebuffer framebuffer;
     Texture diffuseTex, positionTex, normalTex;
     RenderBuffer depthRenderbuf;
 
     KeyFrameAnimation cameraAnim;
-    bool freeCamera;
-
+    
     //GLTexture texture;
     glm::quat rot;
     Transform testTrans;
@@ -62,11 +64,12 @@ class Scene {
     
 public:
     Camera camera;
+    bool freeCamera;
     
-    Scene(): renderWidth(1280), renderHeight(720), freeCamera(true)  {}
+    Scene(): renderWidth(1280), renderHeight(720), freeCamera(false)  {}
     ~Scene() {}
         
-    bool OnInit(AssetManager* assetManager, int width, int height);
+    bool OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int height);
     void OnResize(int w, int h);
     bool OnStep(const Time& time);
     void Destroy();

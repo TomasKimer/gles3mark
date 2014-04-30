@@ -24,7 +24,7 @@ BaseApp::BaseApp(android_app* _state)
 		Log::Stream() << "State loaded: x: " << savedState.x << ", y: " << savedState.y;
 	}
 
-	jniLink = new JNILink(state);
+	jniLink = std::unique_ptr<JNILink>(new JNILink(state));
 
 	//state->activity->internalDataPath;
 }
@@ -58,7 +58,7 @@ void BaseApp::Run() {
 				//showToast("Exiting");
 
 				// detach from current thread (when thread exists) - else error: "native thread exited without detaching"
-				delete jniLink;
+				jniLink.reset();
 
 				return; // return the main, so we get back to our java activity which called the nativeactivity
 			}

@@ -16,6 +16,7 @@ public:
         LShift, LCtrl,
         Up, Down, Left, Right,
         W, S, A, D,
+        Q, E, R, T, Y, U, I, O, P,
     };
 
     enum class Button {
@@ -29,9 +30,9 @@ public:
         switch (osKey) {
             case VK_RETURN:     return KeyCode::Return;
             case VK_SPACE:      return KeyCode::Space;
-            case VK_LSHIFT:     return KeyCode::LShift;
+            case VK_LSHIFT:     return KeyCode::LShift; // not working - why?
             case VK_TAB:        return KeyCode::Tab;
-            case VK_LCONTROL:   return KeyCode::LCtrl;
+            case VK_LCONTROL:   return KeyCode::LCtrl;  // not working - why?
             case VK_ESCAPE:     return KeyCode::Escape;
             case VK_UP:         return KeyCode::Up;
             case VK_DOWN:       return KeyCode::Down;
@@ -41,6 +42,7 @@ public:
             case 'S':           return KeyCode::S;
             case 'A':           return KeyCode::A;
             case 'D':           return KeyCode::D;
+            case 'Q':           return KeyCode::Q;
         }
 #endif
         return KeyCode::Default;

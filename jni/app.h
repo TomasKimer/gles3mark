@@ -9,29 +9,29 @@
 class App : public BaseApp {
 	std::unique_ptr<GLES3Mark> gles3mark;
 
-	virtual void OnInit() /*override*/;
-	virtual void OnResize(int w, int h) /*override*/ {	}
+	virtual void OnInit() override;
+	virtual void OnResize(int w, int h) override {	}
 
-	virtual bool OnIdle() /*override*/ {
+	virtual bool OnIdle() override {
 		//if (!glContext->HasDisplay()) return;
 		return gles3mark->OnStep();
 	}
 
-	virtual void OnQuit() /*override*/;
+	virtual void OnQuit() override;
 
-	virtual void OnDestroy() /*override*/ {
+	virtual void OnDestroy() override {
 		gles3mark.reset();
 	}
 
-	virtual void OnTouchDown(int x, int y, int pointerId) /*override*/ {
+	virtual void OnTouchDown(int x, int y, int pointerId) override {
 		gles3mark->OnTouchDown(x, y, pointerId);
 	}
 
-	virtual void OnTouchUp(int x, int y, int pointerId) /*override*/ {
+	virtual void OnTouchUp(int x, int y, int pointerId) override {
 		gles3mark->OnTouchUp(x, y, pointerId);
 	}
 
-	virtual void OnTouchDragged(int x, int y, int dx, int dy, int pointerId) /*override*/ {
+	virtual void OnTouchDragged(int x, int y, int dx, int dy, int pointerId) override {
 		gles3mark->OnTouchDragged(x, y, dx, dy, pointerId);
 	}
 

@@ -8,6 +8,7 @@
 
 #include <android_native_app_glue.h>
 #include <vector>
+#include <memory>
 
 #include "jnilink.h"
 
@@ -37,8 +38,8 @@ class BaseApp {
 	int32_t HandleInput(AInputEvent* event);
 
 protected:
-	android_app*		    state;
-	JNILink 				*jniLink;
+	android_app*		     state;
+	std::unique_ptr<JNILink> jniLink;
 
 	virtual void OnInit() {}
 	virtual void OnQuit() {}

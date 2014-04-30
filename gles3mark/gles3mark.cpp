@@ -1,39 +1,40 @@
 
-
 #include "gles3mark.h"
+#include "loadingscreen.h"
 
 bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
-	assetManager = new AssetManager(ioContext);
+	try {
+        assetManager = std::unique_ptr<AssetManager>(new AssetManager(ioContext));
 
-    // init GL context
-    glContext = new RenderContextT();
-    glContext->Create(osWnd);
+        // init GL context
+        glContext = std::unique_ptr<RenderContextT>(new RenderContextT());  //std::make_unique<RenderContextT>();
+        glContext->Create(osWnd);
 
-    // display some GL info
-    Log::V() << "GL_VENDOR: "                   + GLQuery::Get<std::string>(GL_VENDOR);
-    Log::V() << "GL_RENDERER: "                 + GLQuery::Get<std::string>(GL_RENDERER);
-    Log::V() << "GL_VERSION: "                  + GLQuery::Get<std::string>(GL_VERSION);
-    Log::V() << "GL_SHADING_LANGUAGE_VERSION: " + GLQuery::Get<std::string>(GL_SHADING_LANGUAGE_VERSION);
+        LoadingScreen ls(assetManager, glContext->GetWidth(), glContext->GetHeight());
+        glContext->Swap();
 
-    Log::D() << "Max render buffer size: " << GLQuery::Get<GLint>(GL_MAX_RENDERBUFFER_SIZE) << ", max samples: " << GLQuery::Get<GLint>(GL_MAX_SAMPLES);  // min 2048
-    Log::D() << "Max texture size: " << GLQuery::Get<GLint>(GL_MAX_TEXTURE_SIZE); // min 2048
-    std::vector<GLint> maxDims = GLQuery::Get<GLint>(GL_MAX_VIEWPORT_DIMS, 2);
-    Log::D() << "Max viewport dims: " << maxDims[0] << "x" << maxDims[1];
-    Log::D() << "Max color attachments: " << GLQuery::Get<GLint>(GL_MAX_COLOR_ATTACHMENTS); // min 4
+        // display some GL info
+        Log::V() << "GL_VENDOR: "                   + GLQuery::Get<std::string>(GL_VENDOR);
+        Log::V() << "GL_RENDERER: "                 + GLQuery::Get<std::string>(GL_RENDERER);
+        Log::V() << "GL_VERSION: "                  + GLQuery::Get<std::string>(GL_VERSION);
+        Log::V() << "GL_SHADING_LANGUAGE_VERSION: " + GLQuery::Get<std::string>(GL_SHADING_LANGUAGE_VERSION);
 
+        Log::D() << "Max render buffer size: " << GLQuery::Get<GLint>(GL_MAX_RENDERBUFFER_SIZE) << ", max samples: " << GLQuery::Get<GLint>(GL_MAX_SAMPLES);  // min 2048
+        Log::D() << "Max texture size: " << GLQuery::Get<GLint>(GL_MAX_TEXTURE_SIZE); // min 2048
+        std::vector<GLint> maxDims = GLQuery::Get<GLint>(GL_MAX_VIEWPORT_DIMS, 2);
+        Log::D() << "Max viewport dims: " << maxDims[0] << "x" << maxDims[1];
+        Log::D() << "Max color attachments: " << GLQuery::Get<GLint>(GL_MAX_COLOR_ATTACHMENTS); // min 4
+        
+        //Log::D() << "C++ ver: " << (long)__cplusplus;
 
-    scene = new Scene();
-    scene->OnInit(assetManager, glContext->GetWidth(), glContext->GetHeight());
-   
-    
-    //Log::Stream() << "C++ ver: " << (long)__cplusplus;
+        scene = std::unique_ptr<Scene>(new Scene());
+        scene->OnInit(assetManager, glContext->GetWidth(), glContext->GetHeight());
 
-    //std::atomic<bool> ready (false);
-    Log::V() << "Concurrent threads supported: " << std::thread::hardware_concurrency();
-    int outParam;
-    std::thread t(doSomeWork, 5, std::ref(outParam));
-    t.join();
-    Log::V() << "thread joined, out param: " << outParam;
+    } catch (std::exception& e) {
+        Log::E() << "Init exception: " << e.what();
+        quit = true;
+        return false;    
+    }
 
     OnResize(glContext->GetWidth(), glContext->GetHeight()); // TODO
 
@@ -57,6 +58,13 @@ void GLES3Mark::OnKeyDown(Input::KeyCode keyCode) {   // TODO rename to keyPress
 
         case Input::KeyCode::Space:
             Log::V() << scene->camera;
+            break;
+
+        case Input::KeyCode::Tab:
+            scene->freeCamera = !scene->freeCamera;
+            break;
+
+        case Input::KeyCode::Q:
             break;
     }
 }
@@ -101,8 +109,7 @@ void GLES3Mark::OnTouchDragged(int x, int y, int dx, int dy, int pointer) {
 }
 
 void GLES3Mark::OnResize(int w, int h) {
-    if (glContext)
-    {
+    if (glContext) {
         glContext->Resize(w, h, vsync);
         scene->OnResize(w, h);            
     }
@@ -110,7 +117,7 @@ void GLES3Mark::OnResize(int w, int h) {
 }
 
 
-bool GLES3Mark::OnStep() {  // TODO return Exit Code
+bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") / messagebox
     if (quit) {
         OnDestroy();
         return false;
@@ -153,7 +160,7 @@ void GLES3Mark::OnDestroy() {
     benchStats.EndMeasure();
 
     //score = benchStats.GetFrameCount();
-    //scene->Destroy();
+    //scene.reset();
     
     // vs destructor?
 }
