@@ -62,10 +62,14 @@ public:
     GLES3Mark() : quit(false), vsync(false), consoleOnTop(true), movePointerId(-2), aimPointerId(-2) {
         if (!consoleOnTop)
             Log::Create();
+
+#ifdef ANDROID
+        vsync = true;
+#endif
     }
 
     ~GLES3Mark() {
-    	if (glContext) {
+        if (glContext) {
     		glContext->Destroy();
     	}
     }

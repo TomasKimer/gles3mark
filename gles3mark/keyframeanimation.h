@@ -4,6 +4,7 @@
 
 #include <vector>
 
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -23,9 +24,9 @@ struct KeyFrame {
 
 class KeyFrameAnimation {
 
-    std::vector<KeyFrame> keyFrames;
-    unsigned currentFrame;
-    float /*startTime, endTime,*/ duration, transition;
+    
+    unsigned currentFrame, lastFrame;
+    float currentTime, duration, transition;
     
     bool repeat, ended;
     unsigned repeatCount;
@@ -33,48 +34,28 @@ class KeyFrameAnimation {
     glm::vec3 currentPos, currentDir;
     glm::quat currentRot;
 
+    void DoLerp(const KeyFrame& first, const KeyFrame& second, float amount) {
+        currentPos = glm::mix  (first.position , second.position , amount);
+        currentDir = glm::mix  (first.direction, second.direction, amount);
+        currentRot = glm::slerp(first.rotation , second.rotation , amount);    
+    }
+
 public:
-    KeyFrameAnimation(float timeOffset = 0.0f) : currentFrame(0), repeat(true), ended(false), repeatCount(0), transition(0) {
-    
+    std::vector<KeyFrame> keyFrames;
+
+    KeyFrameAnimation(float timeOffset = 0.0f) : currentFrame(0), lastFrame(0), currentTime(0), repeat(false), ended(false), repeatCount(0), transition(0) {
     }
 
     void AddKeyFrame(const KeyFrame& keyFrame) {      
         keyFrames.push_back(keyFrame);
     }
 
-    void AddKeyFrame(const glm::vec3& pos, const glm::vec3& dir, float time, const glm::quat& rot = glm::quat()) {
-        AddKeyFrame(KeyFrame(pos, dir, time, rot));    
-    }
+    
+    unsigned GetCurrentKeyFrame(unsigned lastFrame);
+    float GetAmount(const KeyFrame& first, const KeyFrame& second);
+    void Update(float deltaTime);
 
-    void Update(float deltaTime) {
-        if (ended) return;
-        
-        if (transition == 0.0f && keyFrames.size() > currentFrame + 1) {
-            duration = keyFrames[currentFrame + 1].time - keyFrames[currentFrame].time;        
-        }
-        
-        transition += deltaTime;
 
-        float percent = transition / duration;
-        
-        currentPos = glm::mix(keyFrames[currentFrame].position, keyFrames[currentFrame + 1].position, percent);
-        currentDir = glm::mix(keyFrames[currentFrame].direction, keyFrames[currentFrame + 1].direction, percent);
-        currentRot = glm::slerp(keyFrames[currentFrame].rotation, keyFrames[currentFrame + 1].rotation, percent);
-
-        if (percent >= 1.0f)
-        {
-            transition = 0.0f;
-            currentFrame++;
-
-            if (currentFrame >= keyFrames.size() - 1)            
-            {
-                if (!repeat)
-                    ended = true;
-                else
-                    currentFrame = 0;
-            }
-        }
-    }
 
     glm::vec3& GetCurrentPosition() {
         return currentPos;

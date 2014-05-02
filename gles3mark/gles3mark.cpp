@@ -39,6 +39,7 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
 
     OnResize(glContext->GetWidth(), glContext->GetHeight()); // TODO
 
+    time.Init();
     benchStats.StartMeasure();
 
     return true;
@@ -140,7 +141,7 @@ bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") /
     if (!scene->OnStep(time))
         quit = true;
 
-    //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     glContext->Swap();
 

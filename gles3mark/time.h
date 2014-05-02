@@ -16,6 +16,10 @@ class Time {
     
 public:
     Time(): average(0.f), best(9999.f), worst(0.f) {
+        Init();
+    }
+
+    void Init() {
         start = previous = Clock::now();
     }
 

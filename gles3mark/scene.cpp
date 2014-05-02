@@ -133,26 +133,29 @@ bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int h
     framebuffer.Unbind();
 
 
-    camera.Move(glm::vec3(0, 20, -50.f));
-
-    //cameraAnim.AddKeyFrame(KeyFrame(camera.GetEye(), camera.GetTarget(), 0));
-    
-    int j = 1;
+    //camera.Move(glm::vec3(0, 20, -50.f));
+        
+    int j = 0;
     for (float i = -glm::pi<float>() / 2.f; i < 2*glm::pi<float>() - glm::pi<float>() / 2.f; i += (2*glm::pi<float>() / 72.0f)) {
         float x = 50 * glm::cos((float)i);
         float z = 50 * glm::sin((float)i);
-
-        //Log::V() << x << " " << z;
         
-        cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(x, 20+5*glm::sin(i*2), z), camera.GetTarget(), j*0.1f));        
+        cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(x, 25+2*glm::sin(i), z), camera.GetTarget(), j*0.1f));        
+
         j++;
     }
+
+    KeyFrame k = cameraAnim.keyFrames[0];
+    k.time = cameraAnim.keyFrames[cameraAnim.keyFrames.size()-1].time + 0.1f;
+    cameraAnim.AddKeyFrame(k);
+
+    camera.LookAt(k.position, k.direction);
     
-    
-  /*cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(50, 20, 0), camera.GetTarget(), 3));
-    cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(0, 20, 50), camera.GetTarget(), 6));
-    cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(-50, 20, 0), camera.GetTarget(), 9));
-    cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(0, 20, -50), camera.GetTarget(), 12));*/
+    //cameraAnim.AddKeyFrame(KeyFrame(camera.GetEye(), camera.GetTarget(), 0));
+    //cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(50, 20, 0), camera.GetTarget(), 3));
+    //cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(0, 20, 50), camera.GetTarget(), 6));
+    //cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(-50, 20, 0), camera.GetTarget(), 9));
+    //cameraAnim.AddKeyFrame(KeyFrame(glm::vec3(0, 20, -50), camera.GetTarget(), 12));
 
 
 
@@ -204,7 +207,7 @@ void Scene::RenderModel(Model* model, const glm::mat4& modelM, unsigned instance
 }
 
 bool Scene::OnStep(const Time& time) {
-    if (!freeCamera) {
+    if (!freeCamera && time.RealTimeSinceStartup() > 1.0f) {
         cameraAnim.Update(time.DeltaTime());
         camera.LookAt(cameraAnim.GetCurrentPosition(), cameraAnim.GetCurrentDirection());
     }
@@ -273,8 +276,8 @@ bool Scene::OnStep(const Time& time) {
     quadRenderer.Render(1.5f, 0.0f, 0.5f);
 
     //glFlush();
-#ifdef _ANDROID
-    glFinish();  //- not causing delay on swaping egl context
+#ifdef ANDROID
+//    glFinish();  //- not causing delay on swaping egl context
 #endif
     // eglSwapBuffers performs an implicit flush operation on the context (glFlush for an OpenGL ES or OpenGL context,
     // vgFlush for an OpenVG context) bound to surface before swapping. Subsequent client API commands may be issued on

@@ -23,6 +23,7 @@ public:
     void Aim(float verticalAngle, float horizontalAngle);
 
     void LookAt(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up = glm::vec3(0.f, 1.f, 0.f)) {
+        this->eye = eye;
         view = glm::lookAt(eye, target, up);
     }
 

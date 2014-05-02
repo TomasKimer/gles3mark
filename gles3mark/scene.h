@@ -66,6 +66,7 @@ public:
     Camera camera;
     bool freeCamera;
     
+    // TODO adjust renderWidth/height with aspect ration? 16:9 vs 16:10?
     Scene(): renderWidth(1280), renderHeight(720), freeCamera(false)  {}
     ~Scene() {}
         
