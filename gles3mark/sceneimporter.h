@@ -15,6 +15,7 @@
 #include "model.h"
 #include "material.h"
 #include "light.h"
+#include "materialdatabase.h"
 
 
 class SceneImporter {
@@ -22,7 +23,7 @@ public:
     SceneImporter(/*const AssetManager& assetManager*/) /*: refAssetManager(assetManager)*/ {}
     virtual ~SceneImporter() = default;
 
-    virtual Model* Import(/*const*/ std::vector<char>& rawModelData, std::vector<Material*>& materialDatabase) = 0;
+    virtual Model* Import(/*const*/ std::vector<char>& rawModelData, MaterialDatabase& materialDatabase) = 0;
 
 protected:
     /*const AssetManager& refAssetManager;*/
@@ -39,7 +40,7 @@ public:
         Assimp::DefaultLogger::kill();    
     }
 
-    virtual Model* Import(std::vector<char>& rawModelData, std::vector<Material*>& materialDatabase) override;
+    virtual Model* Import(std::vector<char>& rawModelData, MaterialDatabase& materialDatabase) override;
 
 private:
     void RecursiveTransform(Model* model, const aiScene *aScene, const aiNode* aNode, glm::mat4 matrix);

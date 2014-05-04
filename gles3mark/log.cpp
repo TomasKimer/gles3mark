@@ -90,7 +90,7 @@ void Log::logMsg(const std::string & msg, Severity severity) {
     switch (severity) {
         case Severity::Debug:
             sseverity = "Debug: ";
-            color = LogConsole::LIGHTBLUE;
+            color = LogConsole::LIGHTCYAN;
             break;
         case Severity::Info:
             sseverity = "Info: ";
@@ -98,7 +98,7 @@ void Log::logMsg(const std::string & msg, Severity severity) {
             break;
         case Severity::Warn:
             sseverity = "Warning: ";
-            color = LogConsole::MAGENTA;
+            color = LogConsole::LIGHTMAGENTA;
             break;
         case Severity::Error:
             sseverity = "ERROR: ";

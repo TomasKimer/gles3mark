@@ -1,5 +1,7 @@
 
+#include <sstream>
 #include "texture.h"
+#include "glerror.h"
 
 void Texture::InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLsizei width, GLsizei height, GLint level) {
     target = GL_TEXTURE_2D;
@@ -20,14 +22,17 @@ void Texture::FromKTXdata(const std::vector<char>& ktxData) {
     KTX_error_code ktxError = ktxLoadTextureM(&ktxData[0], ktxData.size(), &textureObject, &target,
                                               &ktxDimension, &ktxIsMipmapped, &ktxGLerror, 0, nullptr);
 
-    width = ktxDimension.width;
-    height = ktxDimension.height;
-
-    if (ktxError != KTX_SUCCESS || ktxGLerror != GL_NO_ERROR)
-    	throw std::runtime_error("Failed to load texture with libktx.");
+    if (ktxError != KTX_SUCCESS || ktxGLerror != GL_NO_ERROR) {
+    	std::stringstream ss;
+        ss << "ktx: " << ktxError << ", gl: " << GLError::GetErrorString(ktxGLerror);
+        throw std::runtime_error("Failed to load texture with libktx. Code: " + ss.str());
+    }
 
     if (target != GL_TEXTURE_2D)
     	throw std::runtime_error("Unsupported texture format.");
+
+    width = ktxDimension.width;
+    height = ktxDimension.height;
 
     GLint minFilter = GL_LINEAR;
     if (ktxIsMipmapped)

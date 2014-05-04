@@ -36,7 +36,7 @@ public:
         glDeleteProgram(shaderProgram);
     }
 
-    void Use() {
+    void Use() const {
         glUseProgram(shaderProgram);
     }
 
@@ -44,14 +44,14 @@ public:
         uniforms[name] = glGetUniformLocation(shaderProgram, name.c_str());    
     }
 
-    GLuint GetUniform(const std::string& name) {    
-        return uniforms[name];
+    GLuint GetUniform(const std::string& name) const {    
+        return uniforms.at(name);
     }
 
-    void SetUniform(const std::string& s, int i             ) { glUniform1i       (uniforms[s], i                             ); }
-    void SetUniform(const std::string& s, const glm::vec3& v) { glUniform3fv      (uniforms[s], 1,           glm::value_ptr(v)); }
-    void SetUniform(const std::string& s, const glm::vec4& v) { glUniform4fv      (uniforms[s], 1,           glm::value_ptr(v)); }
-    void SetUniform(const std::string& s, const glm::mat4& m) { glUniformMatrix4fv(uniforms[s], 1, GL_FALSE, glm::value_ptr(m)); }
+    void SetUniform(const std::string& s, int i             ) const { glUniform1i       (uniforms.at(s), i                             ); }
+    void SetUniform(const std::string& s, const glm::vec3& v) const { glUniform3fv      (uniforms.at(s), 1,           glm::value_ptr(v)); }
+    void SetUniform(const std::string& s, const glm::vec4& v) const { glUniform4fv      (uniforms.at(s), 1,           glm::value_ptr(v)); }
+    void SetUniform(const std::string& s, const glm::mat4& m) const { glUniformMatrix4fv(uniforms.at(s), 1, GL_FALSE, glm::value_ptr(m)); }
 
     static GLuint compileShader(GLenum type, const std::string& source);    
 

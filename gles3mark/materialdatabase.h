@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "material.h"
 #include "assetmanager.h"
@@ -24,7 +25,22 @@ public:
         database.push_back(m);
     }
 
-    Material* Get(unsigned id) {
+    Material* Get(unsigned id) const {
         return database[id];
+    }
+
+    unsigned MaterialCount() const {
+        return database.size();
+    }
+
+    // TODO check for duplicite textures
+    void LoadTextures(std::unique_ptr<AssetManager>& assetManager) {
+        for (Material* m : database) {
+            if (m->hasTexture) {
+                std::string ktxPath = m->texture->path.substr(0, m->texture->path.find_last_of(".")) + ".ktx";
+                std::transform(ktxPath.begin(), ktxPath.end(), ktxPath.begin(), ::tolower);
+                m->texture->FromKTXdata(assetManager->LoadContents("textures/" + ktxPath)); //test/rgb-reference.ktx
+            }            
+        }
     }
 };

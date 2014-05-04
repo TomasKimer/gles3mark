@@ -64,7 +64,7 @@ public:
 
     //glInvalidateFramebuffer, glInvalidateSubFramebuffer, glBlitFramebuffer, glReadBuffer, glDrawBuffer, (glReadPixels)
 
-    bool CheckCompleteness();
+    void CheckCompleteness();
 
 private:
     static std::string GetFramebufferStatusString(GLenum status);

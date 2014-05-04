@@ -28,7 +28,7 @@ public:
     static const int BUFFER_ROWS = 999; // maximum mumber of lines the output console should have
     static const int VISIBLE_ROWS = 35;
     static const int BUFFER_COLS = 205;
-    static const int VISIBLE_COLS = 100; // assert(VISIBLE_COLS <= BUFFER_COLS)
+    static const int VISIBLE_COLS = 110; // assert(VISIBLE_COLS <= BUFFER_COLS)
 
     virtual ~LogConsole() = default;
 

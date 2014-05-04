@@ -161,6 +161,9 @@
     <ClInclude Include="..\gles3mark\modelrenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\gles3mark\instancedatabuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gles3mark\assetfile.cpp">
@@ -218,6 +221,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gles3mark\keyframeanimation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gles3mark\modelrenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

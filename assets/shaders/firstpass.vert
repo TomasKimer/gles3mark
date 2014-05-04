@@ -14,25 +14,21 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform bool isInstanced;
 
+out vec3 normalVS;
 out vec2 coord;
-out vec3 normal;
-out vec3 position;
 
 void main() {
-	mat4 inverseProjection = inverse(projection);	
-	
-	if (isInstanced) {
-        mat4 instanceModelMat = mat4(instanceModelMat0, 
-                                     instanceModelMat1,
-                                     instanceModelMat2,
-                                     instanceModelMat3);
-
-		gl_Position = projection * view * instanceModelMat * model * vec4(vertexPosition, 1);
+	mat4 modelMat = model;
+    
+    if (isInstanced) {
+        modelMat = mat4(instanceModelMat0, 
+                        instanceModelMat1,
+                        instanceModelMat2,
+                        instanceModelMat3) * model;
     }
-	else
-		gl_Position = projection * view                    * model * vec4(vertexPosition, 1);
-
-	coord = vertexTextureCoord;
-	normal = vertexNormal;
-	position = vertexPosition;
+    	
+	normalVS = mat3(view) * mat3(modelMat) * vertexNormal;
+    coord = vertexTextureCoord;
+    
+    gl_Position = projection * view * modelMat * vec4(vertexPosition, 1);
 }

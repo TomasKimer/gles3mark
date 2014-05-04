@@ -10,10 +10,10 @@ class Model {
     friend class ModelRenderer;
 
     std::vector<Mesh*> meshes;
-    glm::mat4 matrix;
 
 public:
     ModelRenderer renderer;
+    glm::mat4 matrix;
 
     Model() {    
     }

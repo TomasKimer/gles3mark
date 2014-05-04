@@ -2,7 +2,7 @@
 
 #include "sceneimporter.h"
 
-Model* AssimpSceneImporter::Import(std::vector<char>& rawModelData, std::vector<Material*>& materialDatabase) {
+Model* AssimpSceneImporter::Import(std::vector<char>& rawModelData, MaterialDatabase& materialDatabase) {
     //std::vector<char> rawModelData = refAssetManager.LoadContents("models/" + fileName);
     
     Assimp::Importer aImporter;
@@ -14,7 +14,7 @@ Model* AssimpSceneImporter::Import(std::vector<char>& rawModelData, std::vector<
 
     Model* model = new Model();
 
-    unsigned materialZeroIndex = materialDatabase.size();
+    unsigned materialZeroIndex = materialDatabase.MaterialCount();
     for (unsigned int i = 0; i < aScene->mNumMeshes; ++i) {
         const aiMesh* aMesh = aScene->mMeshes[i];
         Mesh* m = LoadMesh(aMesh, materialZeroIndex); 
@@ -26,7 +26,7 @@ Model* AssimpSceneImporter::Import(std::vector<char>& rawModelData, std::vector<
     for (unsigned int i = 0; i < aScene->mNumMaterials; i++) {
         const aiMaterial* aMat = aScene->mMaterials[i];            
         Material* m = LoadMaterial(aMat);            
-        materialDatabase.push_back(m);            
+        materialDatabase.Add(m);            
     }
 
     for (unsigned int i = 0; i < aScene->mNumLights; ++i) {

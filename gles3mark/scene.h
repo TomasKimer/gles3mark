@@ -15,6 +15,7 @@
 #include "framebuffer.h"
 #include "quadrenderer.h"
 #include "keyframeanimation.h"
+#include "materialdatabase.h"
 
 #include <memory>
 #include <string>
@@ -44,20 +45,19 @@ class Scene {  // public Screen?
     ShaderProgram* secondPassProgram;
     ShaderProgram* screenQuadProgram;
     Model *modelE112, *modelChairs, *modelDeskMid, *modelDeskSide;
+    Mesh meshPointLight;
     QuadRenderer quadRenderer;
-    std::vector<Material*> materialDatabase;
-
-    void RenderModel(Model* model, const glm::mat4& modelM, unsigned instanceCount = 1);
+    MaterialDatabase materialDatabase;
     
     Framebuffer framebuffer;
-    Texture diffuseTex, positionTex, normalTex;
-    RenderBuffer depthRenderbuf;
+    Texture albedoTex, normalTex, depthTex;
+    //RenderBuffer depthRenderbuf;
 
     KeyFrameAnimation cameraAnim;
     
     //GLTexture texture;
-    glm::quat rot;
-    Transform testTrans;
+    //glm::quat rot;
+    //Transform testTrans;
 
     int width, height;
     int renderWidth, renderHeight;

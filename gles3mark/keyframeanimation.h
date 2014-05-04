@@ -7,7 +7,7 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/gtc/matrix_transform.hpp>
 
 #include "log.h"
 
@@ -24,57 +24,55 @@ struct KeyFrame {
 
 class KeyFrameAnimation {
 
-    
-    unsigned currentFrame, lastFrame;
-    float currentTime, duration, transition;
+    std::vector<KeyFrame> keyFrames;
+    unsigned currentFrame;
+    float currentTime; //, transition;
     
     bool repeat, ended;
-    unsigned repeatCount;
+    //unsigned repeatCount;
 
     glm::vec3 currentPos, currentDir;
     glm::quat currentRot;
 
-    void DoLerp(const KeyFrame& first, const KeyFrame& second, float amount) {
-        currentPos = glm::mix  (first.position , second.position , amount);
-        currentDir = glm::mix  (first.direction, second.direction, amount);
-        currentRot = glm::slerp(first.rotation , second.rotation , amount);    
-    }
+    void DoLerp(const KeyFrame& first, const KeyFrame& second, float amount);
 
 public:
-    std::vector<KeyFrame> keyFrames;
-
-    KeyFrameAnimation(float timeOffset = 0.0f) : currentFrame(0), lastFrame(0), currentTime(0), repeat(false), ended(false), repeatCount(0), transition(0) {
+    KeyFrameAnimation(float timeOffset = 0.0f) : currentFrame(0), currentTime(0), repeat(true), ended(false)/*, repeatCount(0), transition(0)*/ {
     }
 
     void AddKeyFrame(const KeyFrame& keyFrame) {      
         keyFrames.push_back(keyFrame);
     }
 
-    
     unsigned GetCurrentKeyFrame(unsigned lastFrame);
-    float GetAmount(const KeyFrame& first, const KeyFrame& second);
+
+    float GetTransition(const KeyFrame& first, const KeyFrame& second);
+
     void Update(float deltaTime);
 
-
+    const KeyFrame& GetKeyFrame(unsigned i) const {
+        return keyFrames[i];
+    }
+    unsigned KeyFrameCount() const {
+        return keyFrames.size();
+    }
 
     glm::vec3& GetCurrentPosition() {
         return currentPos;
     }
-
     glm::vec3& GetCurrentDirection() {
         return currentDir;
     }
-
     glm::quat& GetCurrentRotation() {
         return currentRot;
     }
-
-    glm::mat4 GetCurrentMatrix() {
-        return glm::mat4();
-    }
-
+    //glm::mat4 GetCurrentMatrix() {
+    //    return glm::mat4();
+    //}
 
     bool HasEnded() {
         return ended;
     }
+
+    void MakeOrbit(float segments, float timestep, float radius, const glm::vec3 target);
 };

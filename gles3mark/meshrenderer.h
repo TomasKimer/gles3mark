@@ -6,9 +6,14 @@
 #include <glm/glm.hpp>
 #include "glinclude.h"
 
+#include "shaderprogram.h"
+#include "material.h"
+
 class Mesh;
 
 class MeshRenderer {
+    friend class ModelRenderer;
+
     struct VboEntry {
         glm::vec3 pos;          // layout (location=0)
         glm::vec3 normal;       // layout (location=1)
@@ -17,18 +22,29 @@ class MeshRenderer {
     };
 
     GLuint VBO, EBO, VAO;
-    //Mesh* owner;
+    Mesh* owner;
     unsigned elementsCount;
 
     GLuint instanceVBO;         // layout (location=3)
     unsigned instanceCount;
 
+    static GLuint AllocInstanceData(const std::vector<glm::mat4>& data);
+    void AttachInstanceData(GLuint location, GLuint instanceVBO);
+
 public:
+    MeshRenderer() : instanceCount(0), instanceVBO(0) {
+    }
+    
     void Init(Mesh* mesh);
+    void InitInstanceData(const std::vector<glm::mat4>& data);
+    
+    void PreRender(const ShaderProgram& shader, const Material& material, const glm::mat4& parent = glm::mat4());
     void Render();
+    void RenderInstanced(int count);
+    
     void Destroy();
 
-    //template <typename T>
-    void InitInstanceData(const std::vector<glm::mat4>& data);
-    void RenderInstanced(int count = -1);
+    unsigned GetInstanceCount() {
+        return instanceCount;
+    }
 };

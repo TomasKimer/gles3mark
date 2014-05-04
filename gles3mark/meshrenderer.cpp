@@ -5,7 +5,7 @@
 #include "glerror.h"
 
 void MeshRenderer::Init(Mesh* mesh) {
-    //this->owner = mesh;
+    this->owner = mesh;
     
     // Copy data to graphics card
     glGenBuffers(1, &VBO);
@@ -50,45 +50,61 @@ void MeshRenderer::Init(Mesh* mesh) {
     elementsCount = mesh->faces.size() * 3;
 }
 
+void MeshRenderer::InitInstanceData(const std::vector<glm::mat4>& data) {
+    instanceCount = data.size();
+    
+    instanceVBO = AllocInstanceData(data);
+    AttachInstanceData(3, instanceVBO);
+}
+ 
+GLuint MeshRenderer::AllocInstanceData(const std::vector<glm::mat4>& data) {
+    GLuint instanceVBO;
+    
+    glGenBuffers(1, &instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::mat4), &data[0], GL_STATIC_DRAW);
+
+    return instanceVBO;
+}
+
+void MeshRenderer::AttachInstanceData(GLuint location, GLuint instanceVBO) {
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    
+    for (unsigned i = 0; i < 4; ++i) {
+        glEnableVertexAttribArray(location + i);
+        glVertexAttribPointer    (location + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (const GLvoid*)(sizeof(glm::vec4) * i));
+        glVertexAttribDivisor    (location + i, 1);
+    }
+
+    glBindVertexArray(0);
+}
+
+void MeshRenderer::PreRender(const ShaderProgram& shader, const Material& material, const glm::mat4& parent) {
+    shader.SetUniform("model"       , parent * owner->matrix);
+    shader.SetUniform("diffuseColor", material.diffuseColor); 
+    shader.SetUniform("hasTexture"  , material.hasTexture);
+    
+    if (material.hasTexture)
+       material.texture->Bind(GL_TEXTURE0);
+}
+
 void MeshRenderer::Render() {
     glBindVertexArray(VAO);
     GL_CHECK( glDrawElements(GL_TRIANGLES, elementsCount, GL_UNSIGNED_INT, nullptr) );
     glBindVertexArray(0);
 }
 
-void MeshRenderer::InitInstanceData(const std::vector<glm::mat4>& data) {
-    instanceCount = data.size();
-    
-    glGenBuffers(1, &instanceVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, instanceCount * sizeof(glm::mat4), &data[0], GL_STATIC_DRAW);  
-    
-    glBindVertexArray(VAO);
-    
-    int matLoc = 3;
-    for (unsigned i = 0; i < 4; ++i) {
-        glEnableVertexAttribArray(matLoc + i);
-        glVertexAttribPointer(matLoc + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (const GLvoid*)(sizeof(glm::vec4) * i));
-        glVertexAttribDivisor(matLoc + i, 1);
-    }
-
-    glBindVertexArray(0);
-}
-
 void MeshRenderer::RenderInstanced(int count) {
-    if (count == -1)
-        count = instanceCount;
-    
     glBindVertexArray(VAO);
     GL_CHECK( glDrawElementsInstanced(GL_TRIANGLES, elementsCount, GL_UNSIGNED_INT, nullptr, count) );
     glBindVertexArray(0);
 }
 
 void MeshRenderer::Destroy() {
-    //glBindVertexArray(0);
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+    if (instanceVBO)
+        glDeleteBuffers(1, &instanceVBO);
+    
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
     glDeleteVertexArrays(1, &VAO);

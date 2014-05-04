@@ -46,5 +46,6 @@ public:
         std::vector<glm::vec3 >().swap(tangents );    
     }
 
+    void MakeCube();
     void MakeTestMesh();
 };

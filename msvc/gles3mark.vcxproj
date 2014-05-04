@@ -28,6 +28,7 @@
     <ClInclude Include="..\gles3mark\assetmanager.h" />
     <ClInclude Include="..\gles3mark\benchmarkstatistics.h" />
     <ClInclude Include="..\gles3mark\camera.h" />
+    <ClInclude Include="..\gles3mark\instancedatabuilder.h" />
     <ClInclude Include="..\gles3mark\loadingscreen.h" />
     <ClInclude Include="..\gles3mark\logconsole.h" />
     <ClInclude Include="..\gles3mark\fpscounter.h" />
@@ -69,6 +70,7 @@
     <ClCompile Include="..\gles3mark\gl3stub_egl.c" />
     <ClCompile Include="..\gles3mark\keyframeanimation.cpp" />
     <ClCompile Include="..\gles3mark\logconsole.cpp" />
+    <ClCompile Include="..\gles3mark\modelrenderer.cpp" />
     <ClCompile Include="..\gles3mark\quadrenderer.cpp" />
     <ClCompile Include="..\gles3mark\rendercontext_egl.cpp" />
     <ClCompile Include="..\gles3mark\rendercontext_wgl.cpp" />

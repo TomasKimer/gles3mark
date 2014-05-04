@@ -13,8 +13,7 @@ typedef RenderContextEGL RenderContextT;
 #include <memory>
 #include <string>
 #include <stdexcept>
-//#include <atomic>
-#include <thread>
+#include <thread> //#include <atomic>
 #include <random>
 #include <glm/gtc/random.hpp>
 
