@@ -115,10 +115,10 @@ bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int h
     // ------------------------------------------------
     // ------------- gbuffer textures setup -----------
     // ------------------------------------------------
-    albedoTex.InitStorage(GL_RGBA            , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y           );
-    normalTex.InitStorage(GL_R11F_G11F_B10F  , GL_RGB            , GL_FLOAT        , renderSize.x, renderSize.y           );  // GL_R11F_G11F_B10F , GL_RGB  | GL_RG16F, GL_RG
-    depthTex.InitStorage(GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT , renderSize.x, renderSize.y           ); // GL_RG16F
-    finalTex.InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y, GL_LINEAR);    
+    albedoTex.InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y           );
+    normalTex.InitStorage(GL_RGB16F           , GL_RGB            , GL_FLOAT        , renderSize.x, renderSize.y           );  // TODO encode GL_RG16F, GL_RG
+    depthTex .InitStorage(GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT , renderSize.x, renderSize.y           );
+    finalTex .InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y, GL_LINEAR);    
 
     // --------------------------------------------
     // ------------- framebuffers setup -----------
@@ -200,7 +200,7 @@ bool Scene::OnStep(const Time& time) {
     //meshPointLight.renderer.PreRender(*firstPassProgram, lightMat);
     //meshPointLight.renderer.Render();
     
-    //modelChairs  ->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelChairs  ->renderer.GetInstanceCount());
+    modelChairs  ->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelChairs  ->renderer.GetInstanceCount());
     modelDeskMid ->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelDeskMid ->renderer.GetInstanceCount());
     modelDeskSide->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelDeskSide->renderer.GetInstanceCount());
 
@@ -268,16 +268,15 @@ bool Scene::OnStep(const Time& time) {
     normalTex.Bind();
     quadRenderer.Render(1.5f, 0.0f, 0.5f);
 
+
 #ifdef ANDROID
-//    glFinish();  //- not causing delay on swaping egl context
+    glFinish();  //- not causing delay on swaping egl context if vsync is off, and eliminates tearing on low fps (both vsync on and off)
 #endif
+
     // eglSwapBuffers performs an implicit flush operation on the context (glFlush for an OpenGL ES or OpenGL context,
     // vgFlush for an OpenVG context) bound to surface before swapping. Subsequent client API commands may be issued on
     // that context immediately after calling eglSwapBuffers, but are not executed until the buffer exchange is completed.
-
     // FENCE - http://permalink.gmane.org/gmane.comp.lib.cairo/24458
-
-    //assert(glGetError() == GL_NO_ERROR);
 
     return true;
 }

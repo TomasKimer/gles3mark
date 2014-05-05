@@ -9,9 +9,9 @@ void Texture::InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLs
     this->height = height;
 
     glBindTexture(target, textureObject);
-    glTexImage2D(target, level, internalFormat, width, height, 0, format, type, nullptr);
-    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, filter);
-    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, filter);    
+    GL_CHECK( glTexImage2D(target, level, internalFormat, width, height, 0, format, type, nullptr) );
+    GL_CHECK( glTexParameteri(target, GL_TEXTURE_MIN_FILTER, filter) );
+    GL_CHECK( glTexParameteri(target, GL_TEXTURE_MAG_FILTER, filter) );
 }
 
 void Texture::FromKTXdata(const std::vector<char>& ktxData) {

@@ -1,5 +1,5 @@
 
-precision mediump float;  //highp
+precision highp float;  // mediump
 
 // gbuffer
 uniform sampler2D albedoTex;

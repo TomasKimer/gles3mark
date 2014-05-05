@@ -7,7 +7,7 @@ void Framebuffer::CheckCompleteness() {
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     
     if (status != GL_FRAMEBUFFER_COMPLETE) {
-        throw std::runtime_error("Framebuffer incomplete: " + GetFramebufferStatusString(status));
+        throw std::runtime_error("Framebuffer incomplete: " + GetFramebufferStatusString(status)); //Log::E() << GetFramebufferStatusString(status);//
     }
 }
 

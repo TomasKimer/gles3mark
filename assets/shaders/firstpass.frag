@@ -1,5 +1,5 @@
 
-precision mediump float; // highp
+precision highp float;  // mediump
 
 in vec2 coord;
 in vec3 normalVS;

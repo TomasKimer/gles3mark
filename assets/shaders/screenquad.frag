@@ -1,5 +1,5 @@
 
-precision mediump float;
+precision highp float;  // mediump
 
 in vec2 fragTexCoord;
 
