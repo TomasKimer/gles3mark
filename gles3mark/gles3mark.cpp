@@ -9,6 +9,7 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
         // init GL context
         glContext = std::unique_ptr<RenderContextT>(new RenderContextT());  //std::make_unique<RenderContextT>();
         glContext->Create(osWnd);
+        glContext->SetVsync(vsync);
 
         LoadingScreen ls(assetManager, glContext->GetWidth(), glContext->GetHeight());
         glContext->Swap();
@@ -115,7 +116,7 @@ void GLES3Mark::OnTouchDragged(int x, int y, int dx, int dy, int pointer) {
 
 void GLES3Mark::OnResize(int w, int h) {
     if (glContext) {
-        glContext->Resize(w, h, vsync);
+        glContext->Resize(w, h);
         scene->OnResize(w, h);            
     }
     Log::V() << "Resize: " << w << "x" << h; // TODO

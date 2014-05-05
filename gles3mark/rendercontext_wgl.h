@@ -18,8 +18,9 @@ public:
 
     virtual bool Create(void* osWnd) override;
     virtual void Destroy() override;    
-    virtual void Resize(int w, int h, bool vsync) override;    
+    virtual void Resize(int w, int h) override;    
     virtual void Swap() override;
+    virtual void SetVsync(bool enabled) override;
 };
 
 #endif

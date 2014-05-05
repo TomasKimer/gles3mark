@@ -185,17 +185,19 @@ void RenderContextWGL::Destroy() {
     }
 }
 
-void RenderContextWGL::Resize(int w, int h, bool vsync) {
+void RenderContextWGL::Resize(int w, int h) {
     mWidth = w;
     mHeight = h;
-
-    if (WGLEW_EXT_swap_control)  // == wglewIsSupported("WGL_EXT_swap_control")
-        wglSwapIntervalEXT(vsync ? 1 : 0);
 }
 
 void RenderContextWGL::Swap() {
     //wglMakeCurrent(gdiDc, wglContext);
     SwapBuffers(gdiDc);
+}
+
+void RenderContextWGL::SetVsync(bool enabled) {
+    if (WGLEW_EXT_swap_control)  // == wglewIsSupported("WGL_EXT_swap_control")
+        wglSwapIntervalEXT(enabled ? 1 : 0);
 }
 
 #endif

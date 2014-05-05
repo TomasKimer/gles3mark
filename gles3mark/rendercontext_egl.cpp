@@ -120,14 +120,16 @@ void RenderContextEGL::Destroy() {
 	surface = EGL_NO_SURFACE;
 }
 
-void RenderContextEGL::Resize(int w, int h, bool vsync) {
+void RenderContextEGL::Resize(int w, int h) {
 	mWidth = w;
 	mHeight = h;
-
-	eglSwapInterval(display, (int)vsync);  	// Turn off vsync - 0
 }
 void RenderContextEGL::Swap() /*override*/ {
 	eglSwapBuffers(display, surface);
+}
+
+void RenderContextEGL::SetVsync(bool enabled) {
+	eglSwapInterval(display, enabled ? 1 : 0); // Turn off vsync - 0
 }
 
 #endif
