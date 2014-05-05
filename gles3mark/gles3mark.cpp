@@ -81,6 +81,9 @@ void GLES3Mark::OnTouchDown(int screenX, int screenY, int pointer, Input::Button
     if (screenX > 0 && screenX < 100 && screenY > 0 && screenY < 100)
         quit = true;
 
+    if (screenX > glContext->GetWidth() - 100 && screenY > 0 && screenY < 100)
+        scene->freeCamera = !scene->freeCamera;
+
     if (screenX < glContext->GetWidth() / 2) {
         movePointerId = pointer;
         joystickMoveCenter = glm::ivec2(screenX, screenY);
@@ -141,7 +144,7 @@ bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") /
     if (!scene->OnStep(time))
         quit = true;
 
-    //std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(40));
 
     glContext->Swap();
 
@@ -156,6 +159,27 @@ void GLES3Mark::OnProcessInput() {
     
     if (x != 0.f || z != 0.f)
         scene->camera.Move(glm::vec3(x, 0, z));
+
+    if (inputManager.IsKeyDown(Input::KeyCode::Up)) {
+        for (Light *l : scene->lightDatabase) {
+            l->position.y += 0.1f;            
+        }
+    }
+    if (inputManager.IsKeyDown(Input::KeyCode::Down)) {
+        for (Light *l : scene->lightDatabase) {
+            l->position.y -= 0.1f;            
+        }
+    }
+    if (inputManager.IsKeyDown(Input::KeyCode::Left)) {
+        for (Light *l : scene->lightDatabase) {
+            l->position.z += 0.1f;            
+        }
+    }
+    if (inputManager.IsKeyDown(Input::KeyCode::Right)) {
+        for (Light *l : scene->lightDatabase) {
+            l->position.z -= 0.1f;            
+        }
+    }
 }
 
 void GLES3Mark::OnDestroy() {

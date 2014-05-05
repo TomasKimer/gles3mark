@@ -29,6 +29,8 @@
 
 
 class Scene {  // public Screen?
+    friend class GLES3Mark;
+
     // layout (std140) uniform MatrixUniformBlock
     //struct MatrixUniformBlock {
     //    glm::mat4 projection;
@@ -48,26 +50,23 @@ class Scene {  // public Screen?
     Mesh meshPointLight;
     QuadRenderer quadRenderer;
     MaterialDatabase materialDatabase;
+    std::vector<Light*> lightDatabase;
     
-    Framebuffer framebuffer;
-    Texture albedoTex, normalTex, depthTex;
-    //RenderBuffer depthRenderbuf;
+    Framebuffer framebuffer, framebufferSecond;
+    Texture albedoTex, normalTex, depthTex, finalTex;
 
     KeyFrameAnimation cameraAnim;
     
-    //GLTexture texture;
     //glm::quat rot;
     //Transform testTrans;
 
-    int width, height;
-    int renderWidth, renderHeight;
-    
-public:
+    glm::ivec2 screenSize, renderSize;
     Camera camera;
     bool freeCamera;
     
+public:    
     // TODO adjust renderWidth/height with aspect ration? 16:9 vs 16:10?
-    Scene(): renderWidth(1280), renderHeight(720), freeCamera(false)  {}
+    Scene(): renderSize(1280, 720), freeCamera(false)  {}
     ~Scene() {}
         
     bool OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int height);

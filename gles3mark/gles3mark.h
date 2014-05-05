@@ -63,7 +63,7 @@ public:
             Log::Create();
 
 #ifdef ANDROID
-        vsync = true;
+        vsync = false;
 #endif
     }
 

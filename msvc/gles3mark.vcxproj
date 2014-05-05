@@ -13,14 +13,10 @@
   <ItemGroup>
     <None Include="..\assets\shaders\firstpass.frag" />
     <None Include="..\assets\shaders\firstpass.vert" />
-    <None Include="..\assets\shaders\phong.frag" />
-    <None Include="..\assets\shaders\phong.vert" />
     <None Include="..\assets\shaders\screenquad.frag" />
     <None Include="..\assets\shaders\screenquad.vert" />
     <None Include="..\assets\shaders\secondpass.frag" />
     <None Include="..\assets\shaders\secondpass.vert" />
-    <None Include="..\assets\shaders\simple.frag" />
-    <None Include="..\assets\shaders\simple.vert" />
     <None Include="gles3mark_dll.def" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +65,7 @@
     <ClCompile Include="..\gles3mark\framebuffer.cpp" />
     <ClCompile Include="..\gles3mark\gl3stub_egl.c" />
     <ClCompile Include="..\gles3mark\keyframeanimation.cpp" />
+    <ClCompile Include="..\gles3mark\loadingscreen.cpp" />
     <ClCompile Include="..\gles3mark\logconsole.cpp" />
     <ClCompile Include="..\gles3mark\modelrenderer.cpp" />
     <ClCompile Include="..\gles3mark\quadrenderer.cpp" />

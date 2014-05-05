@@ -21,18 +21,6 @@
     <None Include="gles3mark_dll.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\assets\shaders\simple.frag">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="..\assets\shaders\simple.vert">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="..\assets\shaders\phong.frag">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="..\assets\shaders\phong.vert">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
     <None Include="..\assets\shaders\firstpass.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
@@ -224,6 +212,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gles3mark\modelrenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gles3mark\loadingscreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

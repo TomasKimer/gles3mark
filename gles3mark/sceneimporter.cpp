@@ -2,7 +2,7 @@
 
 #include "sceneimporter.h"
 
-Model* AssimpSceneImporter::Import(std::vector<char>& rawModelData, MaterialDatabase& materialDatabase) {
+Model* AssimpSceneImporter::Import(std::vector<char>& rawModelData, MaterialDatabase& materialDatabase, std::vector<Light*>& lightDatabase) {
     //std::vector<char> rawModelData = refAssetManager.LoadContents("models/" + fileName);
     
     Assimp::Importer aImporter;
@@ -32,6 +32,7 @@ Model* AssimpSceneImporter::Import(std::vector<char>& rawModelData, MaterialData
     for (unsigned int i = 0; i < aScene->mNumLights; ++i) {
         const aiLight* aLight = aScene->mLights[i];
         Light* l = LoadLight(aLight);
+        lightDatabase.push_back(l);
     }
 
     if (aScene->HasTextures  ()) Log::W() << "Has embedded textures.";

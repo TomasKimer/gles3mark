@@ -3,15 +3,15 @@
 #include "texture.h"
 #include "glerror.h"
 
-void Texture::InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLsizei width, GLsizei height, GLint level) {
+void Texture::InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLsizei width, GLsizei height, GLint filter, GLint level) {
     target = GL_TEXTURE_2D;
     this->width = width;
     this->height = height;
 
     glBindTexture(target, textureObject);
     glTexImage2D(target, level, internalFormat, width, height, 0, format, type, nullptr);
-    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, filter);
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, filter);    
 }
 
 void Texture::FromKTXdata(const std::vector<char>& ktxData) {
