@@ -28,7 +28,7 @@ public:
 
 
     JSONStatsBuilder& BuildGLinfo() {
-        result << 42;//GLQuery::RENDERER();
+        //result << 42;//GLQuery::RENDERER();
 
         return *this;
     }

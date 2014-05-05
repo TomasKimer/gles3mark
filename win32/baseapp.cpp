@@ -237,6 +237,7 @@ int BaseApp::Run() {
         }
         else {
             if (!OnIdle()) {
+                //ShowMsg(GetResultXML) // TODO
                 OnQuit();
             }
             

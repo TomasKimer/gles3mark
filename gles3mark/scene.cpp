@@ -200,7 +200,7 @@ bool Scene::OnStep(const Time& time) {
     //meshPointLight.renderer.PreRender(*firstPassProgram, lightMat);
     //meshPointLight.renderer.Render();
     
-    modelChairs  ->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelChairs  ->renderer.GetInstanceCount());
+    //modelChairs  ->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelChairs  ->renderer.GetInstanceCount());
     modelDeskMid ->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelDeskMid ->renderer.GetInstanceCount());
     modelDeskSide->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelDeskSide->renderer.GetInstanceCount());
 
@@ -268,7 +268,6 @@ bool Scene::OnStep(const Time& time) {
     normalTex.Bind();
     quadRenderer.Render(1.5f, 0.0f, 0.5f);
 
-    //glFlush();
 #ifdef ANDROID
 //    glFinish();  //- not causing delay on swaping egl context
 #endif
