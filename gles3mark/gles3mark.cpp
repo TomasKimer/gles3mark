@@ -11,7 +11,7 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
         glContext->Create(osWnd);
         glContext->SetVsync(vsync);
 
-        LoadingScreen ls(assetManager, glContext->GetWidth(), glContext->GetHeight());
+        LoadingScreen ls(*assetManager, glContext->GetWidth(), glContext->GetHeight());
         glContext->Swap();
 
         // display some GL info
@@ -30,7 +30,7 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
         //Log::D() << "C++ ver: " << (long)__cplusplus;
 
         scene = std::unique_ptr<Scene>(new Scene());
-        scene->OnInit(assetManager, glContext->GetWidth(), glContext->GetHeight());
+        scene->OnInit(*assetManager, glContext->GetWidth(), glContext->GetHeight());
 
     } catch (std::exception& e) {
         Log::E() << "Init exception: " << e.what();
@@ -161,24 +161,16 @@ void GLES3Mark::OnProcessInput() {
     if (x != 0.f || z != 0.f)
         scene->camera.Move(glm::vec3(x, 0, z));
 
-    if (inputManager.IsKeyDown(Input::KeyCode::Up)) {
-        for (Light *l : scene->lightDatabase) {
-            l->position.y += 0.1f;            
-        }
-    }
-    if (inputManager.IsKeyDown(Input::KeyCode::Down)) {
-        for (Light *l : scene->lightDatabase) {
-            l->position.y -= 0.1f;            
-        }
-    }
-    if (inputManager.IsKeyDown(Input::KeyCode::Left)) {
-        for (Light *l : scene->lightDatabase) {
-            l->position.z += 0.1f;            
-        }
-    }
-    if (inputManager.IsKeyDown(Input::KeyCode::Right)) {
-        for (Light *l : scene->lightDatabase) {
-            l->position.z -= 0.1f;            
+    glm::vec3 lightMove;
+
+    if (inputManager.IsKeyDown(Input::KeyCode::Up   )) lightMove.y =  0.1f;
+    if (inputManager.IsKeyDown(Input::KeyCode::Down )) lightMove.y = -0.1f;
+    if (inputManager.IsKeyDown(Input::KeyCode::Left )) lightMove.z =  0.1f;
+    if (inputManager.IsKeyDown(Input::KeyCode::Right)) lightMove.z = -0.1f;
+
+    if (lightMove != glm::vec3(0)) {
+        for (std::unique_ptr<Light>& l : scene->lightDatabase) {
+            l->Move(lightMove);
         }
     }
 }

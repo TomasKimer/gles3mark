@@ -35,7 +35,7 @@ FILE_LIST_LIB := $(wildcard $(LOCAL_PATH)/../gles3mark/*.cpp)
 
 LOCAL_MODULE    := libgles3mark
 LOCAL_CFLAGS	:= -Werror
-LOCAL_CPPFLAGS  := -std=c++11 -D_DEBUG #-O3 -DNDEBUG #-fexceptions
+LOCAL_CPPFLAGS  := -std=c++11 -D_DEBUG -DGLM_FORCE_RADIANS #-O3 -DNDEBUG #-fexceptions
 LOCAL_CPP_FEATURES := exceptions
 
 LOCAL_SRC_FILES := $(FILE_LIST_JNI:$(LOCAL_PATH)/%=%)

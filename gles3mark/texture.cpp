@@ -3,13 +3,13 @@
 #include "texture.h"
 #include "glerror.h"
 
-void Texture::InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLsizei width, GLsizei height, GLint filter, GLint level) {
+void Texture::InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLsizei width, GLsizei height, GLint filter, GLint level, const GLvoid* pixels) {
     target = GL_TEXTURE_2D;
     this->width = width;
     this->height = height;
 
-    glBindTexture(target, textureObject);
-    GL_CHECK( glTexImage2D(target, level, internalFormat, width, height, 0, format, type, nullptr) );
+    GL_CHECK( glBindTexture(target, textureObject) );
+    GL_CHECK( glTexImage2D(target, level, internalFormat, width, height, 0, format, type, pixels) );
     GL_CHECK( glTexParameteri(target, GL_TEXTURE_MIN_FILTER, filter) );
     GL_CHECK( glTexParameteri(target, GL_TEXTURE_MAG_FILTER, filter) );
 }
@@ -38,8 +38,8 @@ void Texture::FromKTXdata(const std::vector<char>& ktxData) {
     if (ktxIsMipmapped)
     	minFilter = GL_LINEAR_MIPMAP_LINEAR; // trilinear filtering
 
-    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
-    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    GL_CHECK( glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter) );
+    GL_CHECK( glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR) );
 
     Log::V() << "KTX texture " + path + " loaded: " << width << "x" << height
     		 /*<< "x" << ktxDimension.depth*/ << ", mipmapped: " << (ktxIsMipmapped ? "true" : "false");
@@ -59,7 +59,7 @@ void Texture::FromBitmapData(const std::vector<char>& rawData, int width, int he
 
 	GLint minFilter = GL_LINEAR;
 	if (isPowerOfTwo(width) && isPowerOfTwo(height)) { // GL_INVALID_OPERATION if lvl 0 w&h is not power of 2 or is compressed internal format
-		glGenerateMipmap(target);
+		GL_CHECK( glGenerateMipmap(target) );
 		minFilter = GL_LINEAR_MIPMAP_LINEAR;
 	}
 
@@ -68,6 +68,6 @@ void Texture::FromBitmapData(const std::vector<char>& rawData, int width, int he
 }
 
 void Texture::Bind(GLenum textureUnit) {
-    glActiveTexture(textureUnit);
-    glBindTexture(target, textureObject);
+    GL_CHECK( glActiveTexture(textureUnit) );
+    GL_CHECK( glBindTexture(target, textureObject) );
 }

@@ -5,22 +5,22 @@
 #include "instancedatabuilder.h"
 
 
-bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int height) {
-    AssimpSceneImporter* modelImporter = new AssimpSceneImporter(/* *assetManager*/);
+bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
+    std::unique_ptr<AssimpSceneImporter> modelImporter = std::unique_ptr<AssimpSceneImporter>(new AssimpSceneImporter());
     
     // -----------------------------------------------------------------
     // ------------- load scene models, materials and lights -----------
     // -----------------------------------------------------------------
-    std::vector<char> modelData(assetManager->LoadContents("models/e112max.dae")); // e112.3ds
+    std::vector<char> modelData(assetManager.LoadContents("models/e112max.dae"));
     modelE112 = modelImporter->Import(modelData, materialDatabase, lightDatabase);
 
-    modelData = assetManager->LoadContents("models/chairs.dae");
+    modelData = assetManager.LoadContents("models/chairs.dae");
     modelChairs = modelImporter->Import(modelData, materialDatabase, lightDatabase);
 
-    modelData = assetManager->LoadContents("models/desk-mid.dae");
+    modelData = assetManager.LoadContents("models/desk-mid.dae");
     modelDeskMid = modelImporter->Import(modelData, materialDatabase, lightDatabase);
 
-    modelData = assetManager->LoadContents("models/desk-side.dae");
+    modelData = assetManager.LoadContents("models/desk-side.dae");
     modelDeskSide = modelImporter->Import(modelData, materialDatabase, lightDatabase);
 
     // --------------------------------------------------------
@@ -40,7 +40,7 @@ bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int h
             if (i == 3)
                 color = glm::vec3(dist(mt), dist(mt), dist(mt));
         
-            lightDatabase.push_back(new Light(glm::vec3(-70.0f + j*7, 2.5f, i*7.0f), color, 5.0f));
+            lightDatabase.push_back(std::unique_ptr<Light>(new Light(glm::vec3(-70.0f + j*7, 2.5f, i*7.0f), color, 5.0f)));
         }
     }
 
@@ -71,8 +71,8 @@ bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int h
     // -----------------------------------------------
     // ------------- first pass shader setup ---------
     // -----------------------------------------------
-    firstPassProgram = new ShaderProgram(assetManager->LoadText("shaders/firstpass.vert"),
-                                         assetManager->LoadText("shaders/firstpass.frag"));
+    firstPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/firstpass.vert"),
+                                                                        assetManager.LoadText("shaders/firstpass.frag")));
     firstPassProgram->AddUniform("model");
     firstPassProgram->AddUniform("view");
     firstPassProgram->AddUniform("projection");
@@ -84,8 +84,8 @@ bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int h
     // ------------------------------------------------
     // ------------- second pass shader setup ---------
     // ------------------------------------------------
-    secondPassProgram = new ShaderProgram(assetManager->LoadText("shaders/secondpass.vert"),
-                                          assetManager->LoadText("shaders/secondpass.frag"));
+    secondPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/secondpass.vert"),
+                                                                         assetManager.LoadText("shaders/secondpass.frag")));
     secondPassProgram->AddUniform("model");
     secondPassProgram->AddUniform("view");
     secondPassProgram->AddUniform("projection");
@@ -108,9 +108,32 @@ bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int h
     // ------------------------------------------------
     // ------------- screen quad shader setup ---------
     // ------------------------------------------------
-    screenQuadProgram = new ShaderProgram(assetManager->LoadText("shaders/screenquad.vert"),
-                                          assetManager->LoadText("shaders/screenquad.frag"));
+    screenQuadProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/screenquad.vert"),
+                                                                         assetManager.LoadText("shaders/screenquad.frag")));
     screenQuadProgram->AddUniform("tex");
+
+
+
+    ssaoPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/ssaopass.vert"),
+                                                                       assetManager.LoadText("shaders/ssaopass.frag")));
+    ssaoPassProgram->AddUniform("invProj");
+    ssaoPassProgram->AddUniform("projection");
+    ssaoPassProgram->AddUniform("kernel");
+    
+    ssaoPassProgram->AddUniform("albedoTex");
+    ssaoPassProgram->AddUniform("normalVStex");
+    ssaoPassProgram->AddUniform("depthTex");
+    ssaoPassProgram->AddUniform("noiseTex");
+
+    ssaoPassProgram->Use();
+    ssaoPassProgram->SetUniform("albedoTex", 0);
+    ssaoPassProgram->SetUniform("normalVStex", 1);
+    ssaoPassProgram->SetUniform("depthTex", 2);
+    ssaoPassProgram->SetUniform("noiseTex", 3);
+
+    //noiseTex.FromBitmapData()
+    //CreateTextureGL(SSAO_NOISE_SIZE, SSAO_NOISE_SIZE, GL_RGB32F, GL_RGB, GL_FLOAT, GL_NEAREST, &noise[0].x);
+
 
     // ------------------------------------------------
     // ------------- gbuffer textures setup -----------
@@ -118,7 +141,8 @@ bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int h
     albedoTex.InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y           );
     normalTex.InitStorage(GL_RGB16F           , GL_RGB            , GL_FLOAT        , renderSize.x, renderSize.y           );  // TODO encode GL_RG16F, GL_RG
     depthTex .InitStorage(GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT , renderSize.x, renderSize.y           );
-    finalTex .InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y, GL_LINEAR);    
+    finalTex .InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y, GL_LINEAR);
+    noiseTex .InitStorage(GL_RGB16F           , GL_RGB            , GL_FLOAT        , ssaoBuilder.KERNEL_SIZE, ssaoBuilder.KERNEL_SIZE, GL_NEAREST, 0, &(ssaoBuilder.GetNoise()[0].x));
 
     // --------------------------------------------
     // ------------- framebuffers setup -----------
@@ -128,14 +152,14 @@ bool Scene::OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int h
     framebuffer.Attach(albedoTex, GL_COLOR_ATTACHMENT0);    
     framebuffer.Attach(normalTex, GL_COLOR_ATTACHMENT1);
     framebuffer.Attach(finalTex , GL_COLOR_ATTACHMENT2);
-    framebuffer.ActiveColorAttachments(std::vector<GLenum>{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
+    //framebuffer.ActiveColorAttachments(std::vector<GLenum>{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
     framebuffer.CheckCompleteness();
     
-    framebufferSecond.Bind();
-    framebufferSecond.Attach(depthTex, GL_DEPTH_ATTACHMENT);
-    framebufferSecond.Attach(finalTex, GL_COLOR_ATTACHMENT0);
-    framebufferSecond.ActiveColorAttachments(std::vector<GLenum>{GL_COLOR_ATTACHMENT0});
-    framebufferSecond.CheckCompleteness();
+    //framebufferSecond.Bind();
+    //framebufferSecond.Attach(depthTex, GL_DEPTH_ATTACHMENT);
+    //framebufferSecond.Attach(finalTex, GL_COLOR_ATTACHMENT0);
+    //framebufferSecond.ActiveColorAttachments(std::vector<GLenum>{GL_COLOR_ATTACHMENT0});
+    //framebufferSecond.CheckCompleteness();
 
     // ------------------------------------------------
     // ------------- camera animation setup -----------
@@ -179,6 +203,7 @@ bool Scene::OnStep(const Time& time) {
     // -----------------------------------------------------
     glViewport(0, 0, renderSize.x, renderSize.y);
     framebuffer.Bind();
+    framebuffer.ActiveColorAttachments(std::vector<GLenum>{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_NONE});
 
     glDepthMask(GL_TRUE); // enable writing into the depth buffer
 
@@ -204,19 +229,39 @@ bool Scene::OnStep(const Time& time) {
     modelDeskMid ->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelDeskMid ->renderer.GetInstanceCount());
     modelDeskSide->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelDeskSide->renderer.GetInstanceCount());
 
-
     // -------------------------------------------------
-    // -------- second pass - lights -------------------
+    // -------- second pass - SSAO ---------------------
     // -------------------------------------------------
-    framebufferSecond.Bind();
+    framebuffer.ActiveColorAttachments(std::vector<GLenum>{GL_NONE, GL_NONE, GL_COLOR_ATTACHMENT2});
     
+    glDisable(GL_DEPTH_TEST); 
+    glDepthMask(GL_FALSE); // disable writing into the depth buffer
+    
+    ssaoPassProgram->Use();    
+    ssaoPassProgram->SetUniform("invProj", projectionInv);
+    ssaoPassProgram->SetUniform("projection", projection);
+    ssaoPassProgram->SetUniform("kernel", ssaoBuilder.GetKernel());
+
+    albedoTex.Bind(GL_TEXTURE0);
+    normalTex.Bind(GL_TEXTURE1);    
+    depthTex .Bind(GL_TEXTURE2);
+    noiseTex .Bind(GL_TEXTURE3);
+    
+    quadRenderer.Render(0.0f, 0.0f, 2.0f);
+    
+    
+    // -------------------------------------------------
+    // -------- third pass - lights -------------------
+    // -------------------------------------------------
+        
     //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     //glClear(GL_COLOR_BUFFER_BIT);
     
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
     
-    glDepthMask(GL_FALSE);  // disable writing into the depth buffer
+    glEnable(GL_DEPTH_TEST); 
+    //glDepthMask(GL_FALSE);  // disable writing into the depth buffer
     glDepthFunc(GL_GEQUAL); // passes if the incoming depth value is greater than or equal to the stored depth value
     glCullFace(GL_FRONT);   // front-facing polygons are culled
 
@@ -226,17 +271,15 @@ bool Scene::OnStep(const Time& time) {
     secondPassProgram->SetUniform("view", view);    
     secondPassProgram->SetUniform("viewport", glm::vec2(renderSize));
 
-    albedoTex.Bind(GL_TEXTURE0);
-    normalTex.Bind(GL_TEXTURE1);    
-    depthTex .Bind(GL_TEXTURE2);
+    //albedoTex.Bind(GL_TEXTURE0);
+    //normalTex.Bind(GL_TEXTURE1);    
+    //depthTex .Bind(GL_TEXTURE2);
 
-    for (Light* l : lightDatabase) {
+    for (std::unique_ptr<Light>& l : lightDatabase) {
         if (l->type != Light::Type::Point)
             continue;
-        
-        glm::mat4 lightModelMatrix = glm::scale(glm::translate(glm::mat4(), l->position), glm::vec3(l->size));
            
-        secondPassProgram->SetUniform("model", lightModelMatrix);
+        secondPassProgram->SetUniform("model", l->matrix);
         secondPassProgram->SetUniform("lightPos", glm::vec3(view * glm::vec4(l->position, 1)));
         secondPassProgram->SetUniform("lightColor", l->diffuseColor);
         secondPassProgram->SetUniform("lightSize", l->size);    
@@ -286,9 +329,8 @@ void Scene::Destroy() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    // TODO destroy models etc
-
-    delete firstPassProgram;
-    delete secondPassProgram;
-    delete screenQuadProgram;
+    delete modelE112;
+    delete modelChairs;
+    delete modelDeskMid;
+    delete modelDeskSide;
 }

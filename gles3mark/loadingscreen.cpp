@@ -5,13 +5,13 @@
 #include "glinclude.h"
 #include "quadrenderer.h"
 
-LoadingScreen::LoadingScreen(std::unique_ptr<AssetManager>& assetManager, int width, int height) {
-    ShaderProgram screenQuadProgram(assetManager->LoadText("shaders/screenquad.vert"),
-                                    assetManager->LoadText("shaders/screenquad.frag"));
+LoadingScreen::LoadingScreen(const AssetManager& assetManager, int width, int height) {
+    ShaderProgram screenQuadProgram(assetManager.LoadText("shaders/screenquad.vert"),
+                                    assetManager.LoadText("shaders/screenquad.frag"));
     screenQuadProgram.AddUniform("tex");
 
     Texture texture;
-    texture.FromKTXdata(assetManager->LoadContents("textures/loading.ktx")); 
+    texture.FromKTXdata(assetManager.LoadContents("textures/loading.ktx")); 
 
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -284,6 +284,7 @@ void BaseApp::HandleCommand(int32_t cmd) {
 	 */
 	case APP_CMD_RESUME:
 		Log::Msg("APP_CMD_RESUME");
+		animating = true;
 		break;
 
 	/**
@@ -291,6 +292,7 @@ void BaseApp::HandleCommand(int32_t cmd) {
 	 */
 	case APP_CMD_PAUSE:
 		Log::Msg("APP_CMD_PAUSE");
+		animating = false;
 		break;
 
 	/**

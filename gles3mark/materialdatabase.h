@@ -15,18 +15,18 @@
 
 class MaterialDatabase {
 
-    std::vector<Material*> database;
+    std::vector<std::unique_ptr<Material>> database;
 
 public:
     MaterialDatabase() {}
     ~MaterialDatabase() {}
 
     void Add(Material* m) {
-        database.push_back(m);
+        database.push_back(std::unique_ptr<Material>(m));
     }
 
-    Material* Get(unsigned id) const {
-        return database[id];
+    const Material& Get(unsigned id) const {
+        return *database[id];
     }
 
     unsigned MaterialCount() const {
@@ -34,12 +34,12 @@ public:
     }
 
     // TODO check for duplicite textures
-    void LoadTextures(std::unique_ptr<AssetManager>& assetManager) {
-        for (Material* m : database) {
+    void LoadTextures(const AssetManager& assetManager) {
+        for (std::unique_ptr<Material>& m : database) {
             if (m->hasTexture) {
                 std::string ktxPath = m->texture->path.substr(0, m->texture->path.find_last_of(".")) + ".ktx";
                 std::transform(ktxPath.begin(), ktxPath.end(), ktxPath.begin(), ::tolower);
-                m->texture->FromKTXdata(assetManager->LoadContents("textures/" + ktxPath)); //test/rgb-reference.ktx
+                m->texture->FromKTXdata(assetManager.LoadContents("textures/" + ktxPath)); //test/rgb-reference.ktx
             }            
         }
     }

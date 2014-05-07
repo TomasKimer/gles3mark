@@ -2,8 +2,8 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
-#define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
 
 #include <assimp/Importer.hpp>
@@ -23,7 +23,7 @@ public:
     SceneImporter(/*const AssetManager& assetManager*/) /*: refAssetManager(assetManager)*/ {}
     virtual ~SceneImporter() = default;
 
-    virtual Model* Import(/*const*/ std::vector<char>& rawModelData, MaterialDatabase& materialDatabase, std::vector<Light*>& lightDatabase) = 0;
+    virtual Model* Import(/*const*/ std::vector<char>& rawModelData, MaterialDatabase& materialDatabase, std::vector<std::unique_ptr<Light>>& lightDatabase) = 0;
 
 protected:
     /*const AssetManager& refAssetManager;*/
@@ -40,7 +40,7 @@ public:
         Assimp::DefaultLogger::kill();    
     }
 
-    virtual Model* Import(std::vector<char>& rawModelData, MaterialDatabase& materialDatabase, std::vector<Light*>& lightDatabase) override;
+    virtual Model* Import(std::vector<char>& rawModelData, MaterialDatabase& materialDatabase, std::vector<std::unique_ptr<Light>>& lightDatabase) override;
 
 private:
     void RecursiveTransform(Model* model, const aiScene *aScene, const aiNode* aNode, glm::mat4 matrix);

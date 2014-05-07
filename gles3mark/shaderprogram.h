@@ -5,7 +5,6 @@
 #include <vector>
 #include <unordered_map>
 
-#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -49,12 +48,14 @@ public:
         return uniforms.at(name);
     }
 
-    void SetUniform(const std::string& s, int i             ) const { GL_CHECK( glUniform1i       (uniforms.at(s), i                             ) ); }
-    void SetUniform(const std::string& s, float f           ) const { GL_CHECK( glUniform1f       (uniforms.at(s), f                             ) ); }
-    void SetUniform(const std::string& s, const glm::vec2& v) const { GL_CHECK( glUniform2fv      (uniforms.at(s), 1,           glm::value_ptr(v)) ); }
-    void SetUniform(const std::string& s, const glm::vec3& v) const { GL_CHECK( glUniform3fv      (uniforms.at(s), 1,           glm::value_ptr(v)) ); }
-    void SetUniform(const std::string& s, const glm::vec4& v) const { GL_CHECK( glUniform4fv      (uniforms.at(s), 1,           glm::value_ptr(v)) ); }
-    void SetUniform(const std::string& s, const glm::mat4& m) const { GL_CHECK( glUniformMatrix4fv(uniforms.at(s), 1, GL_FALSE, glm::value_ptr(m)) ); }
+    void SetUniform(const std::string& s, int    i           ) const { GL_CHECK( glUniform1i       (uniforms.at(s), i                             ) ); }
+    void SetUniform(const std::string& s, float  f           ) const { GL_CHECK( glUniform1f       (uniforms.at(s), f                             ) ); }
+    void SetUniform(const std::string& s, const  glm::vec2& v) const { GL_CHECK( glUniform2fv      (uniforms.at(s), 1,           glm::value_ptr(v)) ); }
+    void SetUniform(const std::string& s, const  glm::vec3& v) const { GL_CHECK( glUniform3fv      (uniforms.at(s), 1,           glm::value_ptr(v)) ); }
+    void SetUniform(const std::string& s, const  glm::vec4& v) const { GL_CHECK( glUniform4fv      (uniforms.at(s), 1,           glm::value_ptr(v)) ); }
+    void SetUniform(const std::string& s, const  glm::mat4& m) const { GL_CHECK( glUniformMatrix4fv(uniforms.at(s), 1, GL_FALSE, glm::value_ptr(m)) ); }
+
+    void SetUniform(const std::string& s, const std::vector<glm::vec3>& v) const { GL_CHECK( glUniform3fv(uniforms.at(s), 3, &v[0].x) ); }
 
     static GLuint compileShader(GLenum type, const std::string& source);    
 

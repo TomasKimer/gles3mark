@@ -33,7 +33,7 @@ void ModelRenderer::RenderFunc(const ShaderProgram& shader, const MaterialDataba
     shader.SetUniform("isInstanced", instanced);
         
     for (Mesh* m : owner->meshes) {  //if (i == 5 || i == 7) continue; // chair realTime_quality bad mesh    
-        m->renderer.PreRender(shader, *matDB.Get(m->materialID), owner->matrix);
+        m->renderer.PreRender(shader, matDB.Get(m->materialID), owner->matrix);
 
         if (instanced)
             m->renderer.RenderInstanced(count);

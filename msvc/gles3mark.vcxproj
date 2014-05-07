@@ -17,6 +17,8 @@
     <None Include="..\assets\shaders\screenquad.vert" />
     <None Include="..\assets\shaders\secondpass.frag" />
     <None Include="..\assets\shaders\secondpass.vert" />
+    <None Include="..\assets\shaders\ssaopass.frag" />
+    <None Include="..\assets\shaders\ssaopass.vert" />
     <None Include="gles3mark_dll.def" />
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +46,7 @@
     <ClInclude Include="..\gles3mark\rendertarget.h" />
     <ClInclude Include="..\gles3mark\scene.h" />
     <ClInclude Include="..\gles3mark\materialdatabase.h" />
+    <ClInclude Include="..\gles3mark\ssaobuilder.h" />
     <ClInclude Include="..\gles3mark\statsbuilder_json.h" />
     <ClInclude Include="..\gles3mark\texture.h" />
     <ClInclude Include="..\gles3mark\input.h" />
@@ -126,7 +129,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GLES3MARK_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GLES3MARK_EXPORTS;_CRT_SECURE_NO_WARNINGS;GLM_FORCE_RADIANS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -145,7 +148,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GLES3MARK_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GLES3MARK_EXPORTS;_CRT_SECURE_NO_WARNINGS;GLM_FORCE_RADIANS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

@@ -35,16 +35,16 @@ public:
     virtual void OnResize(int w, int h) = 0;
     virtual bool OnStep() = 0;
     virtual std::string GetResultXML() = 0;
-    virtual const std::unique_ptr<RenderContextT>& GetContext() = 0;  // TODO
+    //virtual const RenderContextT& GetContext() = 0;  // TODO
 };
 
 
 class GLES3Mark : public IGLES3MarkLib, public IInputListener {
 
     std::unique_ptr<AssetManager> assetManager;
-    Input inputManager;
 	std::unique_ptr<RenderContextT> glContext;
     std::unique_ptr<Scene> scene;
+    Input inputManager;
     Time time;
     FPSCounter fpsCounter;
     BenchmarkStatistics benchStats;
@@ -73,7 +73,7 @@ public:
     	}
     }
     
-    const std::unique_ptr<RenderContextT>& GetContext() override { return glContext; }
+    //const RenderContextT& GetContext() override { return *glContext; }
 
     bool OnInit(void* osWnd, void* ioContext = nullptr) override;
 

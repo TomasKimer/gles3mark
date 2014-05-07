@@ -13,7 +13,7 @@ uniform vec3  lightColor;
 uniform vec3  lightPos;
 uniform float lightSize;
 
-layout (location=0) out vec4 fragColor;
+layout (location=2) out vec4 fragColor;
 
 void main() {
 	vec2 texCoord = gl_FragCoord.xy / viewport;  // map to [0..1]

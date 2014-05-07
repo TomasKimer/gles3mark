@@ -33,7 +33,7 @@ void AssetFile::Close() {
     }
 }
 
-int AssetFile::Read(size_t bytesToRead, void* buffer) {
+int AssetFile::Read(size_t bytesToRead, void* buffer) const {
     int bytesRead = 0;
 
     if (file == nullptr)
@@ -48,7 +48,7 @@ int AssetFile::Read(size_t bytesToRead, void* buffer) {
     return bytesRead;
 }
 
-int AssetFile::Length() {
+int AssetFile::Length() const {
 #ifdef ANDROID
     return AAsset_getLength(file);
 #else

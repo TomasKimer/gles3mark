@@ -16,13 +16,13 @@
 #include "quadrenderer.h"
 #include "keyframeanimation.h"
 #include "materialdatabase.h"
+#include "ssaobuilder.h"
 
 #include <memory>
 #include <string>
 #include <vector>
 #include <cassert>
 
-#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -43,17 +43,16 @@ class Scene {  // public Screen?
     //glBufferData(GL_UNIFORM_BUFFER, sizeof(MatrixUniformBlock), (void*)&mub, GL_STATIC_DRAW);
     // ...
 
-    ShaderProgram* firstPassProgram;
-    ShaderProgram* secondPassProgram;
-    ShaderProgram* screenQuadProgram;
+    std::unique_ptr<ShaderProgram> firstPassProgram, secondPassProgram, screenQuadProgram, ssaoPassProgram;
     Model *modelE112, *modelChairs, *modelDeskMid, *modelDeskSide;
     Mesh meshPointLight;
     QuadRenderer quadRenderer;
     MaterialDatabase materialDatabase;
-    std::vector<Light*> lightDatabase;
+    std::vector<std::unique_ptr<Light>> lightDatabase;
     
-    Framebuffer framebuffer, framebufferSecond;
-    Texture albedoTex, normalTex, depthTex, finalTex;
+    Framebuffer framebuffer;//, framebufferSecond;
+    Texture albedoTex, normalTex, depthTex, finalTex, noiseTex;
+    SSAOBuilder ssaoBuilder;
 
     KeyFrameAnimation cameraAnim;
     
@@ -69,7 +68,7 @@ public:
     Scene(): renderSize(1280, 720), freeCamera(false)  {}
     ~Scene() {}
         
-    bool OnInit(std::unique_ptr<AssetManager>& assetManager, int width, int height);
+    bool OnInit(const AssetManager& assetManager, int width, int height);
     void OnResize(int w, int h);
     bool OnStep(const Time& time);
     void Destroy();

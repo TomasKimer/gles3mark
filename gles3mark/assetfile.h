@@ -26,6 +26,6 @@ public:
 
     void Open(const std::string& fileName);
     void Close();
-    int Read(size_t bytesToRead, void* buffer);
-    int Length();
+    int Read(size_t bytesToRead, void* buffer) const;
+    int Length() const;
 };

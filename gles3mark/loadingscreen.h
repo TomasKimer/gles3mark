@@ -7,6 +7,6 @@
 
 class LoadingScreen {  // public Screen
 public:
-    LoadingScreen(std::unique_ptr<AssetManager>& assetManager, int width, int height);
+    LoadingScreen(const AssetManager& assetManager, int width, int height);
     ~LoadingScreen();
 };

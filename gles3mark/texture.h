@@ -54,7 +54,7 @@ public:
         glDeleteTextures(1, &textureObject);    
     }
 
-    void InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLsizei width, GLsizei height, GLint filter = GL_NEAREST, GLint level = 0);
+    void InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLsizei width, GLsizei height, GLint filter = GL_NEAREST, GLint level = 0, const GLvoid* pixels = nullptr);
 
     void FromKTXdata(const std::vector<char>& ktxData);
     void FromBitmapData(const std::vector<char>& rawData, int width, int height);

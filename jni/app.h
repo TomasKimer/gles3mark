@@ -14,7 +14,10 @@ class App : public BaseApp {
 
 	virtual bool OnIdle() override {
 		//if (!glContext->HasDisplay()) return;
-		return gles3mark->OnStep();
+		if (gles3mark)
+			return gles3mark->OnStep();
+		else
+			return true;
 	}
 
 	virtual void OnQuit() override;
