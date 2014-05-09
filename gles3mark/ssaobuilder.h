@@ -20,8 +20,7 @@ class SSAOBuilder {
         std::uniform_real_distribution<float> dist2( 0.0f, 1.0f);
         
         for (unsigned i = 0; i < size; ++i) {
-            kernel[i] = glm::vec3(dist1(mt), dist1(mt), dist2(mt));
-            glm::normalize(kernel[i]);
+            kernel[i] = glm::normalize(glm::vec3(dist1(mt), dist1(mt), dist2(mt)));
 
             // fallof
             float scale = static_cast<float>(i) / size;
@@ -36,8 +35,7 @@ class SSAOBuilder {
         std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
 
         for (unsigned i = 0; i < size * size; ++i) {
-            noise[i] = glm::vec3(dist(mt), dist(mt), 0.0f);
-            glm::normalize(noise[i]);
+            noise[i] = glm::normalize(glm::vec3(dist(mt), dist(mt), 0.0f));
         }
     }
 

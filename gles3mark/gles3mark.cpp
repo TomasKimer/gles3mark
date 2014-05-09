@@ -175,11 +175,8 @@ void GLES3Mark::OnProcessInput() {
     }
 }
 
+// vs destructor?
 void GLES3Mark::OnDestroy() {
     benchStats.EndMeasure();
-
-    //score = benchStats.GetFrameCount();
-    //scene.reset();
-    
-    // vs destructor?
+    scene.reset();
 }

@@ -13,6 +13,7 @@
 #include <ktx.h>
 
 #include "glquery.h"
+#include "glerror.h"
 #include "rendertarget.h"
 #include "log.h"
 
@@ -47,11 +48,11 @@ public:
 
 public:
     Texture(const std::string& path = std::string()) : path(path) {
-        glGenTextures(1, &textureObject);
+        GL_CHECK( glGenTextures(1, &textureObject) );
         maxSize = GLQuery::Get<GLint>(GL_MAX_TEXTURE_SIZE);
     }
     ~Texture() {
-        glDeleteTextures(1, &textureObject);    
+        GL_CHECK( glDeleteTextures(1, &textureObject) );    
     }
 
     void InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLsizei width, GLsizei height, GLint filter = GL_NEAREST, GLint level = 0, const GLvoid* pixels = nullptr);

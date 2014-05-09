@@ -51,8 +51,8 @@ class Scene {  // public Screen?
     std::vector<std::unique_ptr<Light>> lightDatabase;
     
     Framebuffer framebuffer;//, framebufferSecond;
-    Texture albedoTex, normalTex, depthTex, finalTex, noiseTex;
-    SSAOBuilder ssaoBuilder;
+    Texture albedoTex, normalTex, depthTex, finalTex;//, noiseTex;
+    //SSAOBuilder ssaoBuilder;
 
     KeyFrameAnimation cameraAnim;
     

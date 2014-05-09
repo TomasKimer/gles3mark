@@ -28,6 +28,7 @@ void main() {
     }
     	
 	normalVS = mat3(view) * mat3(modelMat) * vertexNormal;
+    //normalVS = normalize((view * model * vec4(vertexNormal, 0.0)).xyz);
     coord = vertexTextureCoord;
     
     gl_Position = projection * view * modelMat * vec4(vertexPosition, 1);

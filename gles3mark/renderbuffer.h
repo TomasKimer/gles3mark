@@ -15,13 +15,13 @@ class RenderBuffer : public RenderTarget {
 
 public:
     RenderBuffer() {
-        glGenRenderbuffers(1, &rb);
+        GL_CHECK( glGenRenderbuffers(1, &rb) );
         maxSize = GLQuery::Get<GLint>(GL_MAX_RENDERBUFFER_SIZE);
         maxSamples = GLQuery::Get<GLint>(GL_MAX_SAMPLES);
     }
 
     ~RenderBuffer() {
-        glDeleteRenderbuffers(1, &rb);
+        GL_CHECK( glDeleteRenderbuffers(1, &rb) );
     }
 
     void InitStorage(GLenum internalFormat, GLsizei width, GLsizei height, GLsizei samples = 0) {
@@ -29,11 +29,11 @@ public:
         if (width > maxSize) width = maxSize;
         if (height > maxSize) height = maxSize;
         
-        glBindRenderbuffer(GL_RENDERBUFFER, rb);
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internalFormat, width, height);
+        GL_CHECK( glBindRenderbuffer(GL_RENDERBUFFER, rb) );
+        GL_CHECK( glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internalFormat, width, height) );
     }
 
-    /*void Bind() {
-        glBindRenderbuffer(GL_RENDERBUFFER, rb);
-    }*/
+    void Bind() {
+        GL_CHECK( glBindRenderbuffer(GL_RENDERBUFFER, rb) );
+    }
 };

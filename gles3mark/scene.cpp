@@ -117,19 +117,19 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
     ssaoPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/ssaopass.vert"),
                                                                        assetManager.LoadText("shaders/ssaopass.frag")));
     ssaoPassProgram->AddUniform("invProj");
-    ssaoPassProgram->AddUniform("projection");
-    ssaoPassProgram->AddUniform("kernel");
+    //ssaoPassProgram->AddUniform("projection");
+    //ssaoPassProgram->AddUniform("kernel");
     
     ssaoPassProgram->AddUniform("albedoTex");
     ssaoPassProgram->AddUniform("normalVStex");
     ssaoPassProgram->AddUniform("depthTex");
-    ssaoPassProgram->AddUniform("noiseTex");
+    //ssaoPassProgram->AddUniform("noiseTex");
 
     ssaoPassProgram->Use();
     ssaoPassProgram->SetUniform("albedoTex", 0);
     ssaoPassProgram->SetUniform("normalVStex", 1);
     ssaoPassProgram->SetUniform("depthTex", 2);
-    ssaoPassProgram->SetUniform("noiseTex", 3);
+    //ssaoPassProgram->SetUniform("noiseTex", 3);
 
     //noiseTex.FromBitmapData()
     //CreateTextureGL(SSAO_NOISE_SIZE, SSAO_NOISE_SIZE, GL_RGB32F, GL_RGB, GL_FLOAT, GL_NEAREST, &noise[0].x);
@@ -142,7 +142,7 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
     normalTex.InitStorage(GL_RGB16F           , GL_RGB            , GL_FLOAT        , renderSize.x, renderSize.y           );  // TODO encode GL_RG16F, GL_RG
     depthTex .InitStorage(GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT , renderSize.x, renderSize.y           );
     finalTex .InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y, GL_LINEAR);
-    noiseTex .InitStorage(GL_RGB16F           , GL_RGB            , GL_FLOAT        , ssaoBuilder.KERNEL_SIZE, ssaoBuilder.KERNEL_SIZE, GL_NEAREST, 0, &(ssaoBuilder.GetNoise()[0].x));
+//    noiseTex .InitStorage(GL_RGB16F           , GL_RGB            , GL_FLOAT        , ssaoBuilder.KERNEL_SIZE, ssaoBuilder.KERNEL_SIZE, GL_NEAREST, 0, &(ssaoBuilder.GetNoise()[0].x));
 
     // --------------------------------------------
     // ------------- framebuffers setup -----------
@@ -239,13 +239,13 @@ bool Scene::OnStep(const Time& time) {
     
     ssaoPassProgram->Use();    
     ssaoPassProgram->SetUniform("invProj", projectionInv);
-    ssaoPassProgram->SetUniform("projection", projection);
-    ssaoPassProgram->SetUniform("kernel", ssaoBuilder.GetKernel());
+    //ssaoPassProgram->SetUniform("projection", projection);
+    //ssaoPassProgram->SetUniform("kernel", ssaoBuilder.GetKernel());
 
     albedoTex.Bind(GL_TEXTURE0);
     normalTex.Bind(GL_TEXTURE1);    
     depthTex .Bind(GL_TEXTURE2);
-    noiseTex .Bind(GL_TEXTURE3);
+    //noiseTex .Bind(GL_TEXTURE3);
     
     quadRenderer.Render(0.0f, 0.0f, 2.0f);
     
@@ -325,10 +325,6 @@ bool Scene::OnStep(const Time& time) {
 }
 
 void Scene::Destroy() {
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
     delete modelE112;
     delete modelChairs;
     delete modelDeskMid;

@@ -23,8 +23,8 @@ public:
 
         shaderProgram = linkShader({vertexShader, fragmentShader});
 
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+        GL_CHECK( glDeleteShader(vertexShader) );
+        GL_CHECK( glDeleteShader(fragmentShader) );
     }
 
     ShaderProgram(GLuint vertexShader, GLuint fragmentShader) {
@@ -32,8 +32,8 @@ public:
     }
     
     ~ShaderProgram() {
-        glUseProgram(0);
-        glDeleteProgram(shaderProgram);
+        GL_CHECK( glUseProgram(0) );
+        GL_CHECK( glDeleteProgram(shaderProgram) );
     }
 
     void Use() const {
@@ -41,7 +41,7 @@ public:
     }
 
     void AddUniform(const std::string& name) {
-         GL_CHECK( uniforms[name] = glGetUniformLocation(shaderProgram, name.c_str()) );    
+        GL_CHECK( uniforms[name] = glGetUniformLocation(shaderProgram, name.c_str()) );    
     }
 
     GLuint GetUniform(const std::string& name) const {    

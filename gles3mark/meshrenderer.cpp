@@ -8,8 +8,8 @@ void MeshRenderer::Init(Mesh* mesh) {
     this->owner = mesh;
     
     // Copy data to graphics card
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    GL_CHECK( glGenBuffers(1, &VBO) );
+    GL_CHECK( glBindBuffer(GL_ARRAY_BUFFER, VBO) );
     GL_CHECK( glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(VboEntry), nullptr, GL_STATIC_DRAW) );
 
     for (size_t i = 0; i < mesh->vertices.size(); ++i) {
@@ -19,8 +19,8 @@ void MeshRenderer::Init(Mesh* mesh) {
     }
     
     // setup vbo for index buffer
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    GL_CHECK( glGenBuffers(1, &EBO) );
+    GL_CHECK( glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO) );
     GL_CHECK( glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->faces.size()*sizeof(glm::ivec3), &mesh->faces[0].x, GL_STATIC_DRAW) );
 
 
@@ -28,11 +28,11 @@ void MeshRenderer::Init(Mesh* mesh) {
     // Narozdil od VBO neukladaji data o vrcholech (pozice, normala, ...), ale ukladaji reference na VBO a nastaveni atributu.
     // VAO usnadnuji a urychluji vykreslovani. Pro vykresleni staci aktivovat VAO a ten si pamatuje veskere nastaveni.
     // subsequent calls that change the vertex array state (glBindBuffer, glVertexAttribPointer, glEnableVertexAttribArray, and glDisableVertexAttribArray) will affect the new VAO.
-    glGenVertexArrays(1, &VAO);  // TODO VAO + UBO pro kazdy mesh?
-    glBindVertexArray(VAO);
+    GL_CHECK( glGenVertexArrays(1, &VAO) );  // TODO VAO + UBO pro kazdy mesh?
+    GL_CHECK( glBindVertexArray(VAO) );
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    GL_CHECK( glBindBuffer(GL_ARRAY_BUFFER, VBO) );
+    GL_CHECK( glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO) );
 
     // setup vertex shader attribute bindings (connecting current <position and tc> buffer to associated 'in' variable in vertex shader)
     GL_CHECK( glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (const GLvoid*)offsetof(VboEntry, pos     )) );
@@ -40,12 +40,12 @@ void MeshRenderer::Init(Mesh* mesh) {
     GL_CHECK( glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VboEntry), (const GLvoid*)offsetof(VboEntry, texcoord)) );
 
     // enable vertex buffers
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
+    GL_CHECK( glEnableVertexAttribArray(0) );
+    GL_CHECK( glEnableVertexAttribArray(1) );
+    GL_CHECK( glEnableVertexAttribArray(2) );
 
     // unbind VAO
-    glBindVertexArray(0);
+    GL_CHECK( glBindVertexArray(0) );
 
     elementsCount = mesh->faces.size() * 3;
 }
@@ -60,24 +60,24 @@ void MeshRenderer::InitInstanceData(const std::vector<glm::mat4>& data) {
 GLuint MeshRenderer::AllocInstanceData(const std::vector<glm::mat4>& data) {
     GLuint instanceVBO;
     
-    glGenBuffers(1, &instanceVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::mat4), &data[0], GL_STATIC_DRAW);
+    GL_CHECK( glGenBuffers(1, &instanceVBO) );
+    GL_CHECK( glBindBuffer(GL_ARRAY_BUFFER, instanceVBO) );
+    GL_CHECK( glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::mat4), &data[0], GL_STATIC_DRAW) );
 
     return instanceVBO;
 }
 
 void MeshRenderer::AttachInstanceData(GLuint location, GLuint instanceVBO) {
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    GL_CHECK( glBindVertexArray(VAO) );
+    GL_CHECK( glBindBuffer(GL_ARRAY_BUFFER, instanceVBO) );
     
     for (unsigned i = 0; i < 4; ++i) {
-        glEnableVertexAttribArray(location + i);
-        glVertexAttribPointer    (location + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (const GLvoid*)(sizeof(glm::vec4) * i));
-        glVertexAttribDivisor    (location + i, 1);
+        GL_CHECK( glEnableVertexAttribArray(location + i) );
+        GL_CHECK( glVertexAttribPointer    (location + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (const GLvoid*)(sizeof(glm::vec4) * i)) );
+        GL_CHECK( glVertexAttribDivisor    (location + i, 1) );
     }
 
-    glBindVertexArray(0);
+    GL_CHECK( glBindVertexArray(0) );
 }
 
 void MeshRenderer::PreRender(const ShaderProgram& shader, const Material& material, const glm::mat4& parent) {
@@ -90,22 +90,22 @@ void MeshRenderer::PreRender(const ShaderProgram& shader, const Material& materi
 }
 
 void MeshRenderer::Render() {
-    glBindVertexArray(VAO);
+    GL_CHECK( glBindVertexArray(VAO) );
     GL_CHECK( glDrawElements(GL_TRIANGLES, elementsCount, GL_UNSIGNED_INT, nullptr) );
-    glBindVertexArray(0);
+    GL_CHECK( glBindVertexArray(0) );
 }
 
 void MeshRenderer::RenderInstanced(int count) {
-    glBindVertexArray(VAO);
+    GL_CHECK( glBindVertexArray(VAO) );
     GL_CHECK( glDrawElementsInstanced(GL_TRIANGLES, elementsCount, GL_UNSIGNED_INT, nullptr, count) );
-    glBindVertexArray(0);
+    GL_CHECK( glBindVertexArray(0) );
 }
 
 void MeshRenderer::Destroy() {
     if (instanceVBO)
-        glDeleteBuffers(1, &instanceVBO);
+        GL_CHECK( glDeleteBuffers(1, &instanceVBO) );
     
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-    glDeleteVertexArrays(1, &VAO);
+    GL_CHECK( glDeleteBuffers(1, &VBO) );
+    GL_CHECK( glDeleteBuffers(1, &EBO) );
+    GL_CHECK( glDeleteVertexArrays(1, &VAO) );
 }

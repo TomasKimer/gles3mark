@@ -1,7 +1,6 @@
 
 #include <sstream>
 #include "texture.h"
-#include "glerror.h"
 
 void Texture::InitStorage(GLenum internalFormat, GLenum format, GLenum type, GLsizei width, GLsizei height, GLint filter, GLint level, const GLvoid* pixels) {
     target = GL_TEXTURE_2D;
@@ -63,8 +62,8 @@ void Texture::FromBitmapData(const std::vector<char>& rawData, int width, int he
 		minFilter = GL_LINEAR_MIPMAP_LINEAR;
 	}
 
-	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
-	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	GL_CHECK( glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter) );
+	GL_CHECK( glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR) );
 }
 
 void Texture::Bind(GLenum textureUnit) {
