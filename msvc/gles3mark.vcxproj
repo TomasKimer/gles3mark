@@ -11,14 +11,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\assets\shaders\firstpass.frag" />
-    <None Include="..\assets\shaders\firstpass.vert" />
-    <None Include="..\assets\shaders\screenquad.frag" />
-    <None Include="..\assets\shaders\screenquad.vert" />
-    <None Include="..\assets\shaders\secondpass.frag" />
-    <None Include="..\assets\shaders\secondpass.vert" />
-    <None Include="..\assets\shaders\ssaopass.frag" />
-    <None Include="..\assets\shaders\ssaopass.vert" />
+    <None Include="..\assets\shaders\geometrypass-fs.glsl" />
+    <None Include="..\assets\shaders\geometrypass-vs.glsl" />
+    <None Include="..\assets\shaders\screenquad-fs.glsl" />
+    <None Include="..\assets\shaders\screenquad-vs.glsl" />
+    <None Include="..\assets\shaders\lightpass-fs.glsl" />
+    <None Include="..\assets\shaders\lightpass-vs.glsl" />
+    <None Include="..\assets\shaders\shadowpass-fs.glsl" />
+    <None Include="..\assets\shaders\shadowpass-vs.glsl" />
+    <None Include="..\assets\shaders\ssaopass-fs.glsl" />
+    <None Include="..\assets\shaders\ssaopass-vs.glsl" />
     <None Include="gles3mark_dll.def" />
   </ItemGroup>
   <ItemGroup>
@@ -26,6 +28,7 @@
     <ClInclude Include="..\gles3mark\assetmanager.h" />
     <ClInclude Include="..\gles3mark\benchmarkstatistics.h" />
     <ClInclude Include="..\gles3mark\camera.h" />
+    <ClInclude Include="..\gles3mark\igles3marklib.h" />
     <ClInclude Include="..\gles3mark\instancedatabuilder.h" />
     <ClInclude Include="..\gles3mark\loadingscreen.h" />
     <ClInclude Include="..\gles3mark\logconsole.h" />
@@ -46,7 +49,6 @@
     <ClInclude Include="..\gles3mark\rendertarget.h" />
     <ClInclude Include="..\gles3mark\scene.h" />
     <ClInclude Include="..\gles3mark\materialdatabase.h" />
-    <ClInclude Include="..\gles3mark\ssaobuilder.h" />
     <ClInclude Include="..\gles3mark\statsbuilder_json.h" />
     <ClInclude Include="..\gles3mark\texture.h" />
     <ClInclude Include="..\gles3mark\input.h" />
@@ -59,7 +61,6 @@
     <ClInclude Include="..\gles3mark\sceneimporter.h" />
     <ClInclude Include="..\gles3mark\shaderprogram.h" />
     <ClInclude Include="..\gles3mark\time.h" />
-    <ClInclude Include="..\gles3mark\transform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\gles3mark\assetfile.cpp" />
@@ -67,6 +68,8 @@
     <ClCompile Include="..\gles3mark\camera.cpp" />
     <ClCompile Include="..\gles3mark\framebuffer.cpp" />
     <ClCompile Include="..\gles3mark\gl3stub_egl.c" />
+    <ClCompile Include="..\gles3mark\glerror.cpp" />
+    <ClCompile Include="..\gles3mark\instancedatabuilder.cpp" />
     <ClCompile Include="..\gles3mark\keyframeanimation.cpp" />
     <ClCompile Include="..\gles3mark\loadingscreen.cpp" />
     <ClCompile Include="..\gles3mark\logconsole.cpp" />

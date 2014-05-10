@@ -131,6 +131,6 @@ void Log::logMsg(const std::string & msg, Severity severity) {
     		break;
     }
 
-    __android_log_print(iseverity, TAG, "%s", msg.c_str());
+    __android_log_print(iseverity, TAG, "%s", msg.c_str());  // TODO ifdef debug
 #endif
 }

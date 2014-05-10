@@ -1,6 +1,18 @@
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/constants.hpp>
 
 #include "camera.h"
+
+Camera::Camera(float fovy, float aspect, float zNear, float zFar, const glm::vec4 backgroundColor)
+    : fovY(glm::radians(fovy)), aspect(aspect), nearClipPlane(zNear), farClipPlane(zFar), backgroundColor(backgroundColor), orthographic(false) {
+    Reset();
+    Perspective();
+}
+
+Camera::~Camera() {
+
+}
 
 void Camera::Reset() {
     up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -14,43 +26,49 @@ void Camera::Reset() {
 }
 
 void Camera::Move(glm::vec3 vec) {
-    glm::vec3 dir = glm::normalize(target); // posunout o z-nasobek smeru pohledu
+    glm::vec3 dir = glm::normalize(target); // posunuti o z-nasobek smeru pohledu
     eye += dir * vec.z;
 
-    glm::vec3 r = glm::normalize(target); // posunout do strany o x-nasobek right vektoru
+    glm::vec3 r = glm::normalize(target);   // posunuti do strany o x-nasobek right vektoru
     r = glm::cross(-r, up);
     eye += r * vec.x;
 
-    eye.y += vec.y; // pouze stoupani ci klesani
+    eye.y += vec.y;                         // pouze stoupani ci klesani
 
     LookAt(eye, target + eye);
 }
 
 void Camera::Aim(float verticalAngle, float horizontalAngle) {
-    angleHoriz += horizontalAngle; // kamera se bude otacet po jednotkove kouli
+    angleHoriz += horizontalAngle;    // otaceni po jednotkove kouli
     angleVert  += verticalAngle;
 
-    float f_pi_2 = glm::half_pi<float>();
+    float halfPI = glm::half_pi<float>();
 
-    // osetrit pretaceni pres hlavu a pod nohama
-    // pridat korekci, protoze pokud je target shodny s up vektorem, ma LookAt nedefinovane chovani
-    if (angleVert >= f_pi_2)
-        angleVert = f_pi_2 - 0.0001f;
-    if (angleVert <= -f_pi_2)
-        angleVert = -f_pi_2 + 0.0001f;
+    // omezeni pretaceni pres hlavu a pod nohama + korekce (target == up -> undefined lookAt)
+    if (angleVert >=  halfPI) angleVert =  halfPI - 0.0001f;
+    if (angleVert <= -halfPI) angleVert = -halfPI + 0.0001f;
 
-    float l_phi = f_pi_2 - angleHoriz; // uhly sferickych souradnic jsou velke a male fi
-    float u_phi = f_pi_2 - angleVert;
+    float hPhi = halfPI - angleHoriz; // uhly sferickych souradnic
+    float vPhi = halfPI - angleVert;
 
-    target = glm::vec3(sin(u_phi) * cos(l_phi),
-                       cos(u_phi),
-                       sin(u_phi) * sin(l_phi));
+    float hPhiSin = glm::sin(hPhi);
+    float hPhiCos = glm::cos(hPhi);
+
+    float vPhiSin = glm::sin(vPhi);
+    float vPhiCos = glm::cos(vPhi);
+
+    target = glm::vec3(vPhiSin * hPhiCos, vPhiCos, vPhiSin * hPhiSin);
 
     LookAt(eye, target + eye);
 }
 
+void Camera::LookAt(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up) {
+    this->eye = eye;
+    view = glm::lookAt(eye, target, up);
+}
+
 void Camera::Perspective(float fovy, float aspect, float zNear, float zFar) {
-    ortographic = false;
+    orthographic = false;
     nearClipPlane = zNear;
     farClipPlane = zFar;
     fovY = fovy;
@@ -59,10 +77,21 @@ void Camera::Perspective(float fovy, float aspect, float zNear, float zFar) {
     projection = glm::perspective(fovy, aspect, zNear, zFar);
 }
 
+void Camera::Perspective() {
+    projection = glm::perspective(fovY, aspect, nearClipPlane, farClipPlane);
+}
+
 void Camera::Orthographic(float left, float right, float bottom, float top, float zNear, float zFar) {
-    ortographic = true;
+    orthographic = true;
     nearClipPlane = zNear;
     farClipPlane = zFar;
     
     projection = glm::ortho(left, right, bottom, top, zNear, zFar);
+}
+
+void Camera::UpdateAspect(float aspect) {
+    if (!orthographic) {
+        this->aspect = aspect;
+        Perspective();
+    }   
 }

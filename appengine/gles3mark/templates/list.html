@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block description %}Bla bla bla{% endblock %}
+{% block stylesheet %}{{ stylesheet }}{% endblock %}
+
+{% block content %}
+    <h1>
+        {{ title }}
+    </h1>
+
+    {% if message %}
+        <div class="message">
+        {% autoescape false %}
+            <a href="javascript:history.go(0)">Click to refresh the page</a>
+            {{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>
+            {{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>{{ message }}<br>
+        {% endautoescape %}
+        </div>
+    {% endif %}
+{% endblock %}

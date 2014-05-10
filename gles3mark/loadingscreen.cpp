@@ -6,8 +6,8 @@
 #include "quadrenderer.h"
 
 LoadingScreen::LoadingScreen(const AssetManager& assetManager, int width, int height) {
-    ShaderProgram screenQuadProgram(assetManager.LoadText("shaders/screenquad.vert"),
-                                    assetManager.LoadText("shaders/screenquad.frag"));
+    ShaderProgram screenQuadProgram(assetManager.LoadText("shaders/screenquad-vs.glsl"),
+                                    assetManager.LoadText("shaders/screenquad-fs.glsl"));
     screenQuadProgram.AddUniform("tex");
 
     Texture texture;

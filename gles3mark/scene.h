@@ -1,49 +1,30 @@
 
-
 #pragma once
-
-#include "log.h"
-#include "assetmanager.h"
-#include "sceneimporter.h"
-#include "camera.h"
-#include "glerror.h"
-#include "time.h"
-#include "texture.h"
-#include "meshrenderer.h"
-#include "shaderprogram.h"
-#include "glquery.h"
-#include "framebuffer.h"
-#include "quadrenderer.h"
-#include "keyframeanimation.h"
-#include "materialdatabase.h"
-#include "ssaobuilder.h"
 
 #include <memory>
 #include <string>
 #include <vector>
-#include <cassert>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include "assetmanager.h"
+#include "model.h"
+#include "light.h"
+#include "camera.h"
+#include "time.h"
+#include "texture.h"
+#include "shaderprogram.h"
+#include "framebuffer.h"
+#include "quadrenderer.h"
+#include "keyframeanimation.h"
+#include "materialdatabase.h"
 
 class Scene {  // public Screen?
     friend class GLES3Mark;
 
-    // layout (std140) uniform MatrixUniformBlock
-    //struct MatrixUniformBlock {
-    //    glm::mat4 projection;
-    //    glm::mat4 view;
-    //    glm::mat4 model;
-    //} mub;
-    //GLuint matrixUniformBuffer;
-    //glBindBuffer(GL_UNIFORM_BUFFER, matrixUniformBuffer);
-    //glBufferSubData(GL_UNIFORM_BUFFER, offsetof(MatrixUniformBlock, model), sizeof(glm::mat4), glm::value_ptr(mub.model));
-    //glBufferData(GL_UNIFORM_BUFFER, sizeof(MatrixUniformBlock), (void*)&mub, GL_STATIC_DRAW);
-    // ...
-
-    std::unique_ptr<ShaderProgram> firstPassProgram, secondPassProgram, screenQuadProgram, ssaoPassProgram;
+    std::unique_ptr<ShaderProgram> shadowPassProgram, geometryPassProgram, ssaoPassProgram, lightPassProgram, screenQuadProgram; 
     Model *modelE112, *modelChairs, *modelDeskMid, *modelDeskSide;
     Mesh meshPointLight;
     QuadRenderer quadRenderer;
@@ -51,21 +32,16 @@ class Scene {  // public Screen?
     std::vector<std::unique_ptr<Light>> lightDatabase;
     
     Framebuffer framebuffer;//, framebufferSecond;
-    Texture albedoTex, normalTex, depthTex, finalTex;//, noiseTex;
-    //SSAOBuilder ssaoBuilder;
+    Texture albedoTex, normalTex, depthTex, finalTex;
 
     KeyFrameAnimation cameraAnim;
     
-    //glm::quat rot;
-    //Transform testTrans;
-
     glm::ivec2 screenSize, renderSize;
     Camera camera;
     bool freeCamera;
     
 public:    
-    // TODO adjust renderWidth/height with aspect ration? 16:9 vs 16:10?
-    Scene(): renderSize(1280, 720), freeCamera(false)  {}
+    Scene(): renderSize(1280, 720), freeCamera(false), camera(60.0f, 16.0f/9.0f, 1.0f, 256.0f, glm::vec4(0.5f, 0.5f, 1.f, 1.f))  {}
     ~Scene() {}
         
     bool OnInit(const AssetManager& assetManager, int width, int height);

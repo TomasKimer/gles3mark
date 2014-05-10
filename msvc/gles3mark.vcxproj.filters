@@ -21,28 +21,34 @@
     <None Include="gles3mark_dll.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\assets\shaders\firstpass.frag">
+    <None Include="..\assets\shaders\screenquad-fs.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="..\assets\shaders\firstpass.vert">
+    <None Include="..\assets\shaders\screenquad-vs.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="..\assets\shaders\secondpass.frag">
+    <None Include="..\assets\shaders\ssaopass-fs.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="..\assets\shaders\secondpass.vert">
+    <None Include="..\assets\shaders\ssaopass-vs.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="..\assets\shaders\screenquad.frag">
+    <None Include="..\assets\shaders\geometrypass-fs.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="..\assets\shaders\screenquad.vert">
+    <None Include="..\assets\shaders\geometrypass-vs.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="..\assets\shaders\ssaopass.frag">
+    <None Include="..\assets\shaders\lightpass-fs.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="..\assets\shaders\ssaopass.vert">
+    <None Include="..\assets\shaders\lightpass-vs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\assets\shaders\shadowpass-fs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\assets\shaders\shadowpass-vs.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>
@@ -69,9 +75,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gles3mark\time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gles3mark\transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gles3mark\model.h">
@@ -158,7 +161,7 @@
     <ClInclude Include="..\gles3mark\instancedatabuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gles3mark\ssaobuilder.h">
+    <ClInclude Include="..\gles3mark\igles3marklib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -224,6 +227,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gles3mark\loadingscreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gles3mark\instancedatabuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gles3mark\glerror.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

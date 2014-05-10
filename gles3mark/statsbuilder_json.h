@@ -29,6 +29,18 @@ public:
 
     JSONStatsBuilder& BuildGLinfo() {
         //result << 42;//GLQuery::RENDERER();
+                // display some GL info
+        //"GL_VENDOR: "                   + GLQuery::Get<std::string>(GL_VENDOR);
+        //"GL_RENDERER: "                 + GLQuery::Get<std::string>(GL_RENDERER);
+        //"GL_VERSION: "                  + GLQuery::Get<std::string>(GL_VERSION);
+        //"GL_SHADING_LANGUAGE_VERSION: " + GLQuery::Get<std::string>(GL_SHADING_LANGUAGE_VERSION);
+
+        //"Max render buffer size: " << GLQuery::Get<GLint>(GL_MAX_RENDERBUFFER_SIZE) << ", max samples: " << GLQuery::Get<GLint>(GL_MAX_SAMPLES);  // min 2048
+        //"Max texture size: " << GLQuery::Get<GLint>(GL_MAX_TEXTURE_SIZE); // min 2048
+        //std::vector<GLint> maxDims = GLQuery::Get<GLint>(GL_MAX_VIEWPORT_DIMS, 2);
+        //"Max viewport dims: " << maxDims[0] << "x" << maxDims[1];
+        //"Max color attachments: " << GLQuery::Get<GLint>(GL_MAX_COLOR_ATTACHMENTS); // min 4
+        //"Max vertex attributes: " << GLQuery::Get<GLint>(GL_MAX_VERTEX_ATTRIBS); 
 
         return *this;
     }

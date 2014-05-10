@@ -20,13 +20,11 @@ BaseApp::BaseApp(android_app* _state)
 
 	// We are starting with a previous saved state; restore from it.
 	if (state->savedState != nullptr) {
-		savedState = *(Point*)state->savedState;
-		Log::Stream() << "State loaded: x: " << savedState.x << ", y: " << savedState.y;
+		//savedState = *(Point*)state->savedState;
+		//Log::Stream() << "State loaded: x: " << savedState.x << ", y: " << savedState.y;
 	}
 
 	jniLink = std::unique_ptr<JNILink>(new JNILink(state));
-
-	//state->activity->internalDataPath;
 }
 
 void BaseApp::Run() {
@@ -55,7 +53,6 @@ void BaseApp::Run() {
 				Log::Msg("LOOPER DESTROY REQUESTED"); // Quit our app stuff here
 
 				//animating = false;
-				//showToast("Exiting");
 
 				// detach from current thread (when thread exists) - else error: "native thread exited without detaching"
 				jniLink.reset();
@@ -85,7 +82,6 @@ void BaseApp::Run() {
 /**
  * Process the next input event.
  */
-// TODO float !!!
 int32_t BaseApp::HandleInput(AInputEvent* event) {
 	if (quit)
 		return 1;
@@ -162,14 +158,8 @@ void BaseApp::HandleCommand(int32_t cmd) {
 	case APP_CMD_INIT_WINDOW: // The window is being shown, get it ready.
 		Log::Msg("APP_CMD_INIT_WINDOW");
 		if (state->window) {
-			//if (!gles3mark)
-			//	gles3mark = new GLES3Mark();
 			OnInit();
-
-    		//gles3mark->OnResize(gles3mark->GetContext()->GetWidth(), gles3mark->GetContext()->GetHeight());
-			//glContext->Create(state->window);
 			animating = true;
-
 			//OnIdle();
 		}
 		break;
@@ -182,7 +172,6 @@ void BaseApp::HandleCommand(int32_t cmd) {
 	*/
 	case APP_CMD_TERM_WINDOW:   //The window is being hidden or closed, clean it up.
 		Log::Msg("APP_CMD_TERM_WINDOW");
-		//glContext->Destroy();
 		OnDestroy();
 		animating = false;
 		break;
@@ -203,7 +192,6 @@ void BaseApp::HandleCommand(int32_t cmd) {
 	case APP_CMD_LOST_FOCUS: // When our app loses focus, we stop monitoring the accelerometer. This is to avoid consuming battery while not being used.
 		Log::Msg("APP_CMD_LOST_FOCUS");
 		animating = false; // Also stop animating.
-		//OnIdle();
 		break;
 
 	/**
@@ -215,10 +203,9 @@ void BaseApp::HandleCommand(int32_t cmd) {
 	 */
 	case APP_CMD_SAVE_STATE:
 		Log::Msg("APP_CMD_SAVE_STATE");
-		state->savedState = malloc(sizeof(Point));
-		*((Point*)state->savedState) = savedState;
-		state->savedStateSize = sizeof(Point);
-		//Log::Stream() << "State saved: x: " << savedState.x << ", y: " << savedState.y;
+		//state->savedState = malloc(sizeof(Point));
+		//*((Point*)state->savedState) = savedState;
+		//state->savedStateSize = sizeof(Point);
 		break;
 
 	/**
@@ -328,18 +315,3 @@ int32_t BaseApp::handle_input(android_app* app, AInputEvent* event) {
 	return me->HandleInput(event);
 }
 
-// JNI is running the equivalent of the following Java code: activity.showToastAlert(text);
-bool BaseApp::showToast(const std::string& text) {
-	jmethodID showToastAlert = jniLink->GetMethodID("showToastAlert", JNI_STRING_SIGNATURE);
-	jstring jniText = jniLink->NewStringUTF(text);
-	jniLink->CallVoidMethod(showToastAlert, jniText);
-	jniLink->DeleteLocalRef(jniText);
-
-	// Check nvidia's own native_app_glue implementation for encapsulation
-/*		jstring jniText = mApp->appThreadEnv->NewStringUTF(text);   				        EXCEPTION_RETURN(mApp->appThreadEnv);
-    jclass thisClass = mApp->appThreadEnv->GetObjectClass(mApp->appThreadThis);         EXCEPTION_RETURN(mApp->appThreadEnv);
-	jmethodID showToastAlert = mApp->appThreadEnv->GetMethodID(thisClass, "showToastAlert", "(Ljava/lang/String;)V"); EXCEPTION_RETURN(mApp->appThreadEnv);
-	mApp->appThreadEnv->CallVoidMethod(mApp->appThreadThis, showToastAlert, jniText); 	EXCEPTION_RETURN(mApp->appThreadEnv);
-*/
-	return true;
-}

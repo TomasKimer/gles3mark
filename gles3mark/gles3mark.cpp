@@ -1,6 +1,27 @@
 
+#include <stdexcept>
+#include <thread>
+
 #include "gles3mark.h"
+#include "log.h"
 #include "loadingscreen.h"
+#include "statsbuilder_json.h"
+
+GLES3Mark::GLES3Mark() : quit(false), vsync(false), movePointerId(-2), aimPointerId(-2) {
+#ifndef _DEBUG
+    Log::Create(); // console will be below the main window
+#endif      
+
+#ifdef ANDROID
+    //vsync = true;
+#endif
+}
+
+GLES3Mark::~GLES3Mark() {
+    if (glContext) {
+		glContext->Destroy();
+	}
+}
 
 bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
 	try {
@@ -25,9 +46,8 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
         std::vector<GLint> maxDims = GLQuery::Get<GLint>(GL_MAX_VIEWPORT_DIMS, 2);
         Log::D() << "Max viewport dims: " << maxDims[0] << "x" << maxDims[1];
         Log::D() << "Max color attachments: " << GLQuery::Get<GLint>(GL_MAX_COLOR_ATTACHMENTS); // min 4
-        Log::D() << "Max vertex attributes: " << GLQuery::Get<GLint>(GL_MAX_VERTEX_ATTRIBS);
-        
-        //Log::D() << "C++ ver: " << (long)__cplusplus;
+        Log::D() << "Max vertex attributes: " << GLQuery::Get<GLint>(GL_MAX_VERTEX_ATTRIBS);        
+
 
         scene = std::unique_ptr<Scene>(new Scene());
         scene->OnInit(*assetManager, glContext->GetWidth(), glContext->GetHeight());
@@ -46,6 +66,77 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
     return true;
 }
 
+void GLES3Mark::OnResize(int w, int h) {
+    if (glContext) {
+        glContext->Resize(w, h);
+        scene->OnResize(w, h);            
+    }
+    Log::V() << "Resize: " << w << "x" << h; // TODO
+}
+
+bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") / messagebox
+    //if (!glContext->HasDisplay()) return;
+    if (quit) {
+        OnDestroy();
+        return false;
+    }
+    
+    time.Update();
+    if (time.RealTimeSinceStartup() > 1.0f) {
+        fpsCounter.Update(time.DeltaTime());
+        if (fpsCounter.JustUpdated())
+            Log::V() << "SPF [ms] " << time << " | FPS " << fpsCounter;
+    }
+
+    benchStats.OnFrame(time.DeltaTime());
+
+    OnProcessInput();
+    if (joystickMove.x != 0.f || joystickMove.z != 0.f)
+        scene->camera.Move(joystickMove * time.DeltaTime());
+
+    if (!scene->OnStep(time))
+        quit = true;
+
+    //std::this_thread::sleep_for(std::chrono::milliseconds(40));
+
+    glContext->Swap();
+
+    return true;
+}
+
+// vs destructor?
+void GLES3Mark::OnDestroy() {
+    benchStats.EndMeasure();
+    scene.reset();
+}
+
+std::string GLES3Mark::GetResultJSON() {
+    JSONStatsBuilder jsb;
+    return jsb.BuildBenchStatsInfo(benchStats).BuildGLinfo().Build();  //jsb.GetResultJSON(benchStats);
+}
+
+void GLES3Mark::OnProcessInput() {
+    float step = time.DeltaTime() * 100.0f;
+
+    float x = -((-1.0f * inputManager.IsKeyDown(Input::KeyCode::A)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::D))) * step;
+    float z =  ((-1.0f * inputManager.IsKeyDown(Input::KeyCode::S)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::W))) * step;
+    
+    if (x != 0.f || z != 0.f)
+        scene->camera.Move(glm::vec3(x, 0, z));
+
+    glm::vec3 lightMove;
+
+    if (inputManager.IsKeyDown(Input::KeyCode::Up   )) lightMove.y =  0.1f;
+    if (inputManager.IsKeyDown(Input::KeyCode::Down )) lightMove.y = -0.1f;
+    if (inputManager.IsKeyDown(Input::KeyCode::Left )) lightMove.z =  0.1f;
+    if (inputManager.IsKeyDown(Input::KeyCode::Right)) lightMove.z = -0.1f;
+
+    if (lightMove != glm::vec3(0)) {
+        for (std::unique_ptr<Light>& l : scene->lightDatabase) {
+            l->Move(lightMove);
+        }
+    }
+}
 
 void GLES3Mark::OnKeyDown(Input::KeyCode keyCode) {   // TODO rename to keyPress
     inputManager.RegisterKeyDown(keyCode);
@@ -79,11 +170,13 @@ void GLES3Mark::OnKeyUp(Input::KeyCode keyCode) {
 void GLES3Mark::OnTouchDown(int screenX, int screenY, int pointer, Input::Button button) {
     if (pointer == -1) return;
     
+//#ifdef _DEBUG // NDEBUG
     if (screenX > 0 && screenX < 100 && screenY > 0 && screenY < 100)
         quit = true;
 
     if (screenX > glContext->GetWidth() - 100 && screenY > 0 && screenY < 100)
         scene->freeCamera = !scene->freeCamera;
+//#endif
 
     if (screenX < glContext->GetWidth() / 2) {
         movePointerId = pointer;
@@ -112,71 +205,4 @@ void GLES3Mark::OnTouchDragged(int x, int y, int dx, int dy, int pointer) {
     else if (dx != 0 || dy != 0) {
         scene->camera.Aim(-dy * 0.005f, -dx * 0.005f);  // 0.0025
     }
-}
-
-void GLES3Mark::OnResize(int w, int h) {
-    if (glContext) {
-        glContext->Resize(w, h);
-        scene->OnResize(w, h);            
-    }
-    Log::V() << "Resize: " << w << "x" << h; // TODO
-}
-
-
-bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") / messagebox
-    if (quit) {
-        OnDestroy();
-        return false;
-    }
-    
-    time.Update();
-    if (time.RealTimeSinceStartup() > 1.5f) {
-        fpsCounter.Update(time.DeltaTime());
-        if (fpsCounter.JustUpdated())
-            Log::V() << "SPF [ms] " << time << " | FPS " << fpsCounter;
-    }
-
-    benchStats.OnFrame(time.DeltaTime());
-
-    OnProcessInput();
-    if (joystickMove.x != 0.f || joystickMove.z != 0.f)
-        scene->camera.Move(joystickMove * time.DeltaTime());
-
-    if (!scene->OnStep(time))
-        quit = true;
-
-    //std::this_thread::sleep_for(std::chrono::milliseconds(40));
-
-    glContext->Swap();
-
-    return true;
-}
-
-void GLES3Mark::OnProcessInput() {
-    float step = time.DeltaTime() * 100.0f;
-
-    float x = -((-1.0f * inputManager.IsKeyDown(Input::KeyCode::A)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::D))) * step;
-    float z =  ((-1.0f * inputManager.IsKeyDown(Input::KeyCode::S)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::W))) * step;
-    
-    if (x != 0.f || z != 0.f)
-        scene->camera.Move(glm::vec3(x, 0, z));
-
-    glm::vec3 lightMove;
-
-    if (inputManager.IsKeyDown(Input::KeyCode::Up   )) lightMove.y =  0.1f;
-    if (inputManager.IsKeyDown(Input::KeyCode::Down )) lightMove.y = -0.1f;
-    if (inputManager.IsKeyDown(Input::KeyCode::Left )) lightMove.z =  0.1f;
-    if (inputManager.IsKeyDown(Input::KeyCode::Right)) lightMove.z = -0.1f;
-
-    if (lightMove != glm::vec3(0)) {
-        for (std::unique_ptr<Light>& l : scene->lightDatabase) {
-            l->Move(lightMove);
-        }
-    }
-}
-
-// vs destructor?
-void GLES3Mark::OnDestroy() {
-    benchStats.EndMeasure();
-    scene.reset();
 }

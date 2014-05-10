@@ -16,10 +16,10 @@
  * Shared state for the app.
  */
 class BaseApp {
-	struct Point { 	// saved state data.
-		int x, y;
+	struct Point {
+		int x, y;  // float?
 		Point():x(0),y(0){}
-	} savedState;
+	}; //savedState;
 
 	std::vector<Point>      touchDragPoints;
 	bool					animating;
@@ -49,9 +49,6 @@ protected:
 	virtual void OnTouchDown(int x, int y, int pointerId) {}
 	virtual void OnTouchUp(int x, int y, int pointerId) {}
 	virtual void OnTouchDragged(int x, int y, int dx, int dy, int pointerId) {}
-
-	//int score;
-	bool showToast(const std::string& text);
 
 public:
 	BaseApp(android_app* _state);

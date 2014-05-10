@@ -2,7 +2,12 @@
 #include <random>
 
 #include "scene.h"
+#include "sceneimporter.h"
 #include "instancedatabuilder.h"
+#include "log.h"
+#include "glerror.h"
+#include "meshrenderer.h"
+#include "glquery.h"
 
 
 bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
@@ -44,6 +49,10 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
         }
     }
 
+    lightDatabase.push_back(std::unique_ptr<Light>(new Light(glm::vec3(  0.0, 30.0f, 10.0), glm::vec3(1.0f, 1.0f, 1.0f), 70.0f)));
+    lightDatabase.push_back(std::unique_ptr<Light>(new Light(glm::vec3( 40.0, 30.0f, 10.0), glm::vec3(1.0f, 1.0f, 1.0f), 70.0f)));
+    lightDatabase.push_back(std::unique_ptr<Light>(new Light(glm::vec3(-40.0, 30.0f, 10.0), glm::vec3(1.0f, 1.0f, 1.0f), 70.0f)));
+
     // -----------------------------------------------------------
     // ------------- init renderers and instanced data -----------
     // -----------------------------------------------------------
@@ -71,78 +80,72 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
     // -----------------------------------------------
     // ------------- first pass shader setup ---------
     // -----------------------------------------------
-    firstPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/firstpass.vert"),
-                                                                        assetManager.LoadText("shaders/firstpass.frag")));
-    firstPassProgram->AddUniform("model");
-    firstPassProgram->AddUniform("view");
-    firstPassProgram->AddUniform("projection");
-    firstPassProgram->AddUniform("tex");
-    firstPassProgram->AddUniform("diffuseColor");
-    firstPassProgram->AddUniform("hasTexture");
-    firstPassProgram->AddUniform("isInstanced");
+    geometryPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/geometrypass-vs.glsl"),
+                                                                           assetManager.LoadText("shaders/geometrypass-fs.glsl")));
+    geometryPassProgram->AddUniform("model");
+    geometryPassProgram->AddUniform("view");
+    geometryPassProgram->AddUniform("projection");
+    geometryPassProgram->AddUniform("tex");
+    geometryPassProgram->AddUniform("diffuseColor");
+    geometryPassProgram->AddUniform("hasTexture");
+    geometryPassProgram->AddUniform("isInstanced");
 
     // ------------------------------------------------
     // ------------- second pass shader setup ---------
     // ------------------------------------------------
-    secondPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/secondpass.vert"),
-                                                                         assetManager.LoadText("shaders/secondpass.frag")));
-    secondPassProgram->AddUniform("model");
-    secondPassProgram->AddUniform("view");
-    secondPassProgram->AddUniform("projection");
-    secondPassProgram->AddUniform("invProj");
-    secondPassProgram->AddUniform("viewport");
+    lightPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/lightpass-vs.glsl"),
+                                                                        assetManager.LoadText("shaders/lightpass-fs.glsl")));
+    lightPassProgram->AddUniform("model");
+    lightPassProgram->AddUniform("view");
+    lightPassProgram->AddUniform("projection");
+    lightPassProgram->AddUniform("invProj");
+    lightPassProgram->AddUniform("viewport");
 
-    secondPassProgram->AddUniform("albedoTex");
-    secondPassProgram->AddUniform("normalVStex");
-    secondPassProgram->AddUniform("depthTex");
+    lightPassProgram->AddUniform("albedoTex");
+    lightPassProgram->AddUniform("normalVStex");
+    lightPassProgram->AddUniform("depthTex");
 
-    secondPassProgram->AddUniform("lightColor");
-    secondPassProgram->AddUniform("lightPos");
-    secondPassProgram->AddUniform("lightSize");
+    lightPassProgram->AddUniform("lightColor");
+    lightPassProgram->AddUniform("lightPos");
+    lightPassProgram->AddUniform("lightSize");
 
-    secondPassProgram->Use();  // gbuffer[2] ?  glUniform1iv(gbuffer, 3, {0,1,2});
-    secondPassProgram->SetUniform("albedoTex", 0);
-    secondPassProgram->SetUniform("normalVStex", 1);
-    secondPassProgram->SetUniform("depthTex", 2);
+    lightPassProgram->Use();  // gbuffer[2] ?  glUniform1iv(gbuffer, 3, {0,1,2});
+    lightPassProgram->SetUniform("albedoTex", 0);
+    lightPassProgram->SetUniform("normalVStex", 1);
+    lightPassProgram->SetUniform("depthTex", 2);
 
     // ------------------------------------------------
     // ------------- screen quad shader setup ---------
     // ------------------------------------------------
-    screenQuadProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/screenquad.vert"),
-                                                                         assetManager.LoadText("shaders/screenquad.frag")));
+    screenQuadProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/screenquad-vs.glsl"),
+                                                                         assetManager.LoadText("shaders/screenquad-fs.glsl")));
     screenQuadProgram->AddUniform("tex");
 
 
-
-    ssaoPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/ssaopass.vert"),
-                                                                       assetManager.LoadText("shaders/ssaopass.frag")));
+    // -----------------------------------------
+    // ------------- ssao shader setup ---------
+    // -----------------------------------------
+    ssaoPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/ssaopass-vs.glsl"),
+                                                                       assetManager.LoadText("shaders/ssaopass-fs.glsl")));
     ssaoPassProgram->AddUniform("invProj");
-    //ssaoPassProgram->AddUniform("projection");
-    //ssaoPassProgram->AddUniform("kernel");
-    
+
     ssaoPassProgram->AddUniform("albedoTex");
     ssaoPassProgram->AddUniform("normalVStex");
     ssaoPassProgram->AddUniform("depthTex");
-    //ssaoPassProgram->AddUniform("noiseTex");
 
     ssaoPassProgram->Use();
     ssaoPassProgram->SetUniform("albedoTex", 0);
     ssaoPassProgram->SetUniform("normalVStex", 1);
     ssaoPassProgram->SetUniform("depthTex", 2);
-    //ssaoPassProgram->SetUniform("noiseTex", 3);
-
-    //noiseTex.FromBitmapData()
-    //CreateTextureGL(SSAO_NOISE_SIZE, SSAO_NOISE_SIZE, GL_RGB32F, GL_RGB, GL_FLOAT, GL_NEAREST, &noise[0].x);
 
 
     // ------------------------------------------------
     // ------------- gbuffer textures setup -----------
     // ------------------------------------------------
-    albedoTex.InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y           );
-    normalTex.InitStorage(GL_RGB16F           , GL_RGB            , GL_FLOAT        , renderSize.x, renderSize.y           );  // TODO encode GL_RG16F, GL_RG
+    albedoTex.InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y           );  // TODO RGB
+    normalTex.InitStorage(GL_RGB16F           , GL_RGB            , GL_FLOAT        , renderSize.x, renderSize.y           );  // encode to GL_RG16F, GL_RG ?
     depthTex .InitStorage(GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT , renderSize.x, renderSize.y           );
-    finalTex .InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y, GL_LINEAR);
-//    noiseTex .InitStorage(GL_RGB16F           , GL_RGB            , GL_FLOAT        , ssaoBuilder.KERNEL_SIZE, ssaoBuilder.KERNEL_SIZE, GL_NEAREST, 0, &(ssaoBuilder.GetNoise()[0].x));
+    finalTex .InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y, GL_LINEAR);  // TODO RGB
 
     // --------------------------------------------
     // ------------- framebuffers setup -----------
@@ -171,63 +174,67 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
     // ------------- misc gl setup -----------
     // ---------------------------------------
     glEnable(GL_CULL_FACE);
+    glEnable(GL_SCISSOR_TEST);
     
     return true;
 }
 
 void Scene::OnResize(int w, int h) {
 	screenSize = glm::ivec2(w, h);
-    camera.Perspective(glm::radians(60.0f), static_cast<float>(screenSize.x) / screenSize.y, 1.0f, 200.0f);
+    //camera.UpdateAspect(static_cast<float>(screenSize.x) / screenSize.y);
 }
 
 bool Scene::OnStep(const Time& time) {
+    // animation
     if (!freeCamera && time.RealTimeSinceStartup() > 1.0f) {
         cameraAnim.Update(time.DeltaTime());
+        if (cameraAnim.HasEnded())
+            return false;
         camera.LookAt(cameraAnim.GetCurrentPosition(), cameraAnim.GetCurrentDirection());
     }
     
-    // MVP
+    // camera properties
+    glm::vec4& bc            = camera.GetBackgroundColor();
     glm::mat4& projection    = camera.GetProjectionMatrix();
     glm::mat4& view          = camera.GetViewMatrix();
     glm::mat4  projectionInv = glm::inverse(projection);
 
-    //testTrans.Rotate(Transform::Up(), glm::radians(90.0f), Transform::Space::World);
-    //testTrans.Translate(glm::vec3(0,0,-70));
-    //rot = glm::rotate(rot, time.DeltaTime(), glm::vec3(0, 1, 0));
-    //glm::mat4 modelMat = glm::scale(glm::mat4(), glm::vec3(0.1f, 0.1f, 0.1f)); //glm::mat4_cast(rot); //testTrans.GetMatrix(); //      
-    //glm::mat4 mvp = projection * view * model;
-
-
     // -----------------------------------------------------
     // ------- first pass - render to textures -------------
     // -----------------------------------------------------
-    glViewport(0, 0, renderSize.x, renderSize.y);
     framebuffer.Bind();
     framebuffer.ActiveColorAttachments(std::vector<GLenum>{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_NONE});
 
+    glViewport(0, 0, renderSize.x, renderSize.y);
+    glScissor (0, 0, renderSize.x, renderSize.y);
+
     glDepthMask(GL_TRUE); // enable writing into the depth buffer
 
-    glClearColor(0.5f, 0.5f, 1.f, 1.f); //
+    glClearColor(bc.r, bc.g, bc.b, bc.a); //
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    
     
     glEnable(GL_DEPTH_TEST); 
     glDepthFunc(GL_LESS); // passes if the incoming depth value is less than the stored depth value.    
 
-    firstPassProgram->Use();
-    firstPassProgram->SetUniform("tex", 0);
-    firstPassProgram->SetUniform("projection", projection);
-    firstPassProgram->SetUniform("view", view);
+    geometryPassProgram->Use();
+    geometryPassProgram->SetUniform("tex", 0);
+    geometryPassProgram->SetUniform("projection", projection);
+    geometryPassProgram->SetUniform("view", view);
 
     modelE112->matrix = glm::scale(glm::mat4(), glm::vec3(0.1f, 0.1f, 0.1f));
-    modelE112->renderer.Render(*firstPassProgram, materialDatabase);
+    modelE112->renderer.Render(*geometryPassProgram, materialDatabase);
 
-    //Material lightMat = Material(glm::vec4(0,1,0,1));
-    //meshPointLight.renderer.PreRender(*firstPassProgram, lightMat);
-    //meshPointLight.renderer.Render();
-    
-    modelChairs  ->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelChairs  ->renderer.GetInstanceCount());
-    modelDeskMid ->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelDeskMid ->renderer.GetInstanceCount());
-    modelDeskSide->renderer.RenderInstanced(*firstPassProgram, materialDatabase, modelDeskSide->renderer.GetInstanceCount());
+#ifdef _DEBUG    // draw cubes at light positions
+    for (std::unique_ptr<Light>& l : lightDatabase) {
+        if (l->type != Light::Type::Point) continue;
+        meshPointLight.renderer.PreRender(*geometryPassProgram, Material(glm::vec4(l->diffuseColor, 1.0f)), glm::translate(glm::mat4(), l->position));
+        meshPointLight.renderer.Render();
+    }
+#endif
+
+    modelChairs  ->renderer.RenderInstanced(*geometryPassProgram, materialDatabase, modelChairs  ->renderer.GetInstanceCount());
+    modelDeskMid ->renderer.RenderInstanced(*geometryPassProgram, materialDatabase, modelDeskMid ->renderer.GetInstanceCount());
+    modelDeskSide->renderer.RenderInstanced(*geometryPassProgram, materialDatabase, modelDeskSide->renderer.GetInstanceCount());
 
     // -------------------------------------------------
     // -------- second pass - SSAO ---------------------
@@ -239,13 +246,10 @@ bool Scene::OnStep(const Time& time) {
     
     ssaoPassProgram->Use();    
     ssaoPassProgram->SetUniform("invProj", projectionInv);
-    //ssaoPassProgram->SetUniform("projection", projection);
-    //ssaoPassProgram->SetUniform("kernel", ssaoBuilder.GetKernel());
 
     albedoTex.Bind(GL_TEXTURE0);
     normalTex.Bind(GL_TEXTURE1);    
     depthTex .Bind(GL_TEXTURE2);
-    //noiseTex .Bind(GL_TEXTURE3);
     
     quadRenderer.Render(0.0f, 0.0f, 2.0f);
     
@@ -265,11 +269,11 @@ bool Scene::OnStep(const Time& time) {
     glDepthFunc(GL_GEQUAL); // passes if the incoming depth value is greater than or equal to the stored depth value
     glCullFace(GL_FRONT);   // front-facing polygons are culled
 
-    secondPassProgram->Use();
-    secondPassProgram->SetUniform("projection", projection);
-    secondPassProgram->SetUniform("invProj", projectionInv);
-    secondPassProgram->SetUniform("view", view);    
-    secondPassProgram->SetUniform("viewport", glm::vec2(renderSize));
+    lightPassProgram->Use();
+    lightPassProgram->SetUniform("projection", projection);
+    lightPassProgram->SetUniform("invProj", projectionInv);
+    lightPassProgram->SetUniform("view", view);    
+    lightPassProgram->SetUniform("viewport", glm::vec2(renderSize));
 
     //albedoTex.Bind(GL_TEXTURE0);
     //normalTex.Bind(GL_TEXTURE1);    
@@ -279,10 +283,10 @@ bool Scene::OnStep(const Time& time) {
         if (l->type != Light::Type::Point)
             continue;
            
-        secondPassProgram->SetUniform("model", l->matrix);
-        secondPassProgram->SetUniform("lightPos", glm::vec3(view * glm::vec4(l->position, 1)));
-        secondPassProgram->SetUniform("lightColor", l->diffuseColor);
-        secondPassProgram->SetUniform("lightSize", l->size);    
+        lightPassProgram->SetUniform("model", l->matrix);
+        lightPassProgram->SetUniform("lightPos", glm::vec3(view * glm::vec4(l->position, 1)));
+        lightPassProgram->SetUniform("lightColor", l->diffuseColor);
+        lightPassProgram->SetUniform("lightSize", l->size);    
 
         meshPointLight.renderer.Render();   // TODO instancing? 
     }
@@ -291,8 +295,10 @@ bool Scene::OnStep(const Time& time) {
     // -------------------------------------------------
     // -------- third pass - show textures ------------
     // -------------------------------------------------
-    glViewport(0, 0, screenSize.x, screenSize.y);
     Framebuffer::BindDefault();
+
+    glViewport(0, 0, screenSize.x, screenSize.y);
+    glScissor (0, 0, screenSize.x, screenSize.y);
 
     glClear(GL_COLOR_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
@@ -305,11 +311,13 @@ bool Scene::OnStep(const Time& time) {
     finalTex.Bind();
     quadRenderer.Render(0.0f, 0.0f, 2.0f);
 
+#ifdef _DEBUG
     albedoTex.Bind();
     quadRenderer.Render(0.0f, 0.0f, 0.5f);
 
     normalTex.Bind();
     quadRenderer.Render(1.5f, 0.0f, 0.5f);
+#endif
 
 
 #ifdef ANDROID

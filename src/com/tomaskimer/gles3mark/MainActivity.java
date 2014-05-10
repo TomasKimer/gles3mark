@@ -1,27 +1,27 @@
 package com.tomaskimer.gles3mark;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.app.FragmentTransaction; // support.v4 ?
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +30,9 @@ import com.tomaskimer.gles3mark.DeviceInfo;
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
 	final static int BENCH_REQUEST_ID = 1234;
+	final static String SERVER_URL = "http://gles3mark.appspot.com/";
+	final static String USER_AGENT = "gles3mark_android_app";
+	
 	public DeviceInfo deviceInfo = new DeviceInfo(this);
 	public String lastResult = null; 
 	
@@ -124,11 +127,26 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     }
 	
 	@Override
+	// http://stackoverflow.com/questions/5944987/popupwindow-in-android
+	// http://stackoverflow.com/questions/18867029/how-to-show-pop-up-window-in-android
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	        case R.id.action_about:
+	        	Toast.makeText(getApplicationContext(), "OpenGL ES 3.0 Benchmark for Android\n\u00A9 2014 by Tomáš Kimer (FIT BUT)\nBrno, Czech Republic", Toast.LENGTH_LONG).show();
+	            return true;
+	        case R.id.action_settings:
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
+	
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		//Log.e("onActivityResult", String.format("%d, %d", requestCode, resultCode));
 		if (requestCode == BENCH_REQUEST_ID) {
 			if (resultCode == RESULT_OK) {  // -1,  0 = RESULT_CANCELED
-				String myValue = data.getStringExtra("XML Result"); 
+				String myValue = data.getStringExtra("Result"); 
 				Toast.makeText(getApplicationContext(), "Benchmark finished. Score: " + myValue, Toast.LENGTH_SHORT).show();
 				//Log.d("BenchmarkActivityResult", "Score: " + myValue);
 				//textView1.setText(textView1.getText() + "\nBenchmark score: " + myValue);
@@ -179,11 +197,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 				fragment = new TestSectionFragment();
 				break;
 			case 1:
-				fragment = new RankingSectionFragment();
-				break;
-			case 2:
 				fragment = new DeviceinfoSectionFragment();
 				args.putString(DeviceinfoSectionFragment.ARG_DEVICE_INFO, deviceInfo.GetDeviceInfo());
+				break;
+			case 2:
+				fragment = new RankingSectionFragment();
 				break;
 			}
 
@@ -201,9 +219,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		public CharSequence getPageTitle(int position) {
 			Locale l = Locale.getDefault();
 			switch (position) {
-				case 0: return getString(R.string.title_section1).toUpperCase(l);
-				case 1: return getString(R.string.title_section2).toUpperCase(l);
-				case 2:	return getString(R.string.title_section3).toUpperCase(l);
+				case 0: return getString(R.string.title_section_test).toUpperCase(l);
+				case 1: return getString(R.string.title_section_deviceinfo).toUpperCase(l);
+				case 2:	return getString(R.string.title_section_ranking).toUpperCase(l);
 			}
 			return null;
 		}
@@ -260,59 +278,40 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		}
 	}
 	
-	public static class RankingSectionFragment extends ListFragment {  // TODO ListFragment
+	@SuppressLint("SetJavaScriptEnabled")
+	public static class RankingSectionFragment extends Fragment {
 		public static final String ARG_SECTION_NUMBER = "section_number";
 
 		public RankingSectionFragment() {}
 		
-		public class RankItem {
-		    public String device, score;
-		    public RankItem(String device, String score) {
-		    	this.device = device; this.score = score;
+		private class MyWebViewClient extends WebViewClient {
+		    @Override
+		    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+		        if (Uri.parse(url).getHost().equals("gles3mark.appspot.com")) {
+		            // This is my web site, so do not override; let my WebView load the page
+		        	//view.getSettings().setUserAgentString(USER_AGENT);
+		        	return false;
+		        }
+		        // Otherwise, the link is not for a page on my site, so launch another Activity that handles URLs
+		        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+		        startActivity(intent);
+		        return true;
 		    }
 		}
 		
-		public class RanksArrayAdapter extends TwoLineArrayAdapter<RankItem> {
-		    public RanksArrayAdapter(Context context, RankItem[] ranks) {
-		        super(context, ranks);
-		    }
-		    @Override
-		    public String lineOneText(RankItem e) { return e.device; }
-		    @Override
-		    public String lineTwoText(RankItem e) { return e.score ; }
-		}
-
 		@Override
-		// TODO custom http://www.androidhive.info/2012/02/android-custom-listview-with-image-and-text/
-		// TODO simple http://stackoverflow.com/questions/6305899/custom-listview-android
-		// http://developer.android.com/reference/android/widget/SimpleAdapter.html
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main_ranking, container, false); // for custom listview (defined in rankingfragment.xml)
-			/////ListView rankingTextView = (ListView) rootView.findViewById(R.id.ranking_listView);
+			View rootView = inflater.inflate(R.layout.fragment_main_ranking, container, false);
+
+			WebView rankingWebView = (WebView)rootView.findViewById(R.id.webViewRanking);
 			
-			/** Creating an array adapter to store String[] **/
-	        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(inflater.getContext(), android.R.layout.simple_list_item_1, strings);
+			rankingWebView.getSettings().setUserAgentString(USER_AGENT);
+			rankingWebView.getSettings().setJavaScriptEnabled(true);			
+			rankingWebView.setWebViewClient(new MyWebViewClient());  // enable follow links
+			rankingWebView.loadUrl(SERVER_URL);
 			
-	        RankItem[] ranks = new RankItem[] {
-	        		new RankItem("1. Sony Xperia Z1", "986"),
-	        		new RankItem("2. Google Nexus 5", "856"),
-	        		new RankItem("3. Samsung Galaxy S4 I9505", "750"),
-	        		new RankItem("4. <placeholder>", "732"),
-	        		new RankItem("5. <placeholder>", "698"),
-	        		new RankItem("6. <placeholder>", "542"),
-	        		new RankItem("7. <placeholder>", "421"),
-	        		new RankItem("8. <placeholder>", "345"),
-	        		new RankItem("9. <placeholder>", "145"),
-	        		new RankItem("10. <placeholder>", "145"),
-	        		new RankItem("11. <placeholder>", "145"),
-	        		new RankItem("12. <placeholder>", "145"),
-	        };
-	        
-	        
-	        /** Setting the list adapter for the ListFragment */
-	        setListAdapter(new RanksArrayAdapter(inflater.getContext(), ranks)); //adapter.notifyDataSetChanged();
 			
-	        return rootView; // super.onCreateView(inflater, container, savedInstanceState);
+	        return rootView;
 		}
 	}
 	

@@ -22,6 +22,14 @@
         android:gravity="center_horizontal"
         android:textSize="40sp" />
 
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:enabled="false"
+        android:text="@string/button_upload" />
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
