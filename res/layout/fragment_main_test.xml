@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:enabled="false"
+        android:onClick="Upload"
         android:text="@string/button_upload" />
 
     <Space

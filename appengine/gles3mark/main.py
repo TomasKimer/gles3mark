@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 import webapp2
+import json
 from jinja import render_html
 
 class MainHandler(webapp2.RequestHandler):
@@ -23,8 +24,16 @@ class MainHandler(webapp2.RequestHandler):
         usrAg = self.request.headers['User-Agent']
         if usrAg == "gles3mark_android_app" or usrAg.find("Android") != -1 or usrAg.find("Mobile") != -1:
             style = "androidapp.css"
-        render_html(self, "list.html", style, u"Ahoj", self.request.headers['User-Agent']);
+        render_html(self, "list.html", style, u"gles3mark results database", self.request.headers['User-Agent']);
         #  self.response.write('Hello world from PyCharm2!')
+
+    def post(self):
+        req = self.request
+        a = req.body
+        b = json.loads(a)
+
+        #self.response.out.write(b);
+        self.response.out.write("Data received - score: " + b['score'] + ", info: " + b['info']);
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)

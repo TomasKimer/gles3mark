@@ -1,11 +1,23 @@
 package com.tomaskimer.gles3mark;
 
+import java.net.URI;
+import java.util.Date;
 import java.util.Locale;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.app.FragmentTransaction; // support.v4 ?
@@ -13,6 +25,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.format.DateFormat;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -125,6 +138,55 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         	startActivityForResult(intent, BENCH_REQUEST_ID); // startActivity(intent);    		
     	}
     }
+	
+	// http://developer.android.com/reference/android/os/AsyncTask.html
+	private class UploadTask extends AsyncTask<JSONObject, Void, String> {
+	     protected String doInBackground(JSONObject... json) {
+	    	try {	
+                URI website = new URI(SERVER_URL);
+
+				HttpClient client = new DefaultHttpClient();
+				HttpPost request = new HttpPost(website);
+
+				request.setHeader("Content-Type", "application/json");
+
+				// String currentDateTimeString =
+				// DateFormat.getDateTimeInstance().format(new Date());
+
+				StringEntity se = new StringEntity(json[0].toString());
+				request.setEntity(se);
+				HttpResponse response = client.execute(request);
+				
+				return EntityUtils.toString(response.getEntity());
+				
+	    	 } catch (Exception e) {
+					e.printStackTrace();
+					return "failed";
+			 }	    	 
+	     }
+
+	     //protected void onProgressUpdate(Integer... progress) {
+	     //    setProgressPercent(progress[0]);
+	     //}
+
+	     protected void onPostExecute(String result) {
+	    	 Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+	     }
+	 }
+	
+	// on upload_button click
+	public void Upload(View view) {
+		JSONObject obj = new JSONObject();
+		
+		try {
+			obj.put("score", "42");
+			obj.put("info", "I9505");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		new UploadTask().execute(obj);		
+	}
 	
 	@Override
 	// http://stackoverflow.com/questions/5944987/popupwindow-in-android
@@ -308,8 +370,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			rankingWebView.getSettings().setUserAgentString(USER_AGENT);
 			rankingWebView.getSettings().setJavaScriptEnabled(true);			
 			rankingWebView.setWebViewClient(new MyWebViewClient());  // enable follow links
-			rankingWebView.loadUrl(SERVER_URL);
-			
+			rankingWebView.loadUrl(SERVER_URL);			
 			
 	        return rootView;
 		}
