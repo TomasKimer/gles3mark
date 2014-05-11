@@ -143,30 +143,22 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	private class UploadTask extends AsyncTask<JSONObject, Void, String> {
 	     protected String doInBackground(JSONObject... json) {
 	    	try {	
-                URI website = new URI(SERVER_URL);
-
-				HttpClient client = new DefaultHttpClient();
-				HttpPost request = new HttpPost(website);
+				HttpPost request = new HttpPost(SERVER_URL);
 
 				request.setHeader("Content-Type", "application/json");
+				request.setEntity(new StringEntity(json[0].toString()));
 
-				// String currentDateTimeString =
-				// DateFormat.getDateTimeInstance().format(new Date());
-
-				StringEntity se = new StringEntity(json[0].toString());
-				request.setEntity(se);
-				HttpResponse response = client.execute(request);
+				HttpResponse response = (new DefaultHttpClient()).execute(request);
 				
 				return EntityUtils.toString(response.getEntity());
 				
-	    	 } catch (Exception e) {
-					e.printStackTrace();
-					return "failed";
-			 }	    	 
+	    	} catch (Exception e) {
+			    e.printStackTrace();
+				return "Upload to server failed.";
+			}    	 
 	     }
 
 	     //protected void onProgressUpdate(Integer... progress) {
-	     //    setProgressPercent(progress[0]);
 	     //}
 
 	     protected void onPostExecute(String result) {
@@ -349,7 +341,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		private class MyWebViewClient extends WebViewClient {
 		    @Override
 		    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-		        if (Uri.parse(url).getHost().equals("gles3mark.appspot.com")) {
+		        if (Uri.parse(url).getHost().equals(Uri.parse(SERVER_URL).getHost())) {
 		            // This is my web site, so do not override; let my WebView load the page
 		        	//view.getSettings().setUserAgentString(USER_AGENT);
 		        	return false;
