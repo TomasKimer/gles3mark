@@ -84,8 +84,8 @@ bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") /
     time.Update();
     if (time.RealTimeSinceStartup() > 1.0f) {
         benchStats.OnFrame(time.DeltaTime());
-        if (benchStats.fpsCounter.JustUpdated())
-            Log::V() << "SPF [ms]: " << time << " | FPS: " << benchStats.fpsCounter;
+        if (benchStats.GetFPSCounter().JustUpdated())
+            Log::V() << "SPF [ms]: " << time << " | FPS: " << benchStats.GetFPSCounter();
     }
 
     OnProcessInput();
