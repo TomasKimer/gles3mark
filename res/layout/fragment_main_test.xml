@@ -161,9 +161,10 @@
             </TableRow>
 
             <Button
-                android:id="@+id/button1"
+                android:id="@+id/upload_button"
                 android:layout_width="200dp"
                 android:layout_height="40dp"
+                android:enabled="false"
                 android:onClick="Upload"
                 android:text="@string/button_upload" />
 

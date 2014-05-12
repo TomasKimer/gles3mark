@@ -112,7 +112,7 @@ void GLES3Mark::OnDestroy() {
 
 std::string GLES3Mark::GetResultJSON() {
     JSONStatsBuilder jsb;
-    return jsb.BuildBenchStatsInfo(benchStats).BuildGLinfo().Build();  //jsb.GetResultJSON(benchStats);
+    return jsb.BuildBenchStatsInfo(benchStats).BuildGLinfo().Build();
 }
 
 void GLES3Mark::OnProcessInput() {

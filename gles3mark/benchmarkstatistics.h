@@ -2,14 +2,20 @@
 
 #pragma once
 
+#include <vector>
+#include <glm/glm.hpp>
+
 #include "fpscounter.h"
 
 class BenchmarkStatistics {
     friend class JSONStatsBuilder;
 
-    unsigned score, frameCount, fpsCount;
-    float deltaBest, deltaWorst, deltaAvg, deltaAcc, deltaStdDev;
-    float fpsBest, fpsWorst, fpsAvg, fpsAcc, fpsStdDev;
+    unsigned score;
+    float deltaBest, deltaWorst, deltaAvg, deltaStdDev, deltaAcc;
+    float fpsBest, fpsWorst, fpsAvg, fpsStdDev, fpsAcc;
+
+    std::vector<float> deltas;
+    std::vector<float> fpss;
 
     bool running;
 
@@ -23,7 +29,7 @@ public:
     void Reset() {
         running = false;
 
-        score = frameCount = fpsCount = 0;
+        score = 0;
         deltaWorst = deltaAvg = deltaAcc = deltaStdDev = 0.0f;
         fpsBest = fpsAvg = fpsAcc = fpsStdDev = 0.0f;
         fpsWorst = deltaBest = 9999.0f;
@@ -38,12 +44,10 @@ public:
 
         if (deltaTime < deltaBest ) deltaBest  = deltaTime;
         if (deltaTime > deltaWorst) deltaWorst = deltaTime;
-        if (deltaAvg == 0.0f)
-            deltaAvg = deltaTime;
-        else
-            deltaAvg = (deltaAvg + deltaTime) / 2.0f;
-
-
+        
+        deltaAcc += deltaTime;
+        deltas.push_back(deltaTime);
+            
         fpsCounter.Update(deltaTime);
         
         if (fpsCounter.JustUpdated()) {
@@ -52,21 +56,38 @@ public:
             if (fpsCurrent > fpsBest ) fpsBest  = fpsCurrent;
             if (fpsCurrent < fpsWorst) fpsWorst = fpsCurrent;
 
-            if (fpsAvg == 0.0f)
-                fpsAvg = fpsCurrent;
-            else
-                fpsAvg = (fpsAvg + fpsCurrent) / 2.0f;
+            fpsAcc += fpsCurrent;
+            fpss.push_back(fpsCurrent);
         }
-
-        deltaAcc += deltaTime;    
-        frameCount++;
     }
 
     void EndMeasure() {
         running = false;
         
-        score = frameCount;
+        score = deltas.size();
         
-        deltaAvg = deltaAcc / frameCount;
+        deltaAvg = deltaAcc / deltas.size();
+        deltaStdDev = ComputeStdDev(deltas, deltaAvg);
+        
+        fpsAvg   = fpsAcc / fpss.size();
+        fpsStdDev = ComputeStdDev(fpss, fpsAvg);
+    }
+
+private:
+    static float ComputeStdDev(const std::vector<float>& values, float mean) {
+    
+        float acc = 0.0f;
+
+        for (unsigned i = 0; i < values.size(); ++i) {
+            float diff = values[i] - mean;
+            acc += diff * diff;
+        }
+
+        float variance = acc / values.size();
+    
+        if (variance != 0.0f)
+            return glm::sqrt(variance);
+        else
+            return 0.0f;
     }
 };

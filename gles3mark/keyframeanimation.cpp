@@ -1,5 +1,4 @@
 
-#include <cmath>
 #include "keyframeanimation.h"
 
 void KeyFrameAnimation::AddKeyFrame(const KeyFrame& keyFrame) {      

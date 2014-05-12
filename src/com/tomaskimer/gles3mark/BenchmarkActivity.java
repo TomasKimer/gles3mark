@@ -37,6 +37,7 @@ public class BenchmarkActivity extends NativeActivity {
 	    }
 	}
 	
+	// called from JNI with JSON result string
     public void FinishMe(String _result) {  // final
     	final String result = _result;
         this.runOnUiThread(new Runnable() {
@@ -46,7 +47,6 @@ public class BenchmarkActivity extends NativeActivity {
         		setResult(Activity.RESULT_OK, resultData);
 //        		if (getParent() == null) setResult(Activity.RESULT_OK, resultData);
 //        		else getParent().setResult(Activity.RESULT_OK, resultData);            	
-//              score = finalScore;
             	finish();
             }
         });

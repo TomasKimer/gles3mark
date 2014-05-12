@@ -40,6 +40,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,7 +54,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	final static String USER_AGENT = "gles3mark_android_app";
 	
 	public DeviceInfo deviceInfo = new DeviceInfo(this);
-	public String lastResult = null; 
+	public JSONObject lastResult = null; 
 	
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -167,16 +168,19 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	     //protected void onProgressUpdate(Integer... progress) {
 	     //}
 
-	     protected void onPostExecute(String result) {
-	    	 Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
-	     }
+	    protected void onPostExecute(String result) {
+            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+
+	    	Button btnUpload = (Button)findViewById(R.id.upload_button);
+			btnUpload.setEnabled(false);
+	    }
 	 }
 	
 	// on upload_button click
 	public void Upload(View view) {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setTitle("Upload results to server");
+		alert.setTitle("Upload results to the server");
 		alert.setMessage("Please enter your nickname:");
 
 		// Set an EditText view to get user input 
@@ -186,23 +190,21 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		//((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
         //.showSoftInput(input, InputMethodManager.SHOW_FORCED);
 		
-		
 		alert.setView(input);
 
 		alert.setPositiveButton("Upload", new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int whichButton) {
 		  // Do something with value!
-			JSONObject obj = new JSONObject();
-			Random rnd = new Random();
-			
 			try {
-				obj.put("score", String.format("%d", rnd.nextInt(20000)));
-				obj.put("info", "I9505");
+				JSONObject obj = new JSONObject();
+				
+				obj.put("score", lastResult.getJSONObject("BenchInfo").getString("score"));
+				obj.put("info", "I9505 " + input.getText().toString());
+				
+				new UploadTask().execute(obj);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-			
-			new UploadTask().execute(obj);		
 		  }
 		});
 
@@ -232,17 +234,28 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		//Log.e("onActivityResult", String.format("%d, %d", requestCode, resultCode));
 		if (requestCode == BENCH_REQUEST_ID) {
 			if (resultCode == RESULT_OK) {  // -1,  0 = RESULT_CANCELED
-				String myValue = data.getStringExtra("Result"); 
-				Toast.makeText(getApplicationContext(), "Benchmark finished. Score: " + myValue, Toast.LENGTH_SHORT).show();
-				//Log.d("BenchmarkActivityResult", "Score: " + myValue);
-				//textView1.setText(textView1.getText() + "\nBenchmark score: " + myValue);
-				TestSectionFragment f = (TestSectionFragment)mSectionsPagerAdapter.getActiveFragment(mViewPager, 0);
-				if (f != null) //  && f.isResumed() -- Interact with any views/data that must be alive
-					f.SetScoreLabel(myValue); // else  Flag something for update later, when this viewPagerFragment returns to onResume
-				lastResult = myValue;
+				String resultStr = data.getStringExtra("Result"); 				
+				JSONObject jsonObject = null;
+				
+				try {
+					jsonObject = new JSONObject(resultStr);
+					JSONObject benchInfo = jsonObject.getJSONObject("BenchInfo");
+					Toast.makeText(getApplicationContext(), "Benchmark finished. Score: " + benchInfo.getString("score"),
+							       Toast.LENGTH_SHORT).show();					
+					TestSectionFragment f = (TestSectionFragment)mSectionsPagerAdapter.getActiveFragment(mViewPager, 0);
+					if (f != null) //  && f.isResumed() -- Interact with any views/data that must be alive
+						f.SetLabels(benchInfo); // else  Flag something for update later, when this viewPagerFragment returns to onResume
+					
+					lastResult = jsonObject;
+					
+					Button btnUpload = (Button)findViewById(R.id.upload_button);
+					btnUpload.setEnabled(true);
+					
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
 			}
 			else {
 				Toast.makeText(getApplicationContext(), "Benchmark aborted", Toast.LENGTH_SHORT).show();
@@ -287,7 +300,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 				break;
 			case 1:
 				fragment = new DeviceinfoSectionFragment();
-				args.putString(DeviceinfoSectionFragment.ARG_DEVICE_INFO, deviceInfo.GetDeviceInfo());
+				args.putString(DeviceinfoSectionFragment.ARG_DEVICE_INFO, deviceInfo.BuildJSON().toString());
 				break;
 			case 2:
 				fragment = new RankingSectionFragment();
@@ -331,8 +344,26 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		public TestSectionFragment() {}
 		
 		private TextView scoreTextView;
-		public void SetScoreLabel(String score) {
-			scoreTextView.setText(score);
+		private TextView tvFPSavg, tvFPSstddev, tvFPSbest, tvFPSworst;
+		private TextView tvSPFavg, tvSPFstddev, tvSPFbest, tvSPFworst;
+		
+		public void SetLabels(JSONObject json) {
+			try {
+				scoreTextView.setText(json.getString("score"));
+				
+				tvFPSavg   .setText(json.getString("FPSavg"   ));
+				tvFPSstddev.setText(json.getString("FPSstddev"));
+				tvFPSbest  .setText(json.getString("FPSbest"  ));
+				tvFPSworst .setText(json.getString("FPSworst" ));
+				
+				tvSPFavg   .setText(json.getString("SPFavg"   ) + " ms");
+				tvSPFstddev.setText(json.getString("SPFstddev") + " ms");
+				tvSPFbest  .setText(json.getString("SPFbest"  ) + " ms");
+				tvSPFworst .setText(json.getString("SPFworst" ) + " ms");
+			
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		}
 
 		@Override
@@ -349,15 +380,23 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			//Log.d("FRAGMENT", "Test onCreateView " + getTag());
-			
 			View rootView = inflater.inflate(R.layout.fragment_main_test, container, false);
+			
 			scoreTextView = (TextView)rootView.findViewById(R.id.score_label);
+			
+			tvFPSavg    = (TextView)rootView.findViewById(R.id.tvFPSavg);
+			tvFPSstddev = (TextView)rootView.findViewById(R.id.tvFPSstddev);
+			tvFPSbest   = (TextView)rootView.findViewById(R.id.tvFPSbest);
+			tvFPSworst  = (TextView)rootView.findViewById(R.id.tvFPSworst);
+			
+			tvSPFavg    = (TextView)rootView.findViewById(R.id.tvSPFavg);
+			tvSPFstddev = (TextView)rootView.findViewById(R.id.tvSPFstddev);
+			tvSPFbest   = (TextView)rootView.findViewById(R.id.tvSPFbest);
+			tvSPFworst  = (TextView)rootView.findViewById(R.id.tvSPFworst);
 			
 			//String lastResult = ((MainActivity)getActivity()).lastResult;
 			//String score = lastResult == null ? "no score" : lastResult;
-			
-			//scoreTextView.setText("no score");  //Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER))
+
 			return rootView;
 		}
 
