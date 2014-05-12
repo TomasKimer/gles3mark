@@ -1,5 +1,4 @@
 
-
 #pragma once
 
 #include <chrono>
@@ -8,53 +7,24 @@
 
 #include "log.h"
 
-
 // http://stackoverflow.com/questions/14391327/how-to-get-duration-as-int-millis-and-float-seconds-from-chrono
-
 class Time {
     typedef std::chrono::high_resolution_clock Clock;
     
 public:
-    Time(): average(0.f), best(9999.f), worst(0.f) {
-        Init();
-    }
+    Time();
 
-    void Init() {
-        start = previous = Clock::now();
-    }
+    void Init();
+    void Update();
 
     // The time in seconds it took to complete the last frame
-    float DeltaTime() const {
-        return elapsed.count();
-    }
+    float DeltaTime() const;
 
     // The real time in seconds since the game started.
-    float RealTimeSinceStartup() const {
-        return std::chrono::duration<float>(current - start).count();
-    }
-
-    void Update() {
-        current = Clock::now();
-        elapsed = current - previous;
-        //total = current - start; 
-        previous = current;                
-
-        //if (RealTimeSinceStartup() > 1.5f) {
-        //    fElapsed = elapsed.count();
-        //    if (fElapsed < best ) best  = fElapsed;
-        //    if (fElapsed > worst) worst = fElapsed;
-        //    if (average == 0.0f)
-        //            average = fElapsed;
-        //        else
-        //            average = (average + fElapsed) / 2.0f;
-        //}       
-    }
+    float RealTimeSinceStartup() const;
 
     friend std::ostream& operator << (std::ostream& o, const Time& v) {
-        o <<   "C: " << std::setw(3) << std::fixed << std::setprecision(4) << v.DeltaTime() * 1000;
-//        << ", A: " << std::setw(3) << std::fixed << std::setprecision(4) << v.average  * 1000
-//        << ", B: " << std::setw(3) << v.best     * 1000
-//        << ", W: " << std::setw(3) << v.worst    * 1000;
+        o << std::setw(3) << std::fixed << std::setprecision(4) << v.DeltaTime() * 1000;
         return o;
     }
 
@@ -65,24 +35,23 @@ private:
 };
 
 
-
+/*
+ *  Generic StopWatch
+ *  Usage:
+ *      StopWatch<std::chrono::high_resolution_clock> sw;
+ *      // stuff
+ *      auto elapsed = sw.elapsed<std::chrono::nanoseconds>();
+ */
 template<typename C>
 class StopWatch {
     std::chrono::time_point<C> start;
-
 public:
     StopWatch() : start(C::now()) {}
-
     template<typename U>
     typename U::rep elapsed() const {
         return std::chrono::duration_cast<U>(C::now() - start).count();
     }
-
     void reset() {
         start = C::now();
     }
 };
-
-//StopWatch<std::chrono::high_resolution_clock> sw;
-//std::this_thread::sleep_for(std::chrono::milliseconds(100));
-//Log::V() << "Elapsed time: " << sw.elapsed<std::chrono::nanoseconds>() << " nanoseconds";

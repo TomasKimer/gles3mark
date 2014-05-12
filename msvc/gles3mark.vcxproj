@@ -65,16 +65,25 @@
   <ItemGroup>
     <ClCompile Include="..\gles3mark\assetfile.cpp" />
     <ClCompile Include="..\gles3mark\assetmanager.cpp" />
+    <ClCompile Include="..\gles3mark\benchmarkstatistics.cpp" />
     <ClCompile Include="..\gles3mark\camera.cpp" />
+    <ClCompile Include="..\gles3mark\fpscounter.cpp" />
     <ClCompile Include="..\gles3mark\framebuffer.cpp" />
     <ClCompile Include="..\gles3mark\gl3stub_egl.c" />
     <ClCompile Include="..\gles3mark\glerror.cpp" />
+    <ClCompile Include="..\gles3mark\glquery.cpp" />
+    <ClCompile Include="..\gles3mark\input.cpp" />
     <ClCompile Include="..\gles3mark\instancedatabuilder.cpp" />
     <ClCompile Include="..\gles3mark\keyframeanimation.cpp" />
+    <ClCompile Include="..\gles3mark\light.cpp" />
     <ClCompile Include="..\gles3mark\loadingscreen.cpp" />
     <ClCompile Include="..\gles3mark\logconsole.cpp" />
+    <ClCompile Include="..\gles3mark\material.cpp" />
+    <ClCompile Include="..\gles3mark\materialdatabase.cpp" />
+    <ClCompile Include="..\gles3mark\model.cpp" />
     <ClCompile Include="..\gles3mark\modelrenderer.cpp" />
     <ClCompile Include="..\gles3mark\quadrenderer.cpp" />
+    <ClCompile Include="..\gles3mark\renderbuffer.cpp" />
     <ClCompile Include="..\gles3mark\rendercontext_egl.cpp" />
     <ClCompile Include="..\gles3mark\rendercontext_wgl.cpp" />
     <ClCompile Include="..\gles3mark\gles3mark.cpp" />
@@ -84,7 +93,9 @@
     <ClCompile Include="..\gles3mark\scene.cpp" />
     <ClCompile Include="..\gles3mark\sceneimporter.cpp" />
     <ClCompile Include="..\gles3mark\shaderprogram.cpp" />
+    <ClCompile Include="..\gles3mark\statsbuilder_json.cpp" />
     <ClCompile Include="..\gles3mark\texture.cpp" />
+    <ClCompile Include="..\gles3mark\time.cpp" />
     <ClCompile Include="..\win32\gles3mark_dll.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

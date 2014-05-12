@@ -83,12 +83,10 @@ bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") /
     
     time.Update();
     if (time.RealTimeSinceStartup() > 1.0f) {
-        fpsCounter.Update(time.DeltaTime());
-        if (fpsCounter.JustUpdated())
-            Log::V() << "SPF [ms] " << time << " | FPS " << fpsCounter;
+        benchStats.OnFrame(time.DeltaTime());
+        if (benchStats.fpsCounter.JustUpdated())
+            Log::V() << "SPF [ms]: " << time << " | FPS: " << benchStats.fpsCounter;
     }
-
-    benchStats.OnFrame(time.DeltaTime());
 
     OnProcessInput();
     if (joystickMove.x != 0.f || joystickMove.z != 0.f)
@@ -97,7 +95,7 @@ bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") /
     if (!scene->OnStep(time))
         quit = true;
 
-    //std::this_thread::sleep_for(std::chrono::milliseconds(40));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(180));
 
     glContext->Swap();
 
@@ -108,6 +106,8 @@ bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") /
 void GLES3Mark::OnDestroy() {
     benchStats.EndMeasure();
     scene.reset();
+
+    Log::D() << "Result JSON: " << GetResultJSON();
 }
 
 std::string GLES3Mark::GetResultJSON() {

@@ -10,15 +10,15 @@ uniform sampler2D depthTex;
 
 uniform mat4      invProj;
 
+layout (location=2) out vec4 ambientColor;
+layout (location=3) out float ssaoColor;
 
 const float ambientContribution = 0.1;  //0.2
+const float filterRadius        = 5.0;  // 10 / screenWidth, 10 / screenHeight
+const float distanceThreshold   = 5.0;
+const int sample_count          = 16;
 
-layout (location=2) out vec4 fragColor;
-
-
-
-const int sample_count = 16;
-const vec2 poisson16[] = vec2[](    // These are the Poisson Disk Samples
+const vec2 poisson16[] = vec2[](    // Poisson Disk Samples
     vec2( -0.94201624,  -0.39906216 ),
     vec2(  0.94558609,  -0.76890725 ),
     vec2( -0.094184101, -0.92938870 ),
@@ -36,8 +36,6 @@ const vec2 poisson16[] = vec2[](    // These are the Poisson Disk Samples
     vec2(  0.19984126,   0.78641367 ),
     vec2(  0.14383161,  -0.14100790 )
 );
-const float filterRadius = 5.0;  // 10 / screenWidth, 10 / screenHeight
-const float distanceThreshold = 5.0;
 
 vec3 reconstructPosition(in vec2 coord, in float depth)
 {    
@@ -47,9 +45,8 @@ vec3 reconstructPosition(in vec2 coord, in float depth)
     return viewPos.xyz;
 }
 
-float computeSsao(in vec3 viewPos, in vec3 viewNormal, in vec2 radius) {
-    float ambientOcclusion = 0.0;
-    // perform AO
+float computeSSAO(in vec3 viewPos, in vec3 viewNormal, in vec2 radius) {
+    float occlusion = 0.0;
     for (int i = 0; i < sample_count; ++i) {
         
         // sample at an offset specified by the current Poisson-Disk sample and scale it by a radius (has to be in Texture-Space)
@@ -68,10 +65,10 @@ float computeSsao(in vec3 viewPos, in vec3 viewNormal, in vec2 radius) {
         // b = dot-Product
         float b = NdotS;
  
-        ambientOcclusion += (a * b);
+        occlusion += (a * b);
     }
  
-    return 1.0 - (ambientOcclusion / float(sample_count));
+    return 1.0 - (occlusion / float(sample_count));
 }
 
 
@@ -83,10 +80,10 @@ void main() {
 
     // Calculate the pixel's position in view space
     vec3 viewPos = reconstructPosition(texCoord, depth);
-    vec2 radius = filterRadius / vec2(1280.0, 720.0);   // vec2(textureSize(depthTex, 0));  // - app die on Adreno
-    float ssaoTerm = computeSsao(viewPos, normal, radius);
+    vec2 radius = filterRadius / vec2(1280.0, 720.0);   // vec2(textureSize(depthTex, 0));  // - app will die on Adreno
+    float ssaoTerm = computeSSAO(viewPos, normal, radius);
 
     // Final
-    //fragColor = vec4(vec3(ssaoTerm), 1.0);
-    fragColor = vec4(albedo * ambientContribution * ssaoTerm, 1.0);
+    ssaoColor = ssaoTerm; //vec4(vec3(ssaoTerm), 1.0);
+    ambientColor = vec4(albedo * ambientContribution * ssaoTerm, 1.0);
 }

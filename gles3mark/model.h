@@ -1,10 +1,8 @@
 
-
 #pragma once
 
 #include "mesh.h"
 #include "modelrenderer.h"
-
 
 class Model {
     friend class ModelRenderer;
@@ -12,29 +10,14 @@ class Model {
     std::vector<Mesh*> meshes;
 
 public:
+    Model();
+    ~Model();
+
+    void AddMesh(Mesh* mesh);
+    void InitRenderer();
+
+    std::vector<Mesh*>& GetMeshes() { return meshes; }
+
     ModelRenderer renderer;
     glm::mat4 matrix;
-
-    Model() {    
-    }
-
-    ~Model() {
-        for (Mesh* mesh : meshes) {
-            delete mesh;        
-        }    
-        meshes.clear();
-    }
-
-    void AddMesh(Mesh* mesh) {
-        meshes.push_back(mesh);
-    }
-
-    void InitRenderer() {
-        renderer.Init(this);
-    }
-
-    std::vector<Mesh*>& GetMeshes() {
-        return meshes;
-    }
-
 };

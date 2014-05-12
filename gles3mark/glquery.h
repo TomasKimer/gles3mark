@@ -1,10 +1,8 @@
 
-
 #pragma once
 
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #include "glinclude.h"
 
@@ -14,20 +12,8 @@
 
 class GLQuery {
 public:
-    static std::vector<std::string> Extensions() {
-        GLint count = Get<GLint>(GL_NUM_EXTENSIONS);
-
-        std::vector<std::string> ret;
-        for (int i = 0; i < count; ++i)
-            ret.push_back(reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, i)));
-
-        return ret;    
-    }
-
-    static bool IsExtensionSupported(const std::string& extension) {
-        std::vector<std::string> extensions = Extensions();
-        return (std::find(extensions.begin(), extensions.end(), extension) != extensions.end());    
-    }
+    static std::vector<std::string> Extensions();
+    static bool IsExtensionSupported(const std::string& extension);
 
     template <typename T>
     static T Get(GLenum name) {

@@ -16,7 +16,10 @@
 #
 import webapp2
 import json
+
 from jinja import render_html
+from datastore import ResultItem
+
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
@@ -24,17 +27,26 @@ class MainHandler(webapp2.RequestHandler):
         usrAg = self.request.headers['User-Agent']
         if usrAg == "gles3mark_android_app" or usrAg.find("Android") != -1 or usrAg.find("Mobile") != -1:
             style = "androidapp.css"
-        render_html(self, "list.html", style, u"gles3mark results database", self.request.headers['User-Agent']);
-        #  self.response.write('Hello world from PyCharm2!')
+
+        results = ResultItem.query().order(-ResultItem.score).fetch()
+        render_html(self, "list.html", style, u"gles3mark result database", self.request.headers['User-Agent'],
+                    template_values={"results": results})
 
     def post(self):
-        req = self.request
-        a = req.body
-        b = json.loads(a)
+        rec = json.loads(self.request.body)
 
-        #self.response.out.write(b);
-        self.response.out.write("Data received - score: " + b['score'] + ", info: " + b['info']);
+        dbrec = ResultItem()
+        dbrec.score = int(rec['score'])
+        dbrec.device = rec['info']
+        dbrec.put()
+
+        self.response.out.write("Data received - score: " + rec['score'] + ", info: " + rec['info']);
+
+class AdminHandler(webapp2.RequestHandler):
+    def get(self):
+        self.response.write("Admin page is under construction.");
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    ('/admin', AdminHandler)
 ], debug=True)

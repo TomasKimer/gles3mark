@@ -19,7 +19,6 @@ typedef RenderContextEGL RenderContextT;
 #include "assetmanager.h"
 #include "scene.h"
 #include "time.h"
-#include "fpscounter.h"
 #include "benchmarkstatistics.h"
 
 
@@ -29,7 +28,6 @@ class GLES3Mark : public IGLES3MarkLib, public IInputListener {
     std::unique_ptr<Scene> scene;
     Input inputManager;
     Time time;
-    FPSCounter fpsCounter;
     BenchmarkStatistics benchStats;
 
     bool quit, vsync;

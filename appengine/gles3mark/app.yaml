@@ -4,6 +4,7 @@ runtime: python27
 api_version: 1
 threadsafe: yes
 
+# https://developers.google.com/appengine/docs/python/config/appconfig
 handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
@@ -11,6 +12,11 @@ handlers:
 
 - url: /css
   static_dir: static/css
+
+- url: /admin
+  script: main.app
+  login: admin
+  secure: always
 
 - url: .*
   script: main.app
@@ -20,3 +26,6 @@ libraries:
   version: "2.5.2"
 - name: jinja2
   version: latest
+
+builtins:
+- admin_redirect: on

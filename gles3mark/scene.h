@@ -32,7 +32,7 @@ class Scene {  // public Screen?
     std::vector<std::unique_ptr<Light>> lightDatabase;
     
     Framebuffer framebuffer;//, framebufferSecond;
-    Texture albedoTex, normalTex, depthTex, finalTex;
+    Texture albedoTex, normalTex, depthTex, finalTex, ssaoTex;
 
     KeyFrameAnimation cameraAnim;
     
@@ -41,8 +41,8 @@ class Scene {  // public Screen?
     bool freeCamera;
     
 public:    
-    Scene(): renderSize(1280, 720), freeCamera(false), camera(60.0f, 16.0f/9.0f, 1.0f, 256.0f, glm::vec4(0.5f, 0.5f, 1.f, 1.f))  {}
-    ~Scene() {}
+    Scene();
+    ~Scene();
         
     bool OnInit(const AssetManager& assetManager, int width, int height);
     void OnResize(int w, int h);

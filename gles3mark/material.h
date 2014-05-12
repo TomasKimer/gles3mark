@@ -28,16 +28,5 @@ public:
 
 public:
     Material(const glm::vec4& diffuse, const glm::vec4& ambient = glm::vec4(0), const glm::vec4& specular = glm::vec4(0),
-             const glm::vec4& emissive = glm::vec4(0), float shininess = 0.0f, const std::string& texturePath = std::string(), const std::string& name = std::string()) :
-             diffuseColor(diffuse), ambientColor(ambient), specularColor(specular),
-             emissiveColor(emissive), shininess(shininess), texture(nullptr), name(name)
-    {
-        hasTexture = !texturePath.empty();
-
-        if (hasTexture) {
-            texture = new Texture(texturePath);
-        }
-    }
-
-
+             const glm::vec4& emissive = glm::vec4(0), float shininess = 0.0f, const std::string& texturePath = std::string(), const std::string& name = std::string());
 };

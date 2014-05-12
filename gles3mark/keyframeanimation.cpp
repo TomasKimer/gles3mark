@@ -2,6 +2,10 @@
 #include <cmath>
 #include "keyframeanimation.h"
 
+void KeyFrameAnimation::AddKeyFrame(const KeyFrame& keyFrame) {      
+    keyFrames.push_back(keyFrame);
+}
+
 unsigned KeyFrameAnimation::GetCurrentKeyFrame(unsigned lastFrame) {
     for (unsigned i = lastFrame + 1; i < keyFrames.size(); ++i) {
         if (currentTime <= keyFrames[i].time) {
@@ -16,15 +20,15 @@ float KeyFrameAnimation::GetTransition(const KeyFrame& first, const KeyFrame& se
 }
 
 void KeyFrameAnimation::Update(float deltaTime) {
-    if (ended) return;
+    if (HasEnded()) return;
 
     currentTime += deltaTime;
 
     currentFrame = GetCurrentKeyFrame(currentFrame);    
 
     if (currentFrame == keyFrames.size() - 1) {
-        if (!repeat) {
-            ended = true;
+        currentRepeat++;
+        if (HasEnded()) {
             currentFrame--; // step to the last frame // vs return
         }
         else {
@@ -62,12 +66,15 @@ void KeyFrameAnimation::Update(float deltaTime) {
     //}
 }
 
+bool KeyFrameAnimation::HasEnded() {
+    return (repeatCount != 0 && currentRepeat >= repeatCount);
+}
+
 void KeyFrameAnimation::DoLerp(const KeyFrame& first, const KeyFrame& second, float amount) {
     currentPos = glm::mix  (first.position , second.position , amount);
     currentDir = glm::mix  (first.direction, second.direction, amount);
     currentRot = glm::slerp(first.rotation , second.rotation , amount);    
 }
-
 
 void KeyFrameAnimation::MakeOrbit(float segments, float timestep, float radius, const glm::vec3 target) {
     int j = 0;

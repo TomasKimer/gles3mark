@@ -10,7 +10,7 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
-import android.telephony.TelephonyManager;
+//import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -94,9 +94,9 @@ public class DeviceInfo {
     	result += "\nTotal memory: " + (float)memoryInfo.totalMem / (1 << 20) + " MB";
     	
     	// --- Telephony ---
-    	TelephonyManager telephonyManager = (TelephonyManager)activity.getSystemService(Context.TELEPHONY_SERVICE);
-    	result += "\nIMEI: " + telephonyManager.getDeviceId();
-    	result += "\nIMSI: " + telephonyManager.getSubscriberId();
+    	//TelephonyManager telephonyManager = (TelephonyManager)activity.getSystemService(Context.TELEPHONY_SERVICE);
+    	//result += "\nIMEI: " + telephonyManager.getDeviceId();
+    	//result += "\nIMSI: " + telephonyManager.getSubscriberId();
     	
     	return result;
     }

@@ -8,7 +8,7 @@ uniform sampler2D tex;
 uniform vec4 diffuseColor;
 uniform bool hasTexture;
 
-//const float ambientContribution = 1.0;  //0.2
+//const float ambientContribution = 0.1;  //0.2
 
 layout (location=0) out vec4 fragColor;
 layout (location=1) out vec3 fragNormal;

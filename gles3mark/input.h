@@ -6,7 +6,7 @@
 #include <windows.h>
 #endif
 
-#include <map> // unordered_
+#include <map> // unordered_map -> problem with enum class key
 
 class Input {
 public:
@@ -25,35 +25,12 @@ public:
         ScrollUp, ScrollDown,
     };
 
-    static KeyCode OsKeyToKeyCode(int osKey) {
-#ifdef _WIN32
-        switch (osKey) {
-            case VK_RETURN:     return KeyCode::Return;
-            case VK_SPACE:      return KeyCode::Space;
-            case VK_LSHIFT:     return KeyCode::LShift; // not working - why?
-            case VK_TAB:        return KeyCode::Tab;
-            case VK_LCONTROL:   return KeyCode::LCtrl;  // not working - why?
-            case VK_ESCAPE:     return KeyCode::Escape;
-            case VK_UP:         return KeyCode::Up;
-            case VK_DOWN:       return KeyCode::Down;
-            case VK_LEFT:       return KeyCode::Left;
-            case VK_RIGHT:      return KeyCode::Right;
-            case 'W':           return KeyCode::W;
-            case 'S':           return KeyCode::S;
-            case 'A':           return KeyCode::A;
-            case 'D':           return KeyCode::D;
-            case 'Q':           return KeyCode::Q;
-        }
-#endif
-        return KeyCode::Default;
-    }
+    static KeyCode OsKeyToKeyCode(int osKey);
 
-    void RegisterKeyDown(KeyCode keyCode) { activeKeys[keyCode] = true; }
-    void RegisterKeyUp(KeyCode keyCode) { activeKeys[keyCode] = false; }
+    void RegisterKeyDown(KeyCode keyCode) { activeKeys[keyCode] = true;  }
+    void RegisterKeyUp  (KeyCode keyCode) { activeKeys[keyCode] = false; }
 
-    bool IsKeyDown(KeyCode keyCode) {
-        return activeKeys[keyCode];
-    }
+    bool IsKeyDown      (KeyCode keyCode) { return activeKeys[keyCode];  }
 
 private:
     std::map<KeyCode, bool> activeKeys; // unordered_

@@ -3,6 +3,7 @@ package com.tomaskimer.gles3mark;
 import java.net.URI;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -15,6 +16,9 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -32,9 +36,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -168,16 +174,45 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 	// on upload_button click
 	public void Upload(View view) {
-		JSONObject obj = new JSONObject();
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		alert.setTitle("Upload results to server");
+		alert.setMessage("Please enter your nickname:");
+
+		// Set an EditText view to get user input 
+		final EditText input = new EditText(this);
+		input.setHint("nickname");
 		
-		try {
-			obj.put("score", "42");
-			obj.put("info", "I9505");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		//((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
+        //.showSoftInput(input, InputMethodManager.SHOW_FORCED);
 		
-		new UploadTask().execute(obj);		
+		
+		alert.setView(input);
+
+		alert.setPositiveButton("Upload", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		  // Do something with value!
+			JSONObject obj = new JSONObject();
+			Random rnd = new Random();
+			
+			try {
+				obj.put("score", String.format("%d", rnd.nextInt(20000)));
+				obj.put("info", "I9505");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			
+			new UploadTask().execute(obj);		
+		  }
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		  public void onClick(DialogInterface dialog, int whichButton) {
+		    // Canceled.
+		  }
+		});
+
+		alert.show();
 	}
 	
 	@Override
@@ -322,7 +357,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			//String lastResult = ((MainActivity)getActivity()).lastResult;
 			//String score = lastResult == null ? "no score" : lastResult;
 			
-			scoreTextView.setText("no score");  //Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER))
+			//scoreTextView.setText("no score");  //Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER))
 			return rootView;
 		}
 
