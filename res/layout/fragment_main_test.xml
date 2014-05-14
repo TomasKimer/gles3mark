@@ -41,12 +41,12 @@
 
                 <TextView
                     android:id="@+id/textView2"
-                    android:text="FPS average:" />
+                    android:text="Frame time average:" />
 
                 <TextView
-                    android:id="@+id/tvFPSavg"
+                    android:id="@+id/tvSPFavg"
                     android:gravity="right"
-                    android:text="N/A" />
+                    android:text="N/A ms" />
             </TableRow>
 
             <TableRow
@@ -56,12 +56,12 @@
 
                 <TextView
                     android:id="@+id/textView4"
-                    android:text="FPS stddev:" />
+                    android:text="Frame time best:" />
 
                 <TextView
-                    android:id="@+id/tvFPSstddev"
+                    android:id="@+id/tvSPFbest"
                     android:gravity="right"
-                    android:text="N/A" />
+                    android:text="N/A ms" />
             </TableRow>
 
             <TableRow
@@ -71,12 +71,12 @@
 
                 <TextView
                     android:id="@+id/textView6"
-                    android:text="FPS best:" />
+                    android:text="Frame time worst:" />
 
                 <TextView
-                    android:id="@+id/tvFPSbest"
+                    android:id="@+id/tvSPFworst"
                     android:gravity="right"
-                    android:text="N/A" />
+                    android:text="N/A ms" />
             </TableRow>
 
             <TableRow
@@ -87,12 +87,12 @@
 
                 <TextView
                     android:id="@+id/textView8"
-                    android:text="FPS worst:" />
+                    android:text="Frame time stddev" />
 
                 <TextView
-                    android:id="@+id/tvFPSworst"
+                    android:id="@+id/tvSPFstddev"
                     android:gravity="right"
-                    android:text="N/A" />
+                    android:text="N/A ms" />
             </TableRow>
 
             <TableRow
@@ -102,12 +102,12 @@
 
                 <TextView
                     android:id="@+id/textView10"
-                    android:text="Frame time average:" />
+                    android:text="FPS average:" />
 
                 <TextView
-                    android:id="@+id/tvSPFavg"
+                    android:id="@+id/tvFPSavg"
                     android:gravity="right"
-                    android:text="N/A ms" />
+                    android:text="N/A" />
 
             </TableRow>
 
@@ -118,12 +118,12 @@
 
                 <TextView
                     android:id="@+id/textView12"
-                    android:text="Frame time stddev:" />
+                    android:text="FPS best:" />
 
                 <TextView
-                    android:id="@+id/tvSPFstddev"
+                    android:id="@+id/tvFPSbest"
                     android:gravity="right"
-                    android:text="N/A ms" />
+                    android:text="N/A" />
 
             </TableRow>
 
@@ -134,12 +134,12 @@
 
                 <TextView
                     android:id="@+id/textView14"
-                    android:text="Frame time best:" />
+                    android:text="FPS worst:" />
 
                 <TextView
-                    android:id="@+id/tvSPFbest"
+                    android:id="@+id/tvFPSworst"
                     android:gravity="right"
-                    android:text="N/A ms" />
+                    android:text="N/A" />
 
             </TableRow>
 
@@ -151,12 +151,12 @@
 
                 <TextView
                     android:id="@+id/textView16"
-                    android:text="Frame time worst:" />
+                    android:text="FPS stddev:" />
 
                 <TextView
-                    android:id="@+id/tvSPFworst"
+                    android:id="@+id/tvFPSstddev"
                     android:gravity="right"
-                    android:text="N/A ms" />
+                    android:text="N/A" />
 
             </TableRow>
 

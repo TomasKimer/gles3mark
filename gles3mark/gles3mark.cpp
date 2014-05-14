@@ -88,8 +88,10 @@ bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") /
         quit = true;
 
     //std::this_thread::sleep_for(std::chrono::milliseconds(180));
-
+    
     glContext->Swap();
+
+    //std::this_thread::sleep_for(std::chrono::milliseconds(40));
 
     return true;
 }

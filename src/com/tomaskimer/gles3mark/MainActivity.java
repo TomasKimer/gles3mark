@@ -232,7 +232,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	        	final TextView tvInfo = new TextView(this);	    		
 	        	tvInfo.setText(Html.fromHtml("<br/>&nbsp OpenGL ES 3.0 Benchmark for Android<br/>" + 
 	        								 "&nbsp Author: Tomáš Kimer (FIT BUT)<br/>" +
-	        								 "&nbsp Brno, Czech Republic, 2014<br/>" +
+	        								 "&nbsp 2014 Brno, Czech Republic<br/>" +
 	        								 "&nbsp <a href=\"http://gles3mark.eu\">www.gles3mark.eu</a><br/>"));
 	    		tvInfo.setMovementMethod(LinkMovementMethod.getInstance());
 	        	
@@ -376,16 +376,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			try {
 				scoreTextView.setText(json.getString("score"));
 				
-				tvFPSavg   .setText(json.getString("FPSavg"   ));
-				tvFPSstddev.setText(json.getString("FPSstddev"));
-				tvFPSbest  .setText(json.getString("FPSbest"  ));
-				tvFPSworst .setText(json.getString("FPSworst" ));
-				
 				tvSPFavg   .setText(json.getString("SPFavg"   ) + " ms");
-				tvSPFstddev.setText(json.getString("SPFstddev") + " ms");
 				tvSPFbest  .setText(json.getString("SPFbest"  ) + " ms");
 				tvSPFworst .setText(json.getString("SPFworst" ) + " ms");
-			
+				tvSPFstddev.setText(json.getString("SPFstddev") + " ms");
+				
+				tvFPSavg   .setText(json.getString("FPSavg"   ));
+				tvFPSbest  .setText(json.getString("FPSbest"  ));
+				tvFPSworst .setText(json.getString("FPSworst" ));
+				tvFPSstddev.setText(json.getString("FPSstddev"));
+				
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -409,15 +409,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			
 			scoreTextView = (TextView)rootView.findViewById(R.id.score_label);
 			
-			tvFPSavg    = (TextView)rootView.findViewById(R.id.tvFPSavg);
-			tvFPSstddev = (TextView)rootView.findViewById(R.id.tvFPSstddev);
-			tvFPSbest   = (TextView)rootView.findViewById(R.id.tvFPSbest);
-			tvFPSworst  = (TextView)rootView.findViewById(R.id.tvFPSworst);
-			
 			tvSPFavg    = (TextView)rootView.findViewById(R.id.tvSPFavg);
-			tvSPFstddev = (TextView)rootView.findViewById(R.id.tvSPFstddev);
 			tvSPFbest   = (TextView)rootView.findViewById(R.id.tvSPFbest);
 			tvSPFworst  = (TextView)rootView.findViewById(R.id.tvSPFworst);
+			tvSPFstddev = (TextView)rootView.findViewById(R.id.tvSPFstddev);
+			
+			tvFPSavg    = (TextView)rootView.findViewById(R.id.tvFPSavg);
+			tvFPSbest   = (TextView)rootView.findViewById(R.id.tvFPSbest);
+			tvFPSworst  = (TextView)rootView.findViewById(R.id.tvFPSworst);
+			tvFPSstddev = (TextView)rootView.findViewById(R.id.tvFPSstddev);
 			
 			//String lastResult = ((MainActivity)getActivity()).lastResult;
 			//String score = lastResult == null ? "no score" : lastResult;

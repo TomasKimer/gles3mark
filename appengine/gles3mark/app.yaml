@@ -18,6 +18,9 @@ handlers:
   login: admin
   secure: always
 
+- url: /setup
+  script: main.app
+
 - url: .*
   script: main.app
 

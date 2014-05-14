@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block description %}Detail{% endblock %}
+{% block stylesheet %}{{ stylesheet }}{% endblock %}
+
+{% block content %}
+    <h1>
+        {{ title }}
+    </h1>
+
+    <a href="/">back</a> <br/><br/>
+
+    <div class="message">
+    {% autoescape false %}
+         <br/> {{ message }}
+    {% endautoescape %}
+    </div>
+
+{% endblock %}

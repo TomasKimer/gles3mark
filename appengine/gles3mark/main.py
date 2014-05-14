@@ -20,17 +20,17 @@ import json
 from jinja import render_html
 from datastore import ResultItem
 
+def get_platform_css(user_agent):
+    style = "main.css"
+    if user_agent == "gles3mark_android_app":  # or user_agent.find("Android") != -1 or user_agent.find("Mobile") != -1:
+        style = "androidapp.css"
+    return style
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        style = "main.css"
-        usrAg = self.request.headers['User-Agent']
-        if usrAg == "gles3mark_android_app" or usrAg.find("Android") != -1 or usrAg.find("Mobile") != -1:
-            style = "androidapp.css"
-
         results = ResultItem.query().order(-ResultItem.score).fetch()
-        render_html(self, "list.html", style, u"gles3mark result database", self.request.headers['User-Agent'],
-                    template_values={"results": results})
+        render_html(self, 'main.html', get_platform_css(self.request.headers['User-Agent']), u"gles3mark result database",
+                    self.request.headers['User-Agent'], template_values={"results": results})
 
     def post(self):
         rec = json.loads(self.request.body)
@@ -53,11 +53,47 @@ class MainHandler(webapp2.RequestHandler):
 
         self.response.out.write("received with thanks");
 
+class DetailHandler(webapp2.RequestHandler):
+    def get(self):
+        idlist = self.request.arguments()
+        if len(idlist) == 1:
+            id = int(idlist[0])
+            dbrec = ResultItem.get_by_id(id)
+            if type(dbrec) is ResultItem:
+                benchinfo = json.loads(dbrec.benchInfo)
+                glinfo = json.loads(dbrec.glInfo)
+                deviceInfo = json.loads(dbrec.deviceInfo)
+
+                render_html(self, "detail.html", get_platform_css(self.request.headers['User-Agent']),
+                            u"gles3mark result detail", unicode(dbrec.uploader) + u' ' + unicode(dbrec.date) + u' ' +
+                            unicode(benchinfo) + u' ' + unicode(glinfo) + u' ' + unicode(deviceInfo),
+                            template_values={"result": dbrec})
+            else:
+                self.response.write("Result with this id does not exist")
+        else:
+            self.response.write("No id specified")
+
 class AdminHandler(webapp2.RequestHandler):
     def get(self):
         self.response.write("Admin page is under construction.");
 
+class SetupHandler(webapp2.RequestHandler):
+    def get(self):
+        dbrec = ResultItem()
+        dbrec.score = 42
+        dbrec.device = "device"
+        dbrec.uploader = "toom"
+        dbrec.benchInfo = ""
+        dbrec.glInfo = ""
+        dbrec.deviceInfo = ""
+        dbrec.put()
+
+        self.response.write("Setup done.")
+        self.redirect('/')
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/admin', AdminHandler)
+    ('/detail', DetailHandler),
+    ('/admin', AdminHandler),
+    ('/setup', SetupHandler)
 ], debug=True)

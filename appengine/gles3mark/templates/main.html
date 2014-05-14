@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ title }}{% endblock %}
-{% block description %}Bla bla bla{% endblock %}
+{% block description %}Main{% endblock %}
 {% block stylesheet %}{{ stylesheet }}{% endblock %}
 
 {% block content %}
@@ -27,7 +27,7 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ r.score }}</td>
                     <td>{{ r.device }}</td>
-                    <td><a href="#">show</a></td>
+                    <td><a href="detail?{{ r.key.id() }}">detail</a></td>
                 </tr>
             {% endfor %}
         {% endif %}
@@ -37,13 +37,9 @@
     {% if message %}
         <div class="message">
         {% autoescape false %}
-             <br/>User agent: {{ message }}
+            <!-- <br/>User agent: {{ message }} -->
         {% endautoescape %}
         </div>
     {% endif %}
-    &copy; 2014 <a href="http://gles3mark.eu">gles3mark.eu</a> |
-    <a href="http://play.google.com">Google Play</a> |
-    <a href="http://tomaskimer.com">tomaskimer.com</a>
-
 
 {% endblock %}

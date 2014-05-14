@@ -10,7 +10,7 @@
 #include "glquery.h"
 
 Scene::Scene():
-    renderSize(1280, 720),  // 640, 360  // 1920, 1080  // 3840, 2160
+    renderSize(1280, 720),  // 640, 360  // 1280, 720  // 1920, 1080  // 3840, 2160
     freeCamera(false    ),
     cameraAnim(2        ), 
     camera(60.0f, 16.0f/9.0f, 1.0f, 256.0f, glm::vec4(0.5f, 0.5f, 1.f, 1.f))
