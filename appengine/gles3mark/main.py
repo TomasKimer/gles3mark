@@ -36,11 +36,22 @@ class MainHandler(webapp2.RequestHandler):
         rec = json.loads(self.request.body)
 
         dbrec = ResultItem()
-        dbrec.score = int(rec['score'])
-        dbrec.device = rec['info']
+        dbrec.score = int(rec['BenchInfo']['score'])
+        dbrec.device = rec['DeviceInfo']['HW']['Model']
+        dbrec.uploader = rec['Uploader'];
+        dbrec.benchInfo = json.dumps(rec['BenchInfo'])
+        dbrec.glInfo = json.dumps(rec['GLInfo'])
+        dbrec.deviceInfo = json.dumps(rec['DeviceInfo']);
+
+        #dbrec.deviceInfoHW = json.dumps(rec['DeviceInfo']['HW']);
+        #dbrec.deviceInfoOS = json.dumps(rec['DeviceInfo']['OS']);
+        #dbrec.deviceInfoDisplay = json.dumps(rec['DeviceInfo']['Display']);
+        #dbrec.deviceInfoCPU = json.dumps(rec['DeviceInfo']['CPU']);
+        #dbrec.deviceInfoMem = json.dumps(rec['DeviceInfo']['Mem']);
+
         dbrec.put()
 
-        self.response.out.write("Data received - score: " + rec['score'] + ", info: " + rec['info']);
+        self.response.out.write("received with thanks");
 
 class AdminHandler(webapp2.RequestHandler):
     def get(self):

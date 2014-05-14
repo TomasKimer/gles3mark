@@ -41,14 +41,6 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
         Log::V() << "GL_VERSION: "                  + GLQuery::Get<std::string>(GL_VERSION);
         Log::V() << "GL_SHADING_LANGUAGE_VERSION: " + GLQuery::Get<std::string>(GL_SHADING_LANGUAGE_VERSION);
 
-        Log::D() << "Max render buffer size: " << GLQuery::Get<GLint>(GL_MAX_RENDERBUFFER_SIZE) << ", max samples: " << GLQuery::Get<GLint>(GL_MAX_SAMPLES);  // min 2048
-        Log::D() << "Max texture size: " << GLQuery::Get<GLint>(GL_MAX_TEXTURE_SIZE); // min 2048
-        std::vector<GLint> maxDims = GLQuery::Get<GLint>(GL_MAX_VIEWPORT_DIMS, 2);
-        Log::D() << "Max viewport dims: " << maxDims[0] << "x" << maxDims[1];
-        Log::D() << "Max color attachments: " << GLQuery::Get<GLint>(GL_MAX_COLOR_ATTACHMENTS); // min 4
-        Log::D() << "Max vertex attributes: " << GLQuery::Get<GLint>(GL_MAX_VERTEX_ATTRIBS);        
-
-
         scene = std::unique_ptr<Scene>(new Scene());
         scene->OnInit(*assetManager, glContext->GetWidth(), glContext->GetHeight());
 

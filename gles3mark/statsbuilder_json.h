@@ -14,7 +14,12 @@
 class JSONStatsBuilder {
     jsoncons::json result;
 
-    std::string toStr(float val);
+    template <typename T>
+    std::string toStr(T val) {
+        std::stringstream ss;
+        ss << val;
+        return ss.str();    
+    }
 
 public:
     JSONStatsBuilder& BuildGLinfo();

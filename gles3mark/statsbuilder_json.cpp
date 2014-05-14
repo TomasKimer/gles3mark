@@ -16,12 +16,24 @@ JSONStatsBuilder& JSONStatsBuilder::BuildGLinfo() {
     glJson["Version"     ] = GLQuery::Get<std::string>(GL_VERSION);
     glJson["GLSL version"] = GLQuery::Get<std::string>(GL_SHADING_LANGUAGE_VERSION);
 
-    //"Max render buffer size: " << GLQuery::Get<GLint>(GL_MAX_RENDERBUFFER_SIZE) << ", max samples: " << GLQuery::Get<GLint>(GL_MAX_SAMPLES);  // min 2048
-    //"Max texture size: " << GLQuery::Get<GLint>(GL_MAX_TEXTURE_SIZE); // min 2048
-    //std::vector<GLint> maxDims = GLQuery::Get<GLint>(GL_MAX_VIEWPORT_DIMS, 2);
-    //"Max viewport dims: " << maxDims[0] << "x" << maxDims[1];
-    //"Max color attachments: " << GLQuery::Get<GLint>(GL_MAX_COLOR_ATTACHMENTS); // min 4
-    //"Max vertex attributes: " << GLQuery::Get<GLint>(GL_MAX_VERTEX_ATTRIBS); 
+    std::vector<GLint> maxDims = GLQuery::Get<GLint>(GL_MAX_VIEWPORT_DIMS, 2);
+    
+    glJson["Max render buffer size"] = GLQuery::Get<GLint>(GL_MAX_RENDERBUFFER_SIZE);
+    glJson["Max texture size"      ] = GLQuery::Get<GLint>(GL_MAX_TEXTURE_SIZE);
+    glJson["Max viewport dims"     ] = toStr(maxDims[0]) + "x" + toStr(maxDims[1]);
+    glJson["Max samples"           ] = GLQuery::Get<GLint>(GL_MAX_SAMPLES);
+    glJson["Max color attachments" ] = GLQuery::Get<GLint>(GL_MAX_COLOR_ATTACHMENTS);
+    glJson["Max vertex attributes" ] = GLQuery::Get<GLint>(GL_MAX_VERTEX_ATTRIBS);
+
+    
+    // TODO JSONArray? or split ' '
+    std::vector<std::string> extensions = GLQuery::Extensions();
+    std::stringstream ss;
+    for (const std::string& e : extensions) {
+        ss << e << " ";
+    }
+    glJson["Extensions"] = ss.str();
+
 
     result["GLInfo"] = glJson;
 
@@ -46,10 +58,4 @@ JSONStatsBuilder& JSONStatsBuilder::BuildBenchStatsInfo(const BenchmarkStatistic
     result["BenchInfo"] = benchJson;
     
     return *this;
-}
-
-std::string JSONStatsBuilder::toStr(float val) {
-    std::stringstream ss;
-    ss << val;
-    return ss.str();    
 }

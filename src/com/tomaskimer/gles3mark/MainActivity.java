@@ -1,12 +1,7 @@
 package com.tomaskimer.gles3mark;
 
-import java.net.URI;
-import java.util.Date;
 import java.util.Locale;
-import java.util.Random;
-
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -17,7 +12,6 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -29,15 +23,14 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.format.DateFormat;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -53,8 +46,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	final static String SERVER_URL = "http://gles3mark.appspot.com/";
 	final static String USER_AGENT = "gles3mark_android_app";
 	
-	public DeviceInfo deviceInfo = new DeviceInfo(this);
-	public JSONObject lastResult = null; 
+	DeviceInfo deviceInfo = new DeviceInfo(this);
+	JSONObject lastResult = null;
+	String lastNickname = "";
 	
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -126,12 +120,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	}
 
 	@Override
-	public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-	}
+	public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {}
 
 	@Override
-	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-	}
+	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {}
 	
     // on start_button click
 	public void StartBenchmark(View view) {
@@ -161,18 +153,19 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 				
 	    	} catch (Exception e) {
 			    e.printStackTrace();
-				return "Upload to server failed.";
+			    return "";
 			}    	 
 	     }
-
-	     //protected void onProgressUpdate(Integer... progress) {
-	     //}
+	     //protected void onProgressUpdate(Integer... progress) {}
 
 	    protected void onPostExecute(String result) {
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
-
-	    	Button btnUpload = (Button)findViewById(R.id.upload_button);
-			btnUpload.setEnabled(false);
+            if (result.equals("received with thanks")) {
+            	Toast.makeText(getApplicationContext(), "Uploaded successfully, thank you!", Toast.LENGTH_LONG).show();
+            }
+            else { 
+            	Toast.makeText(getApplicationContext(), "Upload to server failed, please try again.", Toast.LENGTH_LONG).show();
+            	findViewById(R.id.upload_button).setEnabled(true);
+            }	    	
 	    }
 	 }
 	
@@ -186,6 +179,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		// Set an EditText view to get user input 
 		final EditText input = new EditText(this);
 		input.setHint("nickname");
+		input.setText(lastNickname);
 		
 		//((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
         //.showSoftInput(input, InputMethodManager.SHOW_FORCED);
@@ -195,15 +189,26 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		alert.setPositiveButton("Upload", new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int whichButton) {
 		  // Do something with value!
+        	findViewById(R.id.upload_button).setEnabled(false);			
+			lastNickname = input.getText().toString();
 			try {
-				JSONObject obj = new JSONObject();
+				JSONObject benchInfo = lastResult.getJSONObject("BenchInfo");
+				JSONObject glInfo    = lastResult.getJSONObject("GLInfo");				
+				JSONObject devInfo   = deviceInfo.GetJSON();
 				
-				obj.put("score", lastResult.getJSONObject("BenchInfo").getString("score"));
-				obj.put("info", "I9505 " + input.getText().toString());
+				JSONObject message = new JSONObject();
+				message.put("Uploader", lastNickname);
+				message.put("BenchInfo", benchInfo);
+				message.put("GLInfo", glInfo);
+				message.put("DeviceInfo", devInfo);
 				
-				new UploadTask().execute(obj);
+				//message.put("score", lastResult.getJSONObject("BenchInfo").getString("score"));
+				//message.put("info", "I9505 " + lastNickname);
+				
+				new UploadTask().execute(message);
 			} catch (JSONException e) {
 				e.printStackTrace();
+            	findViewById(R.id.upload_button).setEnabled(true);
 			}
 		  }
 		});
@@ -211,6 +216,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 		  public void onClick(DialogInterface dialog, int whichButton) {
 		    // Canceled.
+			  lastNickname = input.getText().toString();
 		  }
 		});
 
@@ -223,8 +229,20 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
 	        case R.id.action_about:
-	        	Toast.makeText(getApplicationContext(), "OpenGL ES 3.0 Benchmark for Android\n\u00A9 2014 by Tomáš Kimer (FIT BUT)\nBrno, Czech Republic", Toast.LENGTH_LONG).show();
-	            return true;
+	        	final TextView tvInfo = new TextView(this);	    		
+	        	tvInfo.setText(Html.fromHtml("<br/>&nbsp OpenGL ES 3.0 Benchmark for Android<br/>" + 
+	        								 "&nbsp Author: Tomáš Kimer (FIT BUT)<br/>" +
+	        								 "&nbsp Brno, Czech Republic, 2014<br/>" +
+	        								 "&nbsp <a href=\"http://gles3mark.eu\">www.gles3mark.eu</a><br/>"));
+	    		tvInfo.setMovementMethod(LinkMovementMethod.getInstance());
+	        	
+	        	AlertDialog.Builder alert = new AlertDialog.Builder(this);
+	    		alert.setTitle("About gles3mark");
+	    		alert.setView(tvInfo);
+	    		alert.setPositiveButton("OK", null);	        	
+	    		alert.show();
+	        	
+	        	return true;
 	        case R.id.action_settings:
 	            return true;
 	        default:
@@ -237,16 +255,23 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		if (requestCode == BENCH_REQUEST_ID) {
 			if (resultCode == RESULT_OK) {  // -1,  0 = RESULT_CANCELED
 				String resultStr = data.getStringExtra("Result"); 				
-				JSONObject jsonObject = null;
-				
+				JSONObject jsonObject = null;				
 				try {
 					jsonObject = new JSONObject(resultStr);
 					JSONObject benchInfo = jsonObject.getJSONObject("BenchInfo");
+					JSONObject glInfo = jsonObject.getJSONObject("GLInfo"); 
+					
 					Toast.makeText(getApplicationContext(), "Benchmark finished. Score: " + benchInfo.getString("score"),
 							       Toast.LENGTH_SHORT).show();					
+					
 					TestSectionFragment f = (TestSectionFragment)mSectionsPagerAdapter.getActiveFragment(mViewPager, 0);
-					if (f != null) //  && f.isResumed() -- Interact with any views/data that must be alive
-						f.SetLabels(benchInfo); // else  Flag something for update later, when this viewPagerFragment returns to onResume
+					if (f != null) // && f.isResumed() -- Interact with any views/data that must be alive
+						f.SetLabels(benchInfo);
+					// else  Flag something for update later, when this viewPagerFragment returns to onResume
+					
+					DeviceinfoSectionFragment d = (DeviceinfoSectionFragment)mSectionsPagerAdapter.getActiveFragment(mViewPager, 1);
+					if (d != null)
+						d.SetLabels(glInfo);
 					
 					lastResult = jsonObject;
 					
@@ -415,12 +440,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		private class MyWebViewClient extends WebViewClient {
 		    @Override
 		    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-		        if (Uri.parse(url).getHost().equals(Uri.parse(SERVER_URL).getHost())) {
-		            // This is my web site, so do not override; let my WebView load the page
+		        // do not override; let my WebView load the page
+		    	if (Uri.parse(url).getHost().equals(Uri.parse(SERVER_URL).getHost())) {
 		        	//view.getSettings().setUserAgentString(USER_AGENT);
 		        	return false;
 		        }
-		        // Otherwise, the link is not for a page on my site, so launch another Activity that handles URLs
+		        // link is not for a page on my site, so launch another Activity that handles URLs
 		        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 		        startActivity(intent);
 		        return true;
@@ -447,13 +472,24 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		public static final String ARG_DEVICE_INFO = "device_info";
 
 		public DeviceinfoSectionFragment() { }
+		
+		private TextView deviceinfoTextView;
+		
+		public void SetLabels(JSONObject json) {
+			GLInfo glInfo = new GLInfo(json);
+			deviceinfoTextView.setText("--- GL Info ---\n" + glInfo.toString() + '\n' + getArguments().getString(ARG_DEVICE_INFO) +
+										"\n--- GL Extensions ---\n" + glInfo.Extensions());
+		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main_deviceinfo, container, false);
-			TextView deviceinfoTextView = (TextView)rootView.findViewById(R.id.deviceinfo_label);
+			
+			deviceinfoTextView = (TextView)rootView.findViewById(R.id.deviceinfo_label);
 			deviceinfoTextView.setMovementMethod(new ScrollingMovementMethod());
-			deviceinfoTextView.setText(getArguments().getString(ARG_DEVICE_INFO));// Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER))
+			deviceinfoTextView.setText("--- GL Info ---\n<please run benchmark first>\n\n" +
+										getArguments().getString(ARG_DEVICE_INFO));// Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER))
+			
 			return rootView;
 		}
 	}
