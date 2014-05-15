@@ -49,12 +49,6 @@ class MainHandler(webapp2.RequestHandler):
         dbrec.glContextInfo = json.dumps(rec['GLContextInfo'])
         dbrec.deviceInfo = json.dumps(rec['DeviceInfo']);
 
-        #dbrec.deviceInfoHW = json.dumps(rec['DeviceInfo']['HW']);
-        #dbrec.deviceInfoOS = json.dumps(rec['DeviceInfo']['OS']);
-        #dbrec.deviceInfoDisplay = json.dumps(rec['DeviceInfo']['Display']);
-        #dbrec.deviceInfoCPU = json.dumps(rec['DeviceInfo']['CPU']);
-        #dbrec.deviceInfoMem = json.dumps(rec['DeviceInfo']['Mem']);
-
         dbrec.put()
 
         self.response.out.write("received with thanks");

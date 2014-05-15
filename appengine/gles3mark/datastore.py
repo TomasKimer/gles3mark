@@ -15,9 +15,4 @@ class ResultItem(ndb.Model):
     glContextInfo = ndb.TextProperty()
     deviceInfo = ndb.TextProperty()
 
-    #deviceInfoHW = ndb.TextProperty()
-    #deviceInfoOS = ndb.StringProperty()
-    #deviceInfoDisplay = ndb.StringProperty()
-    #deviceInfoCPU = ndb.StringProperty()
-    #deviceInfoMem = ndb.StringProperty()
 
