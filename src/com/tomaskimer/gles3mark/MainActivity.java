@@ -192,14 +192,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         	findViewById(R.id.upload_button).setEnabled(false);			
 			lastNickname = input.getText().toString();
 			try {
-				JSONObject benchInfo = lastResult.getJSONObject("BenchInfo");
-				JSONObject glInfo    = lastResult.getJSONObject("GLInfo");				
-				JSONObject devInfo   = deviceInfo.GetJSON();
+				JSONObject benchInfo     = lastResult.getJSONObject("BenchInfo");
+				JSONObject glInfo        = lastResult.getJSONObject("GLInfo");				
+				JSONObject glContextInfo = lastResult.getJSONObject("GLContextInfo");
+				JSONObject devInfo       = deviceInfo.GetJSON();
 				
 				JSONObject message = new JSONObject();
 				message.put("Uploader", lastNickname);
 				message.put("BenchInfo", benchInfo);
 				message.put("GLInfo", glInfo);
+				message.put("GLContextInfo", glContextInfo);
 				message.put("DeviceInfo", devInfo);
 				
 				//message.put("score", lastResult.getJSONObject("BenchInfo").getString("score"));
@@ -233,7 +235,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	        	tvInfo.setText(Html.fromHtml("<br/>&nbsp OpenGL ES 3.0 Benchmark for Android<br/>" + 
 	        								 "&nbsp Author: Tomáš Kimer (FIT BUT)<br/>" +
 	        								 "&nbsp 2014 Brno, Czech Republic<br/>" +
-	        								 "&nbsp <a href=\"http://gles3mark.eu\">www.gles3mark.eu</a><br/>"));
+	        								 "&nbsp <a href=\"http://gles3mark.appspot.com\">gles3mark.appspot.com</a><br/>"));
 	    		tvInfo.setMovementMethod(LinkMovementMethod.getInstance());
 	        	
 	        	AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -259,7 +261,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 				try {
 					jsonObject = new JSONObject(resultStr);
 					JSONObject benchInfo = jsonObject.getJSONObject("BenchInfo");
-					JSONObject glInfo = jsonObject.getJSONObject("GLInfo"); 
+					JSONObject glInfo  = jsonObject.getJSONObject("GLInfo"); 
+					JSONObject eglInfo = jsonObject.getJSONObject("GLContextInfo");
 					
 					Toast.makeText(getApplicationContext(), "Benchmark finished. Score: " + benchInfo.getString("score") +
 							"\nPlease upload your results!", Toast.LENGTH_SHORT).show();					
@@ -271,7 +274,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 					
 					DeviceinfoSectionFragment d = (DeviceinfoSectionFragment)mSectionsPagerAdapter.getActiveFragment(mViewPager, 1);
 					if (d != null)
-						d.SetLabels(glInfo);
+						d.SetLabels(glInfo, eglInfo);
 					
 					lastResult = jsonObject;
 					
@@ -420,7 +423,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			tvFPSstddev = (TextView)rootView.findViewById(R.id.tvFPSstddev);
 			
 			//String lastResult = ((MainActivity)getActivity()).lastResult;
-			//String score = lastResult == null ? "no score" : lastResult;
 
 			return rootView;
 		}
@@ -475,10 +477,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		
 		private TextView deviceinfoTextView;
 		
-		public void SetLabels(JSONObject json) {
-			GLInfo glInfo = new GLInfo(json);
-			deviceinfoTextView.setText("--- GL Info ---\n" + glInfo.toString() + '\n' + getArguments().getString(ARG_DEVICE_INFO) +
-										"\n--- GL Extensions ---\n" + glInfo.Extensions());
+		public void SetLabels(JSONObject json, JSONObject jsonEGL) {
+			GLInfo glInfo = new GLInfo(json, jsonEGL);
+			deviceinfoTextView.setText(glInfo.toString() + '\n' +
+									   getArguments().getString(ARG_DEVICE_INFO) + "\n" +
+									   glInfo.Limits() + "\n" +
+									   glInfo.Extensions());
 		}
 
 		@Override
@@ -487,9 +491,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			
 			deviceinfoTextView = (TextView)rootView.findViewById(R.id.deviceinfo_label);
 			deviceinfoTextView.setMovementMethod(new ScrollingMovementMethod());
-			deviceinfoTextView.setText("--- GL Info ---\n<please run benchmark first>\n\n" +
-										getArguments().getString(ARG_DEVICE_INFO));// Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER))
-			
+			deviceinfoTextView.setText("--- GL info ---\n<please run benchmark first>\n\n" +
+									   "--- EGL context info ---\n<please run benchmark first>\n\n" +
+									   getArguments().getString(ARG_DEVICE_INFO) +
+									   "\n--- GL implementation-dependent limits ---\n<please run benchmark first>\n" +             
+							           "\n--- GL extensions ---\n<please run benchmark first>");			
 			return rootView;
 		}
 	}

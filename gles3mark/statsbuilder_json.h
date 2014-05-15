@@ -6,12 +6,13 @@
 #include <jsoncons/json.hpp> // http://sourceforge.net/p/jsoncons/wiki/Home/
 
 #include "benchmarkstatistics.h"
+#include "rendercontext.h"
 
 class JSONStatsBuilder {
     jsoncons::json result;
 
     template <typename T>
-    std::string toStr(T val) {
+    static std::string toStr(T val) {
         std::stringstream ss;
         ss << val;
         return ss.str();    
@@ -19,6 +20,7 @@ class JSONStatsBuilder {
 
 public:
     JSONStatsBuilder& BuildGLinfo();
+    JSONStatsBuilder& BuildGLContextInfo(const RenderContext& rc);
     JSONStatsBuilder& BuildBenchStatsInfo(const BenchmarkStatistics& benchStats);
 
     std::string Build();

@@ -12,6 +12,7 @@ class ResultItem(ndb.Model):
 
     benchInfo = ndb.TextProperty()
     glInfo = ndb.TextProperty()
+    glContextInfo = ndb.TextProperty()
     deviceInfo = ndb.TextProperty()
 
     #deviceInfoHW = ndb.TextProperty()

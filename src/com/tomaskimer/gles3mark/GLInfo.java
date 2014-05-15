@@ -1,31 +1,35 @@
 package com.tomaskimer.gles3mark;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class GLInfo extends BaseInfo {
 	
-	JSONObject json;
+	JSONObject json, jsonEGL;
 	
-	public GLInfo(JSONObject json) {
+	public GLInfo(JSONObject json, JSONObject jsonEGL) {
 		this.json = json;
+		this.jsonEGL = jsonEGL;		
 	}
 	
 	public String toString() {
 		String result = new String();
 		
 		try {
+			result += "--- GL info ---\n";
+			
 			result += formatLine(json, "Vendor"      );
 			result += formatLine(json, "Renderer"    );
 			result += formatLine(json, "Version"     );
 			result += formatLine(json, "GLSL version");
 			
-			result += formatLine(json, "Max render buffer size");
-			result += formatLine(json, "Max texture size"      );
-			result += formatLine(json, "Max viewport dims"     );
-			result += formatLine(json, "Max samples"           );
-			result += formatLine(json, "Max color attachments" );
-			result += formatLine(json, "Max vertex attributes" );						
+			result += "\n--- EGL context info ---\n";
+			
+			result += formatLine(jsonEGL, "Version"   );
+			result += formatLine(jsonEGL, "Surface size"   );
+			result += formatLine(jsonEGL, "Min swap interval");
+			result += formatLine(jsonEGL, "Max swap interval");					
 			
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -34,13 +38,29 @@ public class GLInfo extends BaseInfo {
 		return result;
 	}
 	
-	public String Extensions() {
+	public String Limits() {
+		String ret = "--- GL implementation-dependent limits ---\n";		
 		try {
-			return json.getString("Extensions");
+			ret += jsonToString(json.getJSONObject("Limits"));
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return "";
 		}
+		
+		return ret;
+	}
+	
+	public String Extensions() {
+		String ret = "--- GL extensions ---\n";
+		try {
+			JSONArray exts = json.getJSONArray("Extensions");
+			for (int i = 0; i < exts.length(); ++i) {
+				ret += exts.getString(i) + "\n";
+			}
+			//return json.getString("Extensions").replaceAll(" ", "\n");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 }

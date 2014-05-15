@@ -14,9 +14,8 @@ bool RenderContextEGL::Create(void* osWnd) {
 
 	EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);  //eglGetCurrentDisplay()
 
-	EGLint major, minor;
-	eglInitialize(display, &major, &minor);
-	Log::V() << "EGL Initialized: " << major << "." << minor;
+	eglInitialize(display, &versionMajor, &versionMinor);
+	Log::V() << "EGL Initialized: " << versionMajor << "." << versionMinor;
 
 	/*
 	 * Here specify the attributes of the desired configuration.
@@ -73,7 +72,6 @@ bool RenderContextEGL::Create(void* osWnd) {
 	eglQuerySurface(display, surface, EGL_HEIGHT, &h);
 	Log::V() << "EGL surface size: " << w << "x" << h;
 
-	EGLint minSwapInterval, maxSwapInterval;
 	eglGetConfigAttrib(display, config, EGL_MIN_SWAP_INTERVAL, &minSwapInterval);
 	eglGetConfigAttrib(display, config, EGL_MAX_SWAP_INTERVAL, &maxSwapInterval);
 	Log::V() << "EGL swap interval - min: " << minSwapInterval << ", max: " << maxSwapInterval;

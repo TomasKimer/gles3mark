@@ -45,14 +45,10 @@ public class DeviceInfo extends BaseInfo {
 			jsonHW.put("Model"       , android.os.Build.MODEL);
 			jsonHW.put("Device"      , android.os.Build.DEVICE);
 			jsonHW.put("Product"     , android.os.Build.PRODUCT);
-			jsonHW.put("Display"     , android.os.Build.DISPLAY);
 			jsonHW.put("Board"       , android.os.Build.BOARD);
-			jsonHW.put("Fingerprint" , android.os.Build.FINGERPRINT);
 			jsonHW.put("Hardware"    , android.os.Build.HARDWARE);
 			jsonHW.put("Id"          , android.os.Build.ID);
 			jsonHW.put("Serial"      , android.os.Build.SERIAL);
-			jsonHW.put("Tags"        , android.os.Build.TAGS);
-			jsonHW.put("Type"        , android.os.Build.TYPE);
 			
 			json.put("HW", jsonHW);
 			
@@ -62,15 +58,23 @@ public class DeviceInfo extends BaseInfo {
 			
 			jsonOS.put("Android SDK version", android.os.Build.VERSION.SDK_INT);
 			jsonOS.put("Android version"    , android.os.Build.VERSION.RELEASE);
+			jsonOS.put("Android version incremental", android.os.Build.VERSION.INCREMENTAL + " " +
+													  android.os.Build.VERSION.CODENAME);
 			jsonOS.put("Kernel"             , getInfo("/proc/version"));			
 			jsonOS.put("OS"                 , System.getProperty("os.name"   ) + " " +
 					                          System.getProperty("os.version") + " " +
 					                          System.getProperty("os.arch"   ));
-			jsonOS.put("VM implementation"  , System.getProperty("java.vm.name") + " " +
-					   				          System.getProperty("java.vm.version"));
+			jsonOS.put("Java specification" , System.getProperty("java.specification.name") + " " +
+					   				          System.getProperty("java.specification.version"));
 			jsonOS.put("VM specification"   , System.getProperty("java.vm.specification.name") + " " +
 					   				          System.getProperty("java.vm.specification.version"));
-			jsonOS.put("Bootloader"         , android.os.Build.BOOTLOADER);			
+			jsonOS.put("VM implementation"  , System.getProperty("java.vm.name") + " " +
+				          				      System.getProperty("java.vm.version"));
+			jsonOS.put("Bootloader"         , android.os.Build.BOOTLOADER);	
+			jsonOS.put("Build ID"           , android.os.Build.DISPLAY);
+			jsonOS.put("Fingerprint"        , android.os.Build.FINGERPRINT);
+			jsonOS.put("Tags"        		, android.os.Build.TAGS);
+			jsonOS.put("Type"        		, android.os.Build.TYPE);
 			
 			json.put("OS", jsonOS);
 			
@@ -156,19 +160,6 @@ public class DeviceInfo extends BaseInfo {
     		
     		result += formatLine(j, "Total memory"); 
     		
-    		
-    		result += "\n--- OS info ---\n";
-    		j = json.getJSONObject("OS");
-    		
-    		result += formatLine(j, "Android version"    );
-    		result += formatLine(j, "Android SDK version");
-    		result += formatLine(j, "VM implementation"  );
-    		result += formatLine(j, "VM specification"   );
-    		result += formatLine(j, "OS"                 );
-    		result += formatLine(j, "Kernel"             );    		
-    		result += formatLine(j, "Bootloader"         );    		                        				        
-
-    		
     		result += "\n--- HW info ---\n";    		
     		j = json.getJSONObject("HW");
     		
@@ -176,15 +167,27 @@ public class DeviceInfo extends BaseInfo {
     		result += formatLine(j, "Brand"       );
     		result += formatLine(j, "Model"       );
     		result += formatLine(j, "Device"      );
-    		result += formatLine(j, "Product"     );
-    		result += formatLine(j, "Display"     );
-    		result += formatLine(j, "Board"       );
-    		result += formatLine(j, "Fingerprint" );
     		result += formatLine(j, "Hardware"    );
-    		result += formatLine(j, "Id"          );
-    		result += formatLine(j, "Serial"      );   
-    		result += formatLine(j, "Tags"        );    
-    		result += formatLine(j, "Type"        );    		   		
+    		result += formatLine(j, "Board"       );
+    		result += formatLine(j, "Product"     );     		
+//    		result += formatLine(j, "Id"          );
+//    		result += formatLine(j, "Serial"      );
+    		
+    		result += "\n--- Android info ---\n";
+    		j = json.getJSONObject("OS");
+    		
+    		result += formatLine(j, "Android version"    );
+    		result += formatLine(j, "Android SDK version");
+    		result += formatLine(j, "OS"                 );
+    		result += formatLine(j, "Bootloader"         );
+    		result += formatLine(j, "Java specification" );
+    		result += formatLine(j, "VM specification"   );
+    		result += formatLine(j, "VM implementation"  );    		
+    		result += formatLine(j, "Build ID"           );    	
+    		result += formatLine(j, "Fingerprint"        );
+    		result += formatLine(j, "Kernel"             ); 
+//    		result += formatLine(j, "Tags"        );    
+//    		result += formatLine(j, "Type"        );
 		
     	} catch (JSONException e) {
 			e.printStackTrace();

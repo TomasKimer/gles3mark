@@ -10,7 +10,7 @@
 
     <a href="/">&larr;back</a> <br/><br/>
 
-    <b>Basic info</b><br/>
+    <b>General info</b><br/>
     <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
     <tbody>
         <tr> <td>Uploader</td> <td>{{ db.uploader }}</td> </tr>
@@ -21,15 +21,15 @@
     </table>
 
     <br/> <br/>
-    <b>Test details</b><br/>
+    <b>Benchmark results</b><br/>
     <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
     <tbody>
         <tr> <td>Score            </td> <td>{{ db.score        }}</td> </tr>
 
-        <tr> <td>Frame time avg   </td> <td>{{ bench.SPFavg    }}</td> </tr>
-        <tr> <td>Frame time best  </td> <td>{{ bench.SPFbest   }}</td> </tr>
-        <tr> <td>Frame time worst </td> <td>{{ bench.SPFworst  }}</td> </tr>
-        <tr> <td>Frame time stddev</td> <td>{{ bench.SPFstddev }}</td> </tr>
+        <tr> <td>Frame time avg   </td> <td>{{ bench.SPFavg    }} ms</td> </tr>
+        <tr> <td>Frame time best  </td> <td>{{ bench.SPFbest   }} ms</td> </tr>
+        <tr> <td>Frame time worst </td> <td>{{ bench.SPFworst  }} ms</td> </tr>
+        <tr> <td>Frame time stddev</td> <td>{{ bench.SPFstddev }} ms</td> </tr>
 
         <tr> <td>FPS avg   </td> <td>{{ bench.FPSavg    }}</td> </tr>
         <tr> <td>FPS best  </td> <td>{{ bench.FPSbest   }}</td> </tr>
@@ -51,20 +51,85 @@
     </table>
 
     <br/> <br/>
-    <b>Device info</b><br/>
+    <b>EGL context info</b><br/>
     <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
     <tbody>
-        <tr> <td>Model           </td> <td>{{ device.HW.Model        }}</td> </tr>
+        <tr> <td>Version          </td> <td>{{ glcontext["Version"]           }}</td> </tr>
+        <tr> <td>Surface size     </td> <td>{{ glcontext["Surface size"]      }}</td> </tr>
+        <tr> <td>Min swap interval</td> <td>{{ glcontext["Min swap interval"] }}</td> </tr>
+        <tr> <td>Max swap interval</td> <td>{{ glcontext["Max swap interval"] }}</td> </tr>
+    </tbody>
+    </table>
+
+    <br/> <br/>
+    <b>Display info</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+        <tr> <td>Resolution</td> <td>{{ device.Display.Resolution }}</td> </tr>
+    </tbody>
+    </table>
+
+    <br/> <br/>
+    <b>CPU info</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+        <tr> <td>Cores</td> <td>{{ device.CPU.Cores }}</td> </tr>
+    </tbody>
+    </table>
+
+    <br/> <br/>
+    <b>Memory info</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+        <tr> <td>Total memory</td> <td>{{ device.Mem["Total memory"] }}</td> </tr>
+    </tbody>
+    </table>
+
+    <br/> <br/>
+    <b>HW info</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+        <tr> <td>Manufacturer</td> <td>{{ device.HW.Manufacturer }}</td> </tr>
+    </tbody>
+    </table>
+
+    <br/> <br/>
+    <b>Android info</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+        <tr> <td>Android version</td> <td>{{ device.OS["Android version"] }}</td> </tr>
+    </tbody>
+    </table>
+
+    <br/> <br/>
+    <b>OpenGL implementation-dependent limits</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+        {% for l in gllimits %}
+            <tr> <td>{{ l }}</td> <td>{{ gllimits[l] }}</td> </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+
+    <br/> <br/>
+    <b>OpenGL extensions</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+      {% for e in gl.Extensions %}
+        <tr> <td>{{ e }}</td> </tr>
+      {% endfor %}
     </tbody>
     </table>
 
 
-
-    <!--<div class="message">-->
-    <!--{% autoescape false %}-->
-         <!--<br/> {{ message }}-->
-    <!--{% endautoescape %}-->
-    <!--</div>-->
+    <div class="message">
+    {% autoescape false %}
+         <br/> {{ bench }}
+        <br/> {{ gl }}
+        <br/> {{ glcontext }}
+        <br/> {{ device }}
+    {% endautoescape %}
+    </div>
 
     <br/>
     &uarr; <a href="#top">back to top</a> &uarr;<br/>

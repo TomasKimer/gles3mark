@@ -24,7 +24,7 @@ public abstract class BaseInfo {
     	while (keys.hasNext()) {
             String key = (String)keys.next();
             try {
-				result += '\t' + key + ": " + json.get(key) + '\n';
+				result += key + ": " + json.get(key) + '\n';
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
