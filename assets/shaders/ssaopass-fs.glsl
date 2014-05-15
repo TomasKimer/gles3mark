@@ -14,8 +14,9 @@ layout (location=2) out vec4 ambientColor;
 layout (location=3) out float ssaoColor;
 
 const float ambientContribution = 0.1;  //0.2
-const float filterRadius        = 5.0;  // 10 / screenWidth, 10 / screenHeight
+const float filterRadius        = 10.0;  // PC: 5.0 // 10 / screenWidth, 10 / screenHeight
 const float distanceThreshold   = 5.0;
+const float strength            = 1.0;
 const int sample_count          = 16;
 
 const vec2 poisson16[] = vec2[](    // Poisson Disk Samples
@@ -68,7 +69,7 @@ float computeSSAO(in vec3 viewPos, in vec3 viewNormal, in vec2 radius) {
         occlusion += (a * b);
     }
  
-    return 1.0 - (occlusion / float(sample_count));
+    return 1.0 - (occlusion / float(sample_count)) * strength;
 }
 
 

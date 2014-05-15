@@ -21,17 +21,17 @@
 #include "keyframeanimation.h"
 #include "materialdatabase.h"
 
-class Scene {  // public Screen?
+class Scene {  // public Screen
     friend class GLES3Mark;
 
-    std::unique_ptr<ShaderProgram> shadowPassProgram, geometryPassProgram, ssaoPassProgram, lightPassProgram, screenQuadProgram; 
+    std::unique_ptr<ShaderProgram> geometryPassProgram, ssaoPassProgram, lightPassProgram, screenQuadProgram; 
     Model *modelE112, *modelChairs, *modelDeskMid, *modelDeskSide;
     Mesh meshPointLight;
     QuadRenderer quadRenderer;
     MaterialDatabase materialDatabase;
     std::vector<std::unique_ptr<Light>> lightDatabase;
     
-    Framebuffer framebuffer;//, framebufferSecond;
+    Framebuffer framebuffer;
     Texture albedoTex, normalTex, depthTex, finalTex, ssaoTex;
 
     KeyFrameAnimation cameraAnim;

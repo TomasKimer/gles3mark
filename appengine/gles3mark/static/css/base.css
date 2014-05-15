@@ -1,0 +1,17 @@
+
+th {
+    text-align: center;
+}
+
+td {
+    word-wrap: break-word;
+}
+
+.pure-table {
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.pure-table-bordered td {
+    text-align: left;
+}

@@ -17,7 +17,7 @@ Camera::~Camera() {
 void Camera::Reset() {
     up = glm::vec3(0.0f, 1.0f, 0.0f);
     eye = glm::vec3(0, 0, 0);
-    target = glm::vec3(0.f, 0.f, 1.f);
+    target = glm::vec3(0.f, 10.f, 1.f);
 
     angleHoriz = 0.0f; // glm::half_pi<float>()
     angleVert = 0.0f;

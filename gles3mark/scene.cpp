@@ -13,8 +13,8 @@ Scene::Scene():
     renderSize(1280, 720),  // 640, 360  // 1280, 720  // 1920, 1080  // 3840, 2160
     freeCamera(false    ),
     cameraAnim(2        ), 
-    camera(60.0f, 16.0f/9.0f, 1.0f, 256.0f, glm::vec4(0.5f, 0.5f, 1.f, 1.f))
-{
+    camera(60.0f, 16.0f/9.0f, 1.0f, 256.0f, glm::vec4(0.5f, 0.5f, 1.f, 1.f)) {
+
 }
 
 Scene::~Scene() {
@@ -154,10 +154,10 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
     // ------------------------------------------------
     // ------------- gbuffer textures setup -----------
     // ------------------------------------------------
-    albedoTex.InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y           );  // TODO RGB?
+    albedoTex.InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y           );
     normalTex.InitStorage(GL_RGB16F           , GL_RGB            , GL_FLOAT        , renderSize.x, renderSize.y           );  // encode to GL_RG16F, GL_RG ?
     depthTex .InitStorage(GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT , renderSize.x, renderSize.y           );
-    finalTex .InitStorage(GL_RGBA             , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y, GL_LINEAR);  // TODO RGB?
+    finalTex .InitStorage(GL_RGBA8            , GL_RGBA           , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y, GL_LINEAR);
     ssaoTex  .InitStorage(GL_RED              , GL_RED            , GL_UNSIGNED_BYTE, renderSize.x, renderSize.y           );
 
     // --------------------------------------------
@@ -171,17 +171,11 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
     framebuffer.Attach(ssaoTex  , GL_COLOR_ATTACHMENT3);
     framebuffer.CheckCompleteness();
     
-    //framebufferSecond.Bind();
-    //framebufferSecond.Attach(depthTex, GL_DEPTH_ATTACHMENT);
-    //framebufferSecond.Attach(finalTex, GL_COLOR_ATTACHMENT0);
-    //framebufferSecond.ActiveColorAttachments(std::vector<GLenum>{GL_COLOR_ATTACHMENT0});
-    //framebufferSecond.CheckCompleteness();
-
     // ------------------------------------------------
     // ------------- camera animation setup -----------
     // ------------------------------------------------
-    cameraAnim.MakeOrbit(72.0f, 0.1f, 50.0f, camera.GetTarget());  
-    camera.LookAt(cameraAnim.GetKeyFrame(0).position, cameraAnim.GetKeyFrame(0).direction);  //camera.Move(glm::vec3(0, 20, -50.f));
+    cameraAnim.MakeOrbit(72.0f, 0.1f, 50.0f);  
+    camera.LookAt(cameraAnim.GetKeyFrame(0).position, glm::vec3(0.f, 10.f, 1.f));  //camera.Move(glm::vec3(0, 20, -50.f));
      
     // ---------------------------------------
     // ------------- misc gl setup -----------
@@ -201,7 +195,7 @@ bool Scene::OnStep(const Time& time) {
     // animation
     if (!freeCamera && time.RealTimeSinceStartup() > 1.0f) {
         cameraAnim.Update(time.DeltaTime());
-        camera.LookAt(cameraAnim.GetCurrentPosition(), cameraAnim.GetCurrentDirection());
+        camera.LookAt(cameraAnim.GetCurrentPosition(), glm::vec3(0.f, 10.f, 1.f));
     }
     
     // camera properties
@@ -270,14 +264,10 @@ bool Scene::OnStep(const Time& time) {
     // -------------------------------------------------
     framebuffer.ActiveColorAttachments(std::vector<GLenum>{GL_NONE, GL_NONE, GL_COLOR_ATTACHMENT2, GL_NONE});
         
-    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    //glClear(GL_COLOR_BUFFER_BIT);
-    
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
     
     glEnable(GL_DEPTH_TEST); 
-    //glDepthMask(GL_FALSE);  // disable writing into the depth buffer
     glDepthFunc(GL_GEQUAL); // passes if the incoming depth value is greater than or equal to the stored depth value
     glCullFace(GL_FRONT);   // front-facing polygons are culled
 
@@ -301,7 +291,7 @@ bool Scene::OnStep(const Time& time) {
         lightPassProgram->SetUniform("lightColor", l->diffuseColor);
         lightPassProgram->SetUniform("lightSize", l->size);    
 
-        meshPointLight.renderer.Render();   // TODO instancing? 
+        meshPointLight.renderer.Render();   // could be also instanced
     }
     
 
@@ -315,7 +305,7 @@ bool Scene::OnStep(const Time& time) {
 
     glClear(GL_COLOR_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
-    glCullFace(GL_BACK);  // back-facing polygons are culled
+    glCullFace(GL_BACK);
     glDisable(GL_BLEND);
 
     screenQuadProgram->Use();

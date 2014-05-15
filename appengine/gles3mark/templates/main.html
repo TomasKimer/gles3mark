@@ -4,7 +4,7 @@
 {% block stylesheet %}{{ stylesheet }}{% endblock %}
 
 {% block content %}
-    <h1>
+    <h1 id="top">
         {{ title }}
     </h1>
 
@@ -16,6 +16,7 @@
             <th>#</th>
             <th>Score</th>
             <th>Device</th>
+            <th>Renderer</th>
             <th>Details</th>
         </tr>
     </thead>
@@ -25,9 +26,10 @@
             {% for r in results %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{ r.score }}</td>
-                    <td>{{ r.device }}</td>
-                    <td><a href="detail?{{ r.key.id() }}">detail</a></td>
+                    <td>{{ r.score    }}</td>
+                    <td>{{ r.device   }}</td>
+                    <td>{{ r.renderer }}</td>
+                    <td><a href="detail?{{ r.key.id() }}">show</a></td>
                 </tr>
             {% endfor %}
         {% endif %}
@@ -41,5 +43,8 @@
         {% endautoescape %}
         </div>
     {% endif %}
+
+    <br/>
+    &uarr; <a href="#top">back to top</a> &uarr;<br/>
 
 {% endblock %}

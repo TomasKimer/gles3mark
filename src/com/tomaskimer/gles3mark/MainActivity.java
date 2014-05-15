@@ -174,11 +174,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle("Upload results to the server");
-		alert.setMessage("Please enter your nickname:");
+		alert.setMessage("Please enter your name:");
 
 		// Set an EditText view to get user input 
 		final EditText input = new EditText(this);
-		input.setHint("nickname");
+		input.setHint("name");
 		input.setText(lastNickname);
 		
 		//((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
@@ -261,8 +261,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 					JSONObject benchInfo = jsonObject.getJSONObject("BenchInfo");
 					JSONObject glInfo = jsonObject.getJSONObject("GLInfo"); 
 					
-					Toast.makeText(getApplicationContext(), "Benchmark finished. Score: " + benchInfo.getString("score"),
-							       Toast.LENGTH_SHORT).show();					
+					Toast.makeText(getApplicationContext(), "Benchmark finished. Score: " + benchInfo.getString("score") +
+							"\nPlease upload your results!", Toast.LENGTH_SHORT).show();					
 					
 					TestSectionFragment f = (TestSectionFragment)mSectionsPagerAdapter.getActiveFragment(mViewPager, 0);
 					if (f != null) // && f.isResumed() -- Interact with any views/data that must be alive

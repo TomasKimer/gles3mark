@@ -17,8 +17,6 @@
     <None Include="..\assets\shaders\screenquad-vs.glsl" />
     <None Include="..\assets\shaders\lightpass-fs.glsl" />
     <None Include="..\assets\shaders\lightpass-vs.glsl" />
-    <None Include="..\assets\shaders\shadowpass-fs.glsl" />
-    <None Include="..\assets\shaders\shadowpass-vs.glsl" />
     <None Include="..\assets\shaders\ssaopass-fs.glsl" />
     <None Include="..\assets\shaders\ssaopass-vs.glsl" />
     <None Include="gles3mark_dll.def" />

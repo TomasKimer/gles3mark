@@ -36,9 +36,13 @@ class MainHandler(webapp2.RequestHandler):
         rec = json.loads(self.request.body)
 
         dbrec = ResultItem()
+
         dbrec.score = int(rec['BenchInfo']['score'])
         dbrec.device = rec['DeviceInfo']['HW']['Model']
+        dbrec.renderer = rec['GLInfo']['Renderer']
+
         dbrec.uploader = rec['Uploader'];
+
         dbrec.benchInfo = json.dumps(rec['BenchInfo'])
         dbrec.glInfo = json.dumps(rec['GLInfo'])
         dbrec.deviceInfo = json.dumps(rec['DeviceInfo']);
@@ -65,9 +69,8 @@ class DetailHandler(webapp2.RequestHandler):
                 deviceInfo = json.loads(dbrec.deviceInfo)
 
                 render_html(self, "detail.html", get_platform_css(self.request.headers['User-Agent']),
-                            u"gles3mark result detail", unicode(dbrec.uploader) + u' ' + unicode(dbrec.date) + u' ' +
-                            unicode(benchinfo) + u' ' + unicode(glinfo) + u' ' + unicode(deviceInfo),
-                            template_values={"result": dbrec})
+                            u"gles3mark result detail", u'',
+                            template_values={"db": dbrec, "bench": benchinfo, "gl": glinfo, "device": deviceInfo})
             else:
                 self.response.write("Result with this id does not exist")
         else:
@@ -80,12 +83,17 @@ class AdminHandler(webapp2.RequestHandler):
 class SetupHandler(webapp2.RequestHandler):
     def get(self):
         dbrec = ResultItem()
+
         dbrec.score = 42
-        dbrec.device = "device"
-        dbrec.uploader = "toom"
-        dbrec.benchInfo = ""
-        dbrec.glInfo = ""
-        dbrec.deviceInfo = ""
+        dbrec.device = "GT-9505"
+        dbrec.renderer = "Adreno(TM) 320"
+
+        dbrec.uploader = "TooM"
+
+        dbrec.benchInfo = "{}"
+        dbrec.glInfo = "{}"
+        dbrec.deviceInfo = "{}"
+
         dbrec.put()
 
         self.response.write("Setup done.")

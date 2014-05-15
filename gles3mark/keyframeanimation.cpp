@@ -71,17 +71,16 @@ bool KeyFrameAnimation::HasEnded() {
 
 void KeyFrameAnimation::DoLerp(const KeyFrame& first, const KeyFrame& second, float amount) {
     currentPos = glm::mix  (first.position , second.position , amount);
-    currentDir = glm::mix  (first.direction, second.direction, amount);
-    currentRot = glm::slerp(first.rotation , second.rotation , amount);    
+    //currentRot = glm::slerp(first.rotation , second.rotation , amount);  // rotation is not used
 }
 
-void KeyFrameAnimation::MakeOrbit(float segments, float timestep, float radius, const glm::vec3 target) {
+void KeyFrameAnimation::MakeOrbit(float segments, float timestep, float radius) {
     int j = 0;
     for (float i = -glm::pi<float>() / 2.f; i < 2*glm::pi<float>() - glm::pi<float>() / 2.f; i += (2*glm::pi<float>() / segments)) {
         float x = radius * glm::cos((float)i);
         float z = radius * glm::sin((float)i);
         
-        AddKeyFrame(KeyFrame(glm::vec3(x, 25+2*glm::sin(i), z), target, j * timestep));        
+        AddKeyFrame(KeyFrame(glm::vec3(x, 25+2*glm::sin(i), z), j * timestep));        
 
         j++;
     }
@@ -91,9 +90,9 @@ void KeyFrameAnimation::MakeOrbit(float segments, float timestep, float radius, 
     AddKeyFrame(final);
 
     // timestep = 3.0f;
-    //AddKeyFrame(KeyFrame(glm::vec3(  0, 20, -50), target, 0*timestep));
-    //AddKeyFrame(KeyFrame(glm::vec3( 50, 20,   0), target, 1*timestep));
-    //AddKeyFrame(KeyFrame(glm::vec3(  0, 20,  50), target, 2*timestep));
-    //AddKeyFrame(KeyFrame(glm::vec3(-50, 20,   0), target, 3*timestep));
-    //AddKeyFrame(KeyFrame(glm::vec3(  0, 20, -50), target, 4*timestep));
+    //AddKeyFrame(KeyFrame(glm::vec3(  0, 20, -50), 0*timestep));
+    //AddKeyFrame(KeyFrame(glm::vec3( 50, 20,   0), 1*timestep));
+    //AddKeyFrame(KeyFrame(glm::vec3(  0, 20,  50), 2*timestep));
+    //AddKeyFrame(KeyFrame(glm::vec3(-50, 20,   0), 3*timestep));
+    //AddKeyFrame(KeyFrame(glm::vec3(  0, 20, -50), 4*timestep));
 }

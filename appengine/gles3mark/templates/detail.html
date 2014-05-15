@@ -4,16 +4,69 @@
 {% block stylesheet %}{{ stylesheet }}{% endblock %}
 
 {% block content %}
-    <h1>
+    <h1 id="top">
         {{ title }}
     </h1>
 
-    <a href="/">back</a> <br/><br/>
+    <a href="/">&larr;back</a> <br/><br/>
 
-    <div class="message">
-    {% autoescape false %}
-         <br/> {{ message }}
-    {% endautoescape %}
-    </div>
+    <b>Basic info</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+        <tr> <td>Uploader</td> <td>{{ db.uploader }}</td> </tr>
+        <tr> <td>Date</td> <td>{{ db.date }}</td> </tr>
+        <tr> <td>Device</td> <td>{{ db.device }}</td> </tr>
+        <tr> <td>Renderer</td> <td>{{ db.renderer }}</td> </tr>
+    </tbody>
+    </table>
+
+    <br/> <br/>
+    <b>Test details</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+        <tr> <td>Score            </td> <td>{{ db.score        }}</td> </tr>
+
+        <tr> <td>Frame time avg   </td> <td>{{ bench.SPFavg    }}</td> </tr>
+        <tr> <td>Frame time best  </td> <td>{{ bench.SPFbest   }}</td> </tr>
+        <tr> <td>Frame time worst </td> <td>{{ bench.SPFworst  }}</td> </tr>
+        <tr> <td>Frame time stddev</td> <td>{{ bench.SPFstddev }}</td> </tr>
+
+        <tr> <td>FPS avg   </td> <td>{{ bench.FPSavg    }}</td> </tr>
+        <tr> <td>FPS best  </td> <td>{{ bench.FPSbest   }}</td> </tr>
+        <tr> <td>FPS worst </td> <td>{{ bench.FPSworst  }}</td> </tr>
+        <tr> <td>FPS stddev</td> <td>{{ bench.FPSstddev }}</td> </tr>
+
+    </tbody>
+    </table>
+
+    <br/> <br/>
+    <b>OpenGL info</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+        <tr> <td>Vendor       </td> <td>{{ gl.Vendor         }}</td> </tr>
+        <tr> <td>Renderer     </td> <td>{{ gl.Renderer       }}</td> </tr>
+        <tr> <td>Version      </td> <td>{{ gl.Version        }}</td> </tr>
+        <tr> <td>GLSL version </td> <td>{{ gl["GLSL version"]}}</td> </tr>
+    </tbody>
+    </table>
+
+    <br/> <br/>
+    <b>Device info</b><br/>
+    <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
+    <tbody>
+        <tr> <td>Model           </td> <td>{{ device.HW.Model        }}</td> </tr>
+    </tbody>
+    </table>
+
+
+
+    <!--<div class="message">-->
+    <!--{% autoescape false %}-->
+         <!--<br/> {{ message }}-->
+    <!--{% endautoescape %}-->
+    <!--</div>-->
+
+    <br/>
+    &uarr; <a href="#top">back to top</a> &uarr;<br/>
 
 {% endblock %}

@@ -123,8 +123,8 @@ static bool InitGLEW() {
     GLint major, minor;
     glGetIntegerv(GL_MAJOR_VERSION, &major);
     glGetIntegerv(GL_MINOR_VERSION, &minor);        
-    if (major < 4 || (major == 4 && minor < 3))
-        Log::E("OpenGL 4.3 is not supported!");
+    if (major < 3 || (major == 3 && minor < 3))
+        Log::E("OpenGL 3.3 is not supported!");
     Log::V() << "GLEW initialized. Max OpenGL version supported: " << major << "." << minor;
 
     // -- glew setup so dispose of temp window -- ??

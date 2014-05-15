@@ -45,12 +45,6 @@
     <None Include="..\assets\shaders\lightpass-vs.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="..\assets\shaders\shadowpass-fs.glsl">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="..\assets\shaders\shadowpass-vs.glsl">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\gles3mark\camera.h">

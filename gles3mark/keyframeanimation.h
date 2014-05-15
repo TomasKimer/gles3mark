@@ -9,13 +9,12 @@
 #include "log.h"
 
 struct KeyFrame {
-    glm::vec3 position;
-    glm::vec3 direction;
+    glm::vec3 position;  //, direction
     glm::quat rotation;
     float time;
 
-    KeyFrame(const glm::vec3& pos, const glm::vec3& dir, float time, const glm::quat& rot = glm::quat()):
-        position(pos), direction(dir), time(time), rotation(rot) {}
+    KeyFrame(const glm::vec3& pos, float time, const glm::quat& rot = glm::quat()):
+        position(pos), time(time), rotation(rot) {}
 };
 
 class KeyFrameAnimation {
@@ -26,7 +25,7 @@ class KeyFrameAnimation {
     
     unsigned repeatCount, currentRepeat;
 
-    glm::vec3 currentPos, currentDir;
+    glm::vec3 currentPos;
     glm::quat currentRot;
 
     void DoLerp(const KeyFrame& first, const KeyFrame& second, float amount);
@@ -46,8 +45,7 @@ public:
     bool HasEnded();
 
     glm::vec3& GetCurrentPosition()  { return currentPos; }
-    glm::vec3& GetCurrentDirection() { return currentDir; }
     glm::quat& GetCurrentRotation()  { return currentRot; }    
 
-    void MakeOrbit(float segments, float timestep, float radius, const glm::vec3 target);
+    void MakeOrbit(float segments, float timestep, float radius);
 };
