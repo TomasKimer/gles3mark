@@ -114,7 +114,7 @@ void Log::logMsg(const std::string & msg, Severity severity) {
         mOutput.flush();
     }
 
-#else
+#elif !defined(ANDROID_PRODUCTION)
     int iseverity = ANDROID_LOG_VERBOSE;
     switch (severity) {
         case Severity::Debug:

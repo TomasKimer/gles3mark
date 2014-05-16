@@ -314,13 +314,15 @@ bool Scene::OnStep(const Time& time) {
     finalTex.Bind();
     quadRenderer.Render(0.0f, 0.0f, 2.0f);
 
-//#ifdef _DEBUG
+#ifndef ANDROID_PRODUCTION
+#ifdef _DEBUG
     ssaoTex.Bind();
     quadRenderer.Render(0.0f, 0.0f, 0.5f);
 
     normalTex.Bind();
     quadRenderer.Render(1.5f, 0.0f, 0.5f);
-//#endif
+#endif
+#endif
 
 
 #ifdef ANDROID

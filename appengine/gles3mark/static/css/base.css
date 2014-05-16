@@ -10,6 +10,7 @@ td {
 .pure-table {
     margin-left:auto;
     margin-right:auto;
+    max-width: 700px;
 }
 
 .pure-table-bordered td {

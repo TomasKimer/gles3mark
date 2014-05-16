@@ -113,6 +113,7 @@ std::string GLES3Mark::GetResultJSON() {
 }
 
 void GLES3Mark::OnProcessInput() {
+#ifndef ANDROID_PRODUCTION
     float step = time.DeltaTime() * 100.0f;
 
     float x = -((-1.0f * inputManager.IsKeyDown(Input::KeyCode::A)) + (1.0f * inputManager.IsKeyDown(Input::KeyCode::D))) * step;
@@ -133,6 +134,7 @@ void GLES3Mark::OnProcessInput() {
             l->Move(lightMove);
         }
     }
+#endif
 }
 
 void GLES3Mark::OnKeyDown(Input::KeyCode keyCode) {   // TODO rename to keyPress
@@ -165,6 +167,7 @@ void GLES3Mark::OnKeyUp(Input::KeyCode keyCode) {
 }    
 
 void GLES3Mark::OnTouchDown(int screenX, int screenY, int pointer, Input::Button button) {
+#ifndef ANDROID_PRODUCTION
     if (pointer == -1) return;
     
 //#ifdef _DEBUG // NDEBUG
@@ -182,9 +185,11 @@ void GLES3Mark::OnTouchDown(int screenX, int screenY, int pointer, Input::Button
     else {
         aimPointerId = pointer;
     }
+#endif
 }
 
 void GLES3Mark::OnTouchUp(int screenX, int screenY, int pointer, Input::Button button) {
+#ifndef ANDROID_PRODUCTION
     if (pointer == movePointerId) {
         joystickMove = glm::vec3(0);
         movePointerId = -1;
@@ -192,9 +197,11 @@ void GLES3Mark::OnTouchUp(int screenX, int screenY, int pointer, Input::Button b
     else if (pointer == aimPointerId) {
         aimPointerId = -1;
     }
+#endif
 }
 
 void GLES3Mark::OnTouchDragged(int x, int y, int dx, int dy, int pointer) {
+#ifndef ANDROID_PRODUCTION
     if (pointer == movePointerId) {
         joystickMove.x = static_cast<float>(joystickMoveCenter.x - x);
         joystickMove.z = static_cast<float>(joystickMoveCenter.y - y);
@@ -202,4 +209,5 @@ void GLES3Mark::OnTouchDragged(int x, int y, int dx, int dy, int pointer) {
     else if (dx != 0 || dy != 0) {
         scene->camera.Aim(-dy * 0.005f, -dx * 0.005f);  // 0.0025
     }
+#endif
 }

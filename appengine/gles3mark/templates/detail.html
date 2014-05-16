@@ -66,6 +66,9 @@
     <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
     <tbody>
         <tr> <td>Resolution</td> <td>{{ device.Display.Resolution }}</td> </tr>
+        <tr> <td>DPI</td> <td>{{ device.Display.DPI }}</td> </tr>
+        <tr> <td>Size</td> <td>{{ device.Display.Size }}</td> </tr>
+        <!--<tr> <td>OpenGL ES version</td> <td>{{ device.Display["OpenGL ES version"] }}</td> </tr>-->
     </tbody>
     </table>
 
@@ -74,6 +77,9 @@
     <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
     <tbody>
         <tr> <td>Cores</td> <td>{{ device.CPU.Cores }}</td> </tr>
+        <tr> <td>Frequency</td> <td>{{ device.CPU.Freq }}</td> </tr>
+        <tr> <td>Instruction set (ABI)</td> <td>{{ device.CPU.ABI }}</td> </tr>
+        <tr> <td>Instruction set 2 (ABI2)</td> <td>{{ device.CPU.ABI2 }}</td> </tr>
     </tbody>
     </table>
 
@@ -90,6 +96,12 @@
     <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
     <tbody>
         <tr> <td>Manufacturer</td> <td>{{ device.HW.Manufacturer }}</td> </tr>
+        <tr> <td>Brand       </td> <td>{{ device.HW.Brand        }}</td> </tr>
+        <tr> <td>Model       </td> <td>{{ device.HW.Model        }}</td> </tr>
+        <tr> <td>Device      </td> <td>{{ device.HW.Device       }}</td> </tr>
+        <tr> <td>Hardware    </td> <td>{{ device.HW.Hardware     }}</td> </tr>
+        <tr> <td>Board       </td> <td>{{ device.HW.Board        }}</td> </tr>
+        <tr> <td>Product     </td> <td>{{ device.HW.Product      }}</td> </tr>
     </tbody>
     </table>
 
@@ -97,7 +109,16 @@
     <b>Android info</b><br/>
     <table class="pure-table pure-table-bordered"> <!-- pure-table-striped -->
     <tbody>
-        <tr> <td>Android version</td> <td>{{ device.OS["Android version"] }}</td> </tr>
+        <tr> <td>Android version    </td> <td>{{ device.OS["Android version"]     }}</td> </tr>
+        <tr> <td>Android SDK version</td> <td>{{ device.OS["Android SDK version"] }}</td> </tr>
+        <tr> <td>OS                 </td> <td>{{ device.OS.OS                     }}</td> </tr>
+        <tr> <td>Bootloader         </td> <td>{{ device.OS.Bootloader             }}</td> </tr>
+        <tr> <td>Java specification </td> <td>{{ device.OS["Java specification"]  }}</td> </tr>
+        <tr> <td>VM specification   </td> <td>{{ device.OS["VM specification"]    }}</td> </tr>
+        <tr> <td>VM implementation  </td> <td>{{ device.OS["VM implementation"]   }}</td> </tr>
+        <tr> <td>Build ID           </td> <td>{{ device.OS["Build ID"]            }}</td> </tr>
+        <tr> <td>Fingerprint        </td> <td>{{ device.OS.Fingerprint.replace("/", " / ") }}</td> </tr>
+        <tr> <td>Kernel             </td> <td>{{ device.OS.Kernel                 }}</td> </tr>
     </tbody>
     </table>
 
@@ -122,14 +143,14 @@
     </table>
 
 
-    <div class="message">
-    {% autoescape false %}
-         <br/> {{ bench }}
-        <br/> {{ gl }}
-        <br/> {{ glcontext }}
-        <br/> {{ device }}
-    {% endautoescape %}
-    </div>
+    <!--<div class="message">-->
+    <!--{% autoescape false %}-->
+         <!--<br/> {{ bench }}-->
+        <!--<br/> {{ gl }}-->
+        <!--<br/> {{ glcontext }}-->
+        <!--<br/> {{ device }}-->
+    <!--{% endautoescape %}-->
+    <!--</div>-->
 
     <br/>
     &uarr; <a href="#top">back to top</a> &uarr;<br/>

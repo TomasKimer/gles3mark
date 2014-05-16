@@ -3,7 +3,6 @@ package com.tomaskimer.gles3mark;
 import java.util.Locale;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ConnectionReleaseTrigger;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -44,8 +43,8 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import com.tomaskimer.gles3mark.AnalyticsApp.TrackerName;
-import com.tomaskimer.gles3mark.DeviceInfo;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
@@ -53,7 +52,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	final static String SERVER_URL = "http://gles3mark.appspot.com/";
 	final static String USER_AGENT = "gles3mark_android_app";
 	
-	DeviceInfo deviceInfo = new DeviceInfo(this);
+	DeviceInfo deviceInfo = null;
 	JSONObject lastResult = null;
 	String lastNickname = "";
 	
@@ -85,6 +84,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		Tracker t = ((AnalyticsApp)getApplication()).getTracker(TrackerName.APP_TRACKER);
 		t.setScreenName("Main screen");
 		t.send(new HitBuilders.AppViewBuilder().build());
+		
+		deviceInfo = new DeviceInfo(this);
 
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
