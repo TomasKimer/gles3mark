@@ -214,7 +214,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		input.setText(lastNickname);
 		
 		//((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
-        //.showSoftInput(input, InputMethodManager.SHOW_FORCED);
+        //		.showSoftInput(input, InputMethodManager.SHOW_FORCED);
 		
 		alert.setView(input);
 
@@ -354,8 +354,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		// called only when each Fragment needs to be created the first time
 		public Fragment getItem(int position) {
 			// getItem is called to instantiate the fragment for the given page.
-			// Return a DummySectionFragment (defined as a static inner class
-			// below) with the page number as its lone argument.
 			Fragment fragment = null;
 			Bundle args = new Bundle();
 			
@@ -478,7 +476,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		    public boolean shouldOverrideUrlLoading(WebView view, String url) {
 		        // do not override; let my WebView load the page
 		    	if (Uri.parse(url).getHost().equals(Uri.parse(SERVER_URL).getHost())) {
-		        	//view.getSettings().setUserAgentString(USER_AGENT);
 		        	return false;
 		        }
 		        // link is not for a page on my site, so launch another Activity that handles URLs
