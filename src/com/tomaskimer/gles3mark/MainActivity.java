@@ -3,6 +3,7 @@ package com.tomaskimer.gles3mark;
 import java.util.Locale;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectionReleaseTrigger;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -26,6 +27,7 @@ import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +40,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.tomaskimer.gles3mark.AnalyticsApp.TrackerName;
 import com.tomaskimer.gles3mark.DeviceInfo;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
@@ -69,6 +76,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		// https://developer.android.com/google/play-services/setup.html
+		int cr = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
+		if (cr != ConnectionResult.SUCCESS)
+			Log.e("Analytics", "Not available: " + cr);
+		
+		Tracker t = ((AnalyticsApp)getApplication()).getTracker(TrackerName.APP_TRACKER);
+		t.setScreenName("Main screen");
+		t.send(new HitBuilders.AppViewBuilder().build());
 
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
@@ -133,6 +149,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     		    DeviceInfo.GlVersionToString(supportedGLversion) + " (req. 3.0)", Toast.LENGTH_LONG).show();
     		return;
     	} else {
+    		// https://developers.google.com/analytics/devguides/collection/android/v4/events
+    		Tracker t = ((AnalyticsApp)getApplication()).getTracker(TrackerName.APP_TRACKER);
+    		t.send(new HitBuilders.EventBuilder()
+    			.setCategory("Main")  //getString(R.string.main);
+    			.setAction("Start Benchmark")
+    			.build());
+    		
+    		t.setScreenName("Benchmark screen");
+    		t.send(new HitBuilders.AppViewBuilder().build());
+    		
     		Intent intent = new Intent(this, BenchmarkActivity.class);
         	startActivityForResult(intent, BENCH_REQUEST_ID); // startActivity(intent);    		
     	}
@@ -171,6 +197,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 	// on upload_button click
 	public void Upload(View view) {
+		Tracker t = ((AnalyticsApp)getApplication()).getTracker(TrackerName.APP_TRACKER);
+		t.send(new HitBuilders.EventBuilder()
+			.setCategory("Main")  //getString(R.string.main);
+			.setAction("Upload result")
+			.build());
+		
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle("Upload results to the server");
@@ -188,7 +220,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 		alert.setPositiveButton("Upload", new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int whichButton) {
-		  // Do something with value!
         	findViewById(R.id.upload_button).setEnabled(false);			
 			lastNickname = input.getText().toString();
 			try {
@@ -204,9 +235,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 				message.put("GLContextInfo", glContextInfo);
 				message.put("DeviceInfo", devInfo);
 				
-				//message.put("score", lastResult.getJSONObject("BenchInfo").getString("score"));
-				//message.put("info", "I9505 " + lastNickname);
-				
 				new UploadTask().execute(message);
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -217,7 +245,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 		  public void onClick(DialogInterface dialog, int whichButton) {
-		    // Canceled.
 			  lastNickname = input.getText().toString();
 		  }
 		});
@@ -226,8 +253,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	}
 	
 	@Override
-	// http://stackoverflow.com/questions/5944987/popupwindow-in-android
-	// http://stackoverflow.com/questions/18867029/how-to-show-pop-up-window-in-android
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
 	        case R.id.action_about:
@@ -255,6 +280,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == BENCH_REQUEST_ID) {
+			Tracker t = ((AnalyticsApp)getApplication()).getTracker(TrackerName.APP_TRACKER);
 			if (resultCode == RESULT_OK) {  // -1,  0 = RESULT_CANCELED
 				String resultStr = data.getStringExtra("Result"); 				
 				JSONObject jsonObject = null;				
@@ -281,13 +307,24 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 					Button btnUpload = (Button)findViewById(R.id.upload_button);
 					btnUpload.setEnabled(true);
 					
+					t.send(new HitBuilders.EventBuilder()
+	    				.setCategory("Main")
+	    				.setAction("Benchmark finished")
+	    				.build());  
+					
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
 			else {
 				Toast.makeText(getApplicationContext(), "Benchmark aborted", Toast.LENGTH_SHORT).show();
+				t.send(new HitBuilders.EventBuilder()
+    				.setCategory("Main")
+    				.setAction("Benchmark aborted")
+    				.build()); 
 			}
+    		t.setScreenName("Main screen");
+    		t.send(new HitBuilders.AppViewBuilder().build());
 		}    	
 		super.onActivityResult(requestCode, resultCode, data);
 	}
@@ -358,10 +395,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	}
 
 
-	/**
-	 * A dummy fragment representing a section of the app, but that simply
-	 * displays dummy text.
-	 */
 	public static class TestSectionFragment extends Fragment {
 		/**
 		 * The fragment argument representing the section number for this
@@ -423,6 +456,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			tvFPSstddev = (TextView)rootView.findViewById(R.id.tvFPSstddev);
 			
 			//String lastResult = ((MainActivity)getActivity()).lastResult;
+			//Tracker t = ((AnalyticsApp)getActivity().getApplication()).getTracker(TrackerName.APP_TRACKER);
 
 			return rootView;
 		}
