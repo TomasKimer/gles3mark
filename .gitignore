@@ -14,10 +14,10 @@ bin/*
 !bin/glew32.dll
 !bin/Assimp32.dll
 !bin/Assimp32d.dll
-libs/google-play-services_lib/bin/*
 gen/
 obj/
 libs/armeabi/
+libs/google-play-services_lib/bin/
 *.log
 *.pyc
 

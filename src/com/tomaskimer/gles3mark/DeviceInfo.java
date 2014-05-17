@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,6 +17,7 @@ import android.content.pm.ConfigurationInfo;
 //import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 
 public class DeviceInfo extends BaseInfo {	
 	final Activity activity;
@@ -82,12 +85,14 @@ public class DeviceInfo extends BaseInfo {
 	    	// --- Display ---
 			JSONObject jsonDisplay = new JSONObject();
 			
-			DisplayMetrics metrics = activity.getResources().getDisplayMetrics();			
+			final DisplayMetrics metrics = new DisplayMetrics(); //activity.getResources().getDisplayMetrics();	// minus decors
+			activity.getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+			
 			jsonDisplay.put("Resolution", metrics.heightPixels + "x" + metrics.widthPixels);
 			jsonDisplay.put("DPI"       , metrics.densityDpi);			
-			double x = Math.pow(metrics.widthPixels  / metrics.xdpi, 2);  // TODO glcontext? smaller on tegra - bar?
+			double x = Math.pow(metrics.widthPixels  / metrics.xdpi, 2);
 	        double y = Math.pow(metrics.heightPixels / metrics.ydpi, 2);			
-			jsonDisplay.put("Size"      , Math.round(Math.sqrt(x + y)) + "inch");			
+			jsonDisplay.put("Size"      , new DecimalFormat("##.#").format(Math.sqrt(x + y)) + "-inch"); //String.format("%.1f-inch", Math.sqrt(x + y))); ;		
 			jsonDisplay.put("OpenGL ES version", GlVersionToString(GetSupportedGLVersion()));
 			
 			json.put("Display", jsonDisplay);
