@@ -88,7 +88,10 @@ public class DeviceInfo extends BaseInfo {
 			final DisplayMetrics metrics = new DisplayMetrics(); //activity.getResources().getDisplayMetrics();	// minus decors
 			activity.getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
 			
-			jsonDisplay.put("Resolution", metrics.heightPixels + "x" + metrics.widthPixels);
+			int widthToShow = Math.max(metrics.widthPixels, metrics.heightPixels);
+			int heightToShow = Math.min(metrics.widthPixels, metrics.heightPixels);
+			
+			jsonDisplay.put("Resolution", widthToShow + "x" + heightToShow);
 			jsonDisplay.put("DPI"       , metrics.densityDpi);			
 			double x = Math.pow(metrics.widthPixels  / metrics.xdpi, 2);
 	        double y = Math.pow(metrics.heightPixels / metrics.ydpi, 2);			
