@@ -259,7 +259,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	        case R.id.action_about:
 	        	final TextView tvInfo = new TextView(this);	    		
 	        	tvInfo.setText(Html.fromHtml("<br/>&nbsp OpenGL ES 3.0 Benchmark for Android<br/>" + 
-	        								 "&nbsp Author: Tomáš Kimer (FIT BUT)<br/>" +
+	        								 "&nbsp Author: <a href=\"http://tomaskimer.com\">Tomáš Kimer</a> (FIT BUT)<br/>" +
 	        								 "&nbsp 2014 Brno, Czech Republic<br/>" +
 	        								 "&nbsp <a href=\"http://gles3mark.appspot.com\">gles3mark.appspot.com</a><br/>"));
 	    		tvInfo.setMovementMethod(LinkMovementMethod.getInstance());
