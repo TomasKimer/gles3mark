@@ -31,9 +31,6 @@ public:
 
     glm::vec4& GetBackgroundColor() { return backgroundColor; }
 
-    //void SetPosition(const glm::vec3& pos) { eye = pos; }
-    //void SetDirection(const glm::vec3& dir) { target = dir; }
-
     friend std::ostream& operator << (std::ostream& o, const Camera& c) {
         o << "pos "    << c.eye.x    << " " << c.eye.y    << " " << c.eye.z    << '\n'
           << "target " << c.target.x << " " << c.target.y << " " << c.target.z << '\n'

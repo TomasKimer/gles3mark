@@ -1,3 +1,9 @@
+/**
+  *  \file   gles3mark.h
+  *  \date   2014-05-28
+  *  \author Tomas Kimer <xkimer00@stud.fit.vutbr.cz>
+  *  \brief  Lib entry point.
+  */
 
 #pragma once
 
@@ -15,6 +21,7 @@ typedef RenderContextEGL RenderContextT;
 #include <glm/glm.hpp>
 
 #include "igles3marklib.h"
+#include "iinputlistener.h"
 #include "input.h"
 #include "assetmanager.h"
 #include "scene.h"
@@ -22,6 +29,8 @@ typedef RenderContextEGL RenderContextT;
 #include "benchmarkstatistics.h"
 
 
+/// Lib entry point.
+/** Detailed description. */
 class GLES3Mark : public IGLES3MarkLib, public IInputListener {
     std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<RenderContextT> glContext;
@@ -46,7 +55,7 @@ public:
     bool OnStep() override;  // TODO return Exit Code
     std::string GetResultJSON() override;
 
-    void OnKeyDown(Input::KeyCode keyCode) override;   // TODO rename to keyPress
+    void OnKeyDown(Input::KeyCode keyCode) override;
     void OnKeyUp(Input::KeyCode keyCode) override;
     void OnTouchDown(int screenX, int screenY, int pointer = -1, Input::Button button = Input::Button::Default) override;
     void OnTouchUp(int screenX, int screenY, int pointer = -1, Input::Button button = Input::Button::Default) override;

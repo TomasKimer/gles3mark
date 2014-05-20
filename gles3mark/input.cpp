@@ -1,6 +1,18 @@
 
 #include "input.h"
 
+void Input::RegisterKeyDown(KeyCode keyCode) {
+    activeKeys[keyCode] = true;
+}
+
+void Input::RegisterKeyUp(KeyCode keyCode) {
+    activeKeys[keyCode] = false;
+}
+
+bool Input::IsKeyDown(KeyCode keyCode) {
+    return activeKeys[keyCode];
+}
+
 Input::KeyCode Input::OsKeyToKeyCode(int osKey) {
 #ifdef _WIN32
     switch (osKey) {

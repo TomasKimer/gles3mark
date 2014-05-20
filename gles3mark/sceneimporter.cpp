@@ -1,12 +1,12 @@
 
-
 #include "sceneimporter.h"
 
-Model* AssimpSceneImporter::Import(std::vector<char>& rawModelData, MaterialDatabase& materialDatabase, std::vector<std::unique_ptr<Light>>& lightDatabase) {
-    //std::vector<char> rawModelData = refAssetManager.LoadContents("models/" + fileName);
-    
+Model* AssimpSceneImporter::Import(std::vector<char>& rawModelData, MaterialDatabase& materialDatabase,
+                                   std::vector<std::unique_ptr<Light>>& lightDatabase) {
     Assimp::Importer aImporter;
-    const aiScene* aScene = aImporter.ReadFileFromMemory(&rawModelData[0], rawModelData.size(), aiProcessPreset_TargetRealtime_Fast /*aiProcessPreset_TargetRealtime_Quality*/ | aiProcess_FlipUVs);
+    const aiScene* aScene = aImporter.ReadFileFromMemory(&rawModelData[0], rawModelData.size(),
+        aiProcessPreset_TargetRealtime_Fast /*aiProcessPreset_TargetRealtime_Quality*/ | aiProcess_FlipUVs);
+    
     if (!aScene) {
         throw std::runtime_error(std::string("Failed to load model: ") + aImporter.GetErrorString());
     }
@@ -138,8 +138,8 @@ Light* AssimpSceneImporter::LoadLight(const aiLight *aLight) {
     light->direction = toGLM(aLight->mDirection);
     light->position  = toGLM(aLight->mPosition );
 
-    Log::D() << "Position: " << light->position.x << " " << light->position.y << " " << light->position.z;
-    Log::D() << "Direction: " << light->direction.x << " " << light->direction.y << " " << light->direction.z;
+    // Log::D() << "Position: " << light->position.x << " " << light->position.y << " " << light->position.z;
+    // Log::D() << "Direction: " << light->direction.x << " " << light->direction.y << " " << light->direction.z;
     
     // TODO mAngleInnerCone, mAngleOuterCone, mAttenuationConstant, mAttenuationLinear, mAttenuationQuadratic
 

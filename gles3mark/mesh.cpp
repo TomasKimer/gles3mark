@@ -1,7 +1,5 @@
 
-
 #include "mesh.h"
-
 
 void Mesh::TransformData(const glm::mat4& matrix) {    
     for (size_t i = 0; i < vertices.size(); ++i) {
@@ -14,7 +12,6 @@ void Mesh::TransformData(const glm::mat4& matrix) {
         tangents[i] = glm::vec3(matrix * glm::vec4(tangents[i], 0.0f));        
     }
 }
-
 
 void Mesh::MakeCube() {
     /* cube vertices
@@ -38,23 +35,23 @@ void Mesh::MakeCube() {
      */
 
     vertices = {
-        glm::vec3( 1.0f,  1.0f, -1.0f), /* 0 */
-        glm::vec3(-1.0f,  1.0f, -1.0f), /* 1 */
-        glm::vec3(-1.0f, -1.0f, -1.0f), /* 2 */
-        glm::vec3( 1.0f, -1.0f, -1.0f), /* 3 */
-        glm::vec3( 1.0f,  1.0f,  1.0f), /* 4 */
-        glm::vec3(-1.0f,  1.0f,  1.0f), /* 5 */
-        glm::vec3(-1.0f, -1.0f,  1.0f), /* 6 */
-        glm::vec3( 1.0f, -1.0f,  1.0f), /* 7 */    
+        glm::vec3( 1.0f,  1.0f, -1.0f), // 0
+        glm::vec3(-1.0f,  1.0f, -1.0f), // 1
+        glm::vec3(-1.0f, -1.0f, -1.0f), // 2
+        glm::vec3( 1.0f, -1.0f, -1.0f), // 3
+        glm::vec3( 1.0f,  1.0f,  1.0f), // 4
+        glm::vec3(-1.0f,  1.0f,  1.0f), // 5
+        glm::vec3(-1.0f, -1.0f,  1.0f), // 6
+        glm::vec3( 1.0f, -1.0f,  1.0f), // 7    
     };
 
     faces = {
-        glm::ivec3(0, 2, 1),  glm::ivec3(0, 3, 2),  /* front */
-        glm::ivec3(4, 3, 0),  glm::ivec3(4, 7, 3),  /* right */
-        glm::ivec3(4, 1, 5),  glm::ivec3(4, 0, 1),  /* top */
-        glm::ivec3(1, 6, 5),  glm::ivec3(1, 2, 6),  /* left */
-        glm::ivec3(3, 6, 2),  glm::ivec3(3, 7, 6),  /* bottom */
-        glm::ivec3(5, 7, 4),  glm::ivec3(5, 6, 7),  /* back */    
+        glm::ivec3(0, 2, 1),  glm::ivec3(0, 3, 2),  // front
+        glm::ivec3(4, 3, 0),  glm::ivec3(4, 7, 3),  // right
+        glm::ivec3(4, 1, 5),  glm::ivec3(4, 0, 1),  // top
+        glm::ivec3(1, 6, 5),  glm::ivec3(1, 2, 6),  // left
+        glm::ivec3(3, 6, 2),  glm::ivec3(3, 7, 6),  // bottom
+        glm::ivec3(5, 7, 4),  glm::ivec3(5, 6, 7),  // back    
     };
 
     normals.resize(vertices.size()); // TODO

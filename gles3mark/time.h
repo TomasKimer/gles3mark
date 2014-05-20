@@ -17,10 +17,10 @@ public:
     void Init();
     void Update();
 
-    // The time in seconds it took to complete the last frame
+    /// The time in seconds it took to complete the last frame
     float DeltaTime() const;
 
-    // The real time in seconds since the game started.
+    /// The real time in seconds since the game started.
     float RealTimeSinceStartup() const;
 
     friend std::ostream& operator << (std::ostream& o, const Time& v) {
@@ -31,11 +31,10 @@ public:
 private:
     Clock::time_point start, current, previous;
     std::chrono::duration<float> elapsed; // total;
-    float average, best, worst, fElapsed; // DeltaTime statictics
 };
 
 
-/*
+/**
  *  Generic StopWatch
  *  Usage:
  *      StopWatch<std::chrono::high_resolution_clock> sw;

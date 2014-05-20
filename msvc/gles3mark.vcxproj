@@ -27,6 +27,7 @@
     <ClInclude Include="..\gles3mark\benchmarkstatistics.h" />
     <ClInclude Include="..\gles3mark\camera.h" />
     <ClInclude Include="..\gles3mark\igles3marklib.h" />
+    <ClInclude Include="..\gles3mark\iinputlistener.h" />
     <ClInclude Include="..\gles3mark\instancedatabuilder.h" />
     <ClInclude Include="..\gles3mark\loadingscreen.h" />
     <ClInclude Include="..\gles3mark\logconsole.h" />

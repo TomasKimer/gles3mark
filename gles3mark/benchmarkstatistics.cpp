@@ -21,8 +21,8 @@ void BenchmarkStatistics::StartMeasure() {
 void BenchmarkStatistics::OnFrame(float deltaTime) {
     if (!running) return;
     
-    if (deltaTime < deltaBest ) deltaBest  = deltaTime;
-    if (deltaTime > deltaWorst) deltaWorst = deltaTime;
+    deltaBest  = glm::min(deltaTime, deltaBest );
+    deltaWorst = glm::max(deltaTime, deltaWorst);
     
     deltaAcc += deltaTime;
     deltas.push_back(deltaTime);
@@ -32,8 +32,8 @@ void BenchmarkStatistics::OnFrame(float deltaTime) {
     if (fpsCounter.JustUpdated()) {
         float fpsCurrent = fpsCounter.Current();
 
-        if (fpsCurrent > fpsBest ) fpsBest  = fpsCurrent;
-        if (fpsCurrent < fpsWorst) fpsWorst = fpsCurrent;
+        fpsBest  = glm::max(fpsCurrent, fpsBest );
+        fpsWorst = glm::min(fpsCurrent, fpsWorst);
 
         fpsAcc += fpsCurrent;
         fpss.push_back(fpsCurrent);
@@ -57,7 +57,6 @@ void BenchmarkStatistics::EndMeasure() {
 }
 
 float BenchmarkStatistics::ComputeStdDev(const std::vector<float>& values, float mean) {
-
     float acc = 0.0f;
 
     for (unsigned i = 0; i < values.size(); ++i) {

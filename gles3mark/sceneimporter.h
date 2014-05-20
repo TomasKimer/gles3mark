@@ -18,21 +18,16 @@
 #include "materialdatabase.h"
 
 
-class SceneImporter {
+class ISceneImporter {
 public:
-    SceneImporter(/*const AssetManager& assetManager*/) /*: refAssetManager(assetManager)*/ {}
-    virtual ~SceneImporter() = default;
-
-    virtual Model* Import(/*const*/ std::vector<char>& rawModelData, MaterialDatabase& materialDatabase, std::vector<std::unique_ptr<Light>>& lightDatabase) = 0;
-
-protected:
-    /*const AssetManager& refAssetManager;*/
+    virtual ~ISceneImporter() = default;
+    virtual Model* Import(/*const*/ std::vector<char>& rawModelData, MaterialDatabase& materialDatabase,
+                          std::vector<std::unique_ptr<Light>>& lightDatabase) = 0;
 };
 
-
-class AssimpSceneImporter : public SceneImporter {
+class AssimpSceneImporter : public ISceneImporter {
 public:
-    AssimpSceneImporter(/*const AssetManager& assetManager*/): SceneImporter(/*assetManager*/) {
+    AssimpSceneImporter() {
         Assimp::DefaultLogger::set(new AssimpLogger());    
     }
 
@@ -40,7 +35,8 @@ public:
         Assimp::DefaultLogger::kill();    
     }
 
-    virtual Model* Import(std::vector<char>& rawModelData, MaterialDatabase& materialDatabase, std::vector<std::unique_ptr<Light>>& lightDatabase) override;
+    virtual Model* Import(std::vector<char>& rawModelData, MaterialDatabase& materialDatabase,
+                          std::vector<std::unique_ptr<Light>>& lightDatabase) override;
 
 private:
     void RecursiveTransform(Model* model, const aiScene *aScene, const aiNode* aNode, glm::mat4 matrix);
@@ -50,9 +46,9 @@ private:
     Light* LoadLight(const aiLight *aLight);
 
     class AssimpLogger : public Assimp::Logger {
-        virtual void OnDebug(const char* msg) override {}// Log::D() << "Assimp: " << msg; }
+        virtual void OnDebug(const char* msg) override {} // Log::D() << "Assimp: " << msg; }
         virtual void OnInfo (const char* msg) override { Log::V() << "Assimp: " << msg; }
-        virtual void OnWarn (const char* msg) override {}// Log::W() << "Assimp: " << msg; }
+        virtual void OnWarn (const char* msg) override {} // Log::W() << "Assimp: " << msg; }
         virtual void OnError(const char* msg) override { Log::E() << "Assimp: " << msg; }
         virtual bool attachStream (Assimp::LogStream*, unsigned) override { return true; }
         virtual bool detatchStream(Assimp::LogStream*, unsigned) override { return true; }

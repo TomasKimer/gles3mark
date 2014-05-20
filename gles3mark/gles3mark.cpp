@@ -28,7 +28,7 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
         assetManager = std::unique_ptr<AssetManager>(new AssetManager(ioContext));
 
         // init GL context
-        glContext = std::unique_ptr<RenderContextT>(new RenderContextT());  //std::make_unique<RenderContextT>();
+        glContext = std::unique_ptr<RenderContextT>(new RenderContextT());  //std::make_unique<>(); -- C++14
         glContext->Create(osWnd);
         glContext->SetVsync(vsync);
 
@@ -36,9 +36,9 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
         glContext->Swap();
 
         // display some GL info
-        Log::V() << "GL_VENDOR: "                   + GLQuery::Get<std::string>(GL_VENDOR);
-        Log::V() << "GL_RENDERER: "                 + GLQuery::Get<std::string>(GL_RENDERER);
-        Log::V() << "GL_VERSION: "                  + GLQuery::Get<std::string>(GL_VERSION);
+        Log::V() << "GL_VENDOR: "                   + GLQuery::Get<std::string>(GL_VENDOR                  );
+        Log::V() << "GL_RENDERER: "                 + GLQuery::Get<std::string>(GL_RENDERER                );
+        Log::V() << "GL_VERSION: "                  + GLQuery::Get<std::string>(GL_VERSION                 );
         Log::V() << "GL_SHADING_LANGUAGE_VERSION: " + GLQuery::Get<std::string>(GL_SHADING_LANGUAGE_VERSION);
 
         scene = std::unique_ptr<Scene>(new Scene());
@@ -50,7 +50,7 @@ bool GLES3Mark::OnInit(void* osWnd, void* ioContext) {
         return false;    
     }
 
-    OnResize(glContext->GetWidth(), glContext->GetHeight()); // TODO
+    OnResize(glContext->GetWidth(), glContext->GetHeight());
 
     time.Init();
     benchStats.StartMeasure();
@@ -63,7 +63,7 @@ void GLES3Mark::OnResize(int w, int h) {
         glContext->Resize(w, h);
         scene->OnResize(w, h);            
     }
-    Log::V() << "Resize: " << w << "x" << h; // TODO
+    Log::V() << "Resize: " << w << "x" << h;
 }
 
 bool GLES3Mark::OnStep() {  // TODO return Exit Code - if !=0, system("pause") / messagebox
@@ -137,7 +137,7 @@ void GLES3Mark::OnProcessInput() {
 #endif
 }
 
-void GLES3Mark::OnKeyDown(Input::KeyCode keyCode) {   // TODO rename to keyPress
+void GLES3Mark::OnKeyDown(Input::KeyCode keyCode) {
     inputManager.RegisterKeyDown(keyCode);
     
     switch (keyCode) {
@@ -170,13 +170,11 @@ void GLES3Mark::OnTouchDown(int screenX, int screenY, int pointer, Input::Button
 #ifndef ANDROID_PRODUCTION
     if (pointer == -1) return;
     
-//#ifdef _DEBUG // NDEBUG
     if (screenX > 0 && screenX < 100 && screenY > 0 && screenY < 100)
         quit = true;
 
     if (screenX > glContext->GetWidth() - 100 && screenY > 0 && screenY < 100)
         scene->freeCamera = !scene->freeCamera;
-//#endif
 
     if (screenX < glContext->GetWidth() / 2) {
         movePointerId = pointer;

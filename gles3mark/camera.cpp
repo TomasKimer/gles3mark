@@ -26,29 +26,29 @@ void Camera::Reset() {
 }
 
 void Camera::Move(glm::vec3 vec) {
-    glm::vec3 dir = glm::normalize(target); // posunuti o z-nasobek smeru pohledu
+    glm::vec3 dir = glm::normalize(target); // z
     eye += dir * vec.z;
 
-    glm::vec3 r = glm::normalize(target);   // posunuti do strany o x-nasobek right vektoru
+    glm::vec3 r = glm::normalize(target);   // x
     r = glm::cross(-r, up);
     eye += r * vec.x;
 
-    eye.y += vec.y;                         // pouze stoupani ci klesani
+    eye.y += vec.y;                         // y
 
     LookAt(eye, target + eye);
 }
 
 void Camera::Aim(float verticalAngle, float horizontalAngle) {
-    angleHoriz += horizontalAngle;    // otaceni po jednotkove kouli
+    angleHoriz += horizontalAngle;    // unit sphere rotation
     angleVert  += verticalAngle;
 
     float halfPI = glm::half_pi<float>();
 
-    // omezeni pretaceni pres hlavu a pod nohama + korekce (target == up -> undefined lookAt)
+    // clamp + correction (target == up -> undefined lookAt)
     if (angleVert >=  halfPI) angleVert =  halfPI - 0.0001f;
     if (angleVert <= -halfPI) angleVert = -halfPI + 0.0001f;
 
-    float hPhi = halfPI - angleHoriz; // uhly sferickych souradnic
+    float hPhi = halfPI - angleHoriz; // spherical angles
     float vPhi = halfPI - angleVert;
 
     float hPhiSin = glm::sin(hPhi);

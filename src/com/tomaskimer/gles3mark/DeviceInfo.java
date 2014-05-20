@@ -19,6 +19,11 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 
+/**
+ * Generates device info.
+ *  
+ * @author Tomas Kimer
+ */
 public class DeviceInfo extends BaseInfo {	
 	final Activity activity;
 	
@@ -50,7 +55,7 @@ public class DeviceInfo extends BaseInfo {
 			jsonHW.put("Product"     , android.os.Build.PRODUCT);
 			jsonHW.put("Board"       , android.os.Build.BOARD);
 			jsonHW.put("Hardware"    , android.os.Build.HARDWARE);
-			jsonHW.put("Id"          , android.os.Build.ID);
+			jsonHW.put("Id"          , android.os.Build.ID);  // TODO move to OS
 			jsonHW.put("Serial"      , android.os.Build.SERIAL);
 			
 			json.put("HW", jsonHW);

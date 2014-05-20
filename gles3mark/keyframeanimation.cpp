@@ -28,7 +28,7 @@ void KeyFrameAnimation::Update(float deltaTime) {
     if (currentFrame == keyFrames.size() - 1) {
         currentRepeat++;
         if (HasEnded()) {
-            currentFrame--; // step to the last frame // vs return
+            currentFrame--; // step to the last frame (vs return)
         }
         else {
             currentTime = std::fmod(currentTime, keyFrames[currentFrame].time); // or = 0 for animation reset on repeat
@@ -42,27 +42,6 @@ void KeyFrameAnimation::Update(float deltaTime) {
     float amount = GetTransition(first, second);
 
     DoLerp(first, second, amount);
-    
-
-    //if (transition == 0.0f && keyFrames.size() > currentFrame + 1) {
-    //    duration = keyFrames[currentFrame + 1].time - keyFrames[currentFrame].time;        
-    //}
-
-    //transition += deltaTime;
-    //float percent = transition / duration;
-    //DoLerp(keyFrames[currentFrame], keyFrames[currentFrame + 1], percent);
-
-    //if (percent >= 1.0f) {
-    //    transition = 0.0f;
-    //    currentFrame++;
-    //    if (currentFrame >= keyFrames.size() - 1) {            
-    //        if (!repeat)
-    //            ended = true;
-    //        else {
-    //            currentFrame = 0;
-    //        }                
-    //    }
-    //}
 }
 
 bool KeyFrameAnimation::HasEnded() {
@@ -75,12 +54,16 @@ void KeyFrameAnimation::DoLerp(const KeyFrame& first, const KeyFrame& second, fl
 }
 
 void KeyFrameAnimation::MakeOrbit(float segments, float timestep, float radius) {
+    float start =     -glm::pi<float>() / 2.0f;
+    float end   =  2 * glm::pi<float>() - glm::pi<float>() / 2.f;
+    float step  = (2 * glm::pi<float>() / segments);
+    
     int j = 0;
-    for (float i = -glm::pi<float>() / 2.f; i < 2*glm::pi<float>() - glm::pi<float>() / 2.f; i += (2*glm::pi<float>() / segments)) {
-        float x = radius * glm::cos((float)i);
-        float z = radius * glm::sin((float)i);
+    for (float f = start; f < end; f += step) {
+        float x = radius * glm::cos(f);
+        float z = radius * glm::sin(f);
         
-        AddKeyFrame(KeyFrame(glm::vec3(x, 25+2*glm::sin(i), z), j * timestep));        
+        AddKeyFrame(KeyFrame(glm::vec3(x, 25.0f + 2.0f * glm::sin(f), z), j * timestep));        
 
         j++;
     }

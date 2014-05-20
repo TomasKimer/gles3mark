@@ -6,10 +6,6 @@
 
 #include "glinclude.h"
 
-// glGet
-// https://www.khronos.org/opengles/sdk/docs/man/xhtml/glGet.xml
-// http://www.opengl.org/sdk/docs/man/html/glGet.xhtml
-
 class GLQuery {
 public:
     static std::vector<std::string> Extensions();

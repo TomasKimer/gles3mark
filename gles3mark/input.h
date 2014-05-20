@@ -1,12 +1,11 @@
 
-
 #pragma once
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
-#include <map> // unordered_map -> problem with enum class key
+#include <map> // unordered_map -> problem with 'enum class' key
 
 class Input {
 public:
@@ -25,43 +24,13 @@ public:
         ScrollUp, ScrollDown,
     };
 
+    void RegisterKeyDown(KeyCode keyCode);
+    void RegisterKeyUp  (KeyCode keyCode);
+
+    bool IsKeyDown      (KeyCode keyCode);
+
     static KeyCode OsKeyToKeyCode(int osKey);
 
-    void RegisterKeyDown(KeyCode keyCode) { activeKeys[keyCode] = true;  }
-    void RegisterKeyUp  (KeyCode keyCode) { activeKeys[keyCode] = false; }
-
-    bool IsKeyDown      (KeyCode keyCode) { return activeKeys[keyCode];  }
-
 private:
-    std::map<KeyCode, bool> activeKeys; // unordered_
-};
-
-
-class IInputListener {
-public:
-    virtual ~IInputListener() = default;
-
-    // Called when a key was pressed
-    virtual void OnKeyDown(Input::KeyCode keyCode) {}
-    
-    // Called when a key was released
-    virtual void OnKeyUp(Input::KeyCode keyCode) {}
-
-    // Called when a key was typed
-    virtual void OnKeyTyped(char character) {}
-    
-    // Called when the screen was touched or a mouse button was pressed.
-    virtual void OnTouchDown(int screenX, int screenY, int pointer = -1, Input::Button button = Input::Button::Default) {}
-    
-    // Called when a finger was lifted or a mouse button was released.
-    virtual void OnTouchUp(int screenX, int screenY, int pointer = -1, Input::Button button = Input::Button::Default) {}
-    
-    // Called when a finger or the mouse was dragged.
-    virtual void OnTouchDragged(int screenX, int screenY, int dx, int dy, int pointer = -1) {}
-    
-    // Called when the mouse was moved without any buttons being pressed.
-    virtual void OnMouseMoved(int screenX, int screenY) {}
-
-    // Called when the mouse wheel was scrolled.
-    virtual void OnScrolled(int amount) {}
+    std::map<KeyCode, bool> activeKeys;
 };
