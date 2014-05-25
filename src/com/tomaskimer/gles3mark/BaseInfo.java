@@ -5,6 +5,11 @@ import java.util.Iterator;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Abstract class for device and OpenGL infos.
+ *  
+ * @author Tomas Kimer
+ */
 public abstract class BaseInfo {
 	
 	protected JSONObject json;

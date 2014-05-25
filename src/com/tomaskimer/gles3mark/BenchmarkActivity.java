@@ -10,6 +10,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
+/**
+ * Native benchmark activity, parent for native_app_glue C++ app.
+ * (libgles3mark.so)
+ *  
+ * @author Tomas Kimer
+ */
 public class BenchmarkActivity extends NativeActivity {
 	
 	static {

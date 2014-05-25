@@ -4,6 +4,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Formats OpenGL and EGL info from JSON to readable text.
+ *  
+ * @author Tomas Kimer
+ */
 public class GLInfo extends BaseInfo {
 	
 	JSONObject json, jsonEGL;

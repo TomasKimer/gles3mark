@@ -19,6 +19,7 @@
     <None Include="..\assets\shaders\lightpass-vs.glsl" />
     <None Include="..\assets\shaders\ssaopass-fs.glsl" />
     <None Include="..\assets\shaders\ssaopass-vs.glsl" />
+    <None Include="ClassDiagram.cd" />
     <None Include="gles3mark_dll.def" />
   </ItemGroup>
   <ItemGroup>

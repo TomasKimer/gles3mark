@@ -1,4 +1,9 @@
 
+/**
+ * Source: http://blog.evoserv.at/index.php/2012/12/hemispherical-screen-space-ambient-occlusion-ssao-for-deferred-renderers-using-openglglsl
+ *
+ */
+
 precision highp float;  // mediump
 
 in vec2 texCoord;
@@ -9,12 +14,12 @@ uniform sampler2D normalVStex;
 uniform sampler2D depthTex;
 
 uniform mat4      invProj;
+uniform vec2      radius;
 
 layout (location=2) out vec4 ambientColor;
 layout (location=3) out float ssaoColor;
 
 const float ambientContribution = 0.1;  //0.2
-const float filterRadius        = 10.0;  // PC: 5.0 Android 10.0// 10 / screenWidth, 10 / screenHeight
 const float distanceThreshold   = 5.0;
 const float strength            = 1.0;
 const int sample_count          = 16;
@@ -46,7 +51,7 @@ vec3 reconstructPosition(in vec2 coord, in float depth)
     return viewPos.xyz;
 }
 
-float computeSSAO(in vec3 viewPos, in vec3 viewNormal, in vec2 radius) {
+float computeSSAO(in vec3 viewPos, in vec3 viewNormal) {
     float occlusion = 0.0;
     for (int i = 0; i < sample_count; ++i) {
         
@@ -81,8 +86,8 @@ void main() {
 
     // Calculate the pixel's position in view space
     vec3 viewPos = reconstructPosition(texCoord, depth);
-    vec2 radius = filterRadius / vec2(1280.0, 720.0);   // vec2(textureSize(depthTex, 0));  // - app will die on Adreno
-    float ssaoTerm = computeSSAO(viewPos, normal, radius);
+    //vec2 radius = filterRadius / vec2(1280.0, 720.0);   // vec2(textureSize(depthTex, 0));  // - app will die on Adreno
+    float ssaoTerm = computeSSAO(viewPos, normal);
 
     // Final
     ssaoColor = ssaoTerm; //vec4(vec3(ssaoTerm), 1.0);

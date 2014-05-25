@@ -20,7 +20,7 @@ import android.util.Log;
 import android.view.Display;
 
 /**
- * Generates device info.
+ * Generates device info in JSON or in formatted text.
  *  
  * @author Tomas Kimer
  */

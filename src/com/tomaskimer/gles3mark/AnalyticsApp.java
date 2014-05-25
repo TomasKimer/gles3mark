@@ -7,6 +7,11 @@ import com.google.android.gms.analytics.Tracker;
 
 import android.app.Application;
 
+/**
+ * Google Analytics Application, set in AndroidManifest.xml
+ *  
+ * @author Tomas Kimer
+ */
 public class AnalyticsApp extends Application {
 	// The following line should be changed to include the correct property id.
     private static final String PROPERTY_ID = "UA-49008090-2";

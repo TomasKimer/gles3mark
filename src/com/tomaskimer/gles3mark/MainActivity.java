@@ -46,6 +46,11 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import com.tomaskimer.gles3mark.AnalyticsApp.TrackerName;
 
+/**
+ * Main GUI activity, manages three swipeable fragment tabs.
+ *  
+ * @author Tomas Kimer
+ */
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
 	final static int BENCH_REQUEST_ID = 1234;

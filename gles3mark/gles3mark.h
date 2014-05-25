@@ -29,8 +29,11 @@ typedef RenderContextEGL RenderContextT;
 #include "benchmarkstatistics.h"
 
 
-/// Lib entry point.
-/** Detailed description. */
+/**
+ * \brief Lib entry point.
+ *
+ * Detailed description.
+*/
 class GLES3Mark : public IGLES3MarkLib, public IInputListener {
     std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<RenderContextT> glContext;
@@ -65,3 +68,23 @@ private:
     void OnProcessInput();
     void OnDestroy();
 };
+
+
+/**
+ * \mainpage Benchmark for OpenGL ES 3.0 Devices
+ * 
+ * \section intro_sec Description
+ *
+ * Master's Thesis, FIT BUT Brno 2014
+ *
+ * <http://gles3mark.appspot.com>
+ *
+ * <https://play.google.com/store/apps/details?id=com.tomaskimer.gles3mark>
+ *
+ * <https://github.com/TomasKimer/gles3mark>
+ * 
+ *
+ * \date 2014-05-28
+ * \author Tomas Kimer <xkimer00@stud.fit.vutbr.cz>
+ * 
+ */

@@ -44,6 +44,7 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
     // --------------------------------------------------------
     materialDatabase.LoadTextures(assetManager);
 
+    // random light colors
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_real_distribution<float> dist(0.0f, 1.0f);
@@ -53,13 +54,14 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
         for (int j = 0; j < 20; j++) {
             glm::vec3 color = glm::vec3(1);
             
-            if (i == 3)
+            if (i == 3)  // line with random colors
                 color = glm::vec3(dist(mt), dist(mt), dist(mt));
         
             lightDatabase.push_back(std::unique_ptr<Light>(new Light(glm::vec3(-70.0f + j*7, 2.5f, i*7.0f), color, 5.0f)));
         }
     }
 
+    // large lights
     lightDatabase.push_back(std::unique_ptr<Light>(new Light(glm::vec3(  0.0, 30.0f, 10.0), glm::vec3(1.0f, 1.0f, 1.0f), 70.0f)));
     lightDatabase.push_back(std::unique_ptr<Light>(new Light(glm::vec3( 40.0, 30.0f, 10.0), glm::vec3(1.0f, 1.0f, 1.0f), 70.0f)));
     lightDatabase.push_back(std::unique_ptr<Light>(new Light(glm::vec3(-40.0, 30.0f, 10.0), glm::vec3(1.0f, 1.0f, 1.0f), 70.0f)));
@@ -107,6 +109,7 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
     ssaoPassProgram = std::unique_ptr<ShaderProgram>(new ShaderProgram(assetManager.LoadText("shaders/ssaopass-vs.glsl"),
                                                                        assetManager.LoadText("shaders/ssaopass-fs.glsl")));
     ssaoPassProgram->AddUniform("invProj");
+    ssaoPassProgram->AddUniform("radius");
 
     ssaoPassProgram->AddUniform("albedoTex");
     ssaoPassProgram->AddUniform("normalVStex");
@@ -116,6 +119,12 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
     ssaoPassProgram->SetUniform("albedoTex", 0);
     ssaoPassProgram->SetUniform("normalVStex", 1);
     ssaoPassProgram->SetUniform("depthTex", 2);
+    
+    float ssaoRadius = 5.0f;
+#ifdef ANDROID
+    ssaoRadius = 10.0f;
+#endif
+    ssaoPassProgram->SetUniform("radius", glm::vec2(ssaoRadius / renderSize.x, ssaoRadius / renderSize.y));
 
     // ------------------------------------------------
     // ------------- light pass shader setup ----------
@@ -188,7 +197,8 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
 
 void Scene::OnResize(int w, int h) {
 	screenSize = glm::ivec2(w, h);
-    //camera.UpdateAspect(static_cast<float>(screenSize.x) / screenSize.y);
+    // aspect ratio is fixed
+    // camera.UpdateAspect(static_cast<float>(screenSize.x) / screenSize.y);
 }
 
 bool Scene::OnStep(const Time& time) {
@@ -229,7 +239,7 @@ bool Scene::OnStep(const Time& time) {
     modelE112->matrix = glm::scale(glm::mat4(), glm::vec3(0.1f, 0.1f, 0.1f));
     modelE112->renderer.Render(*geometryPassProgram, materialDatabase);
 
-#ifdef _DEBUG    // draw cubes at light positions
+#ifdef _DEBUG    // draw cubes (fixed size) at light positions
     for (std::unique_ptr<Light>& l : lightDatabase) {
         if (l->type != Light::Type::Point) continue;
         meshPointLight.renderer.PreRender(*geometryPassProgram, Material(glm::vec4(l->diffuseColor, 1.0f)), glm::translate(glm::mat4(), l->position));
@@ -283,9 +293,10 @@ bool Scene::OnStep(const Time& time) {
     ssaoTex.Bind(GL_TEXTURE3);
 
     for (std::unique_ptr<Light>& l : lightDatabase) {
-        if (l->type != Light::Type::Point)
+        if (l->type != Light::Type::Point) {
             continue;
-           
+        }          
+
         lightPassProgram->SetUniform("model", l->matrix);
         lightPassProgram->SetUniform("lightPos", glm::vec3(view * glm::vec4(l->position, 1)));
         lightPassProgram->SetUniform("lightColor", l->diffuseColor);
@@ -324,18 +335,13 @@ bool Scene::OnStep(const Time& time) {
 #endif
 #endif
 
-
 #ifdef ANDROID
     glFinish();  //- not causing delay on swaping egl context if vsync is off, and eliminates tearing on low fps (both vsync on and off)
 #endif
 
-    // eglSwapBuffers performs an implicit flush operation on the context (glFlush for an OpenGL ES or OpenGL context,
-    // vgFlush for an OpenVG context) bound to surface before swapping. Subsequent client API commands may be issued on
-    // that context immediately after calling eglSwapBuffers, but are not executed until the buffer exchange is completed.
-    // FENCE - http://permalink.gmane.org/gmane.comp.lib.cairo/24458
-
-    if (cameraAnim.HasEnded())
+    if (cameraAnim.HasEnded()) {
         return false;
+    }
 
     return true;
 }
