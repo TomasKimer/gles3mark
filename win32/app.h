@@ -14,10 +14,15 @@
 
 const std::string DLLPATH("gles3mark.dll");
 
+/**
+ * \brief Benchmark windows app.
+ */
 class App : public BaseApp {
 
+    /**
+     * \brief DLL Imported functions.
+     */
     class DLL {
-        // DLL Imported functions
         using DLLPreInitT   = void(*)(                  );
         using DLLInitT      = bool(*)(HWND              );   // typedef void(*DLLInitT  )(HWND    );
         using DLLResizeT    = void(*)(int, int          );   // typedef void(*DLLResizeT)(int, int);

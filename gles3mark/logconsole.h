@@ -7,7 +7,9 @@
 
 #pragma once
 
-// console adapter
+/**
+ * \brief Console adapter.
+ */
 class LogConsole {
 public:
     enum ColorCode {
@@ -49,8 +51,10 @@ public:
 #include <iostream>
 #include <fstream>
 
-/*
- *  http://www.cplusplus.com/forum/windows/58206/
+/**
+ * \brief Benchmark windows app.
+ *
+ * http://www.cplusplus.com/forum/windows/58206/
  */
 class LogConsoleWin : public LogConsole {
 

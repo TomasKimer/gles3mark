@@ -1,6 +1,9 @@
-/*
- * baseapp.cpp
- */
+/**
+  *  gles3mark v1.0
+  *
+  *  \date   2014-05-28
+  *  \author Tomas Kimer <xkimer00@stud.fit.vutbr.cz>
+  */
 
 #include "baseapp.h"
 #include "../gles3mark/log.h"

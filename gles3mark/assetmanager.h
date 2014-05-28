@@ -13,7 +13,9 @@
 
 #include "assetfile.h"
 
-
+/**
+ * \brief Asset manager.
+ */
 class AssetManager {
 
 public:

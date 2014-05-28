@@ -7,6 +7,9 @@
 
 #pragma once
 
+/**
+ * \brief Abstract render context.
+ */
 class RenderContext {
 public:
     RenderContext(): mWidth(0), mHeight(0),

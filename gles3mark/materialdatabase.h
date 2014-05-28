@@ -18,6 +18,9 @@
 // but what about texture settings - only texture data (from file) database? - not in memory after load, Sampler objects?
 // resource manager? - ShaderDatabase, ...
 
+/**
+ * \brief Material database.
+ */
 class MaterialDatabase {
 
     std::vector<std::unique_ptr<Material>> database;

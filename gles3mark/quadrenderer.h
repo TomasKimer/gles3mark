@@ -11,6 +11,9 @@
 //#include "shaderprogram.h"
 
 // TODO Mesh + MeshRenderer?
+/**
+ * \brief Quad renderer.
+ */
 class QuadRenderer {
     const int COUNT = 4;
 

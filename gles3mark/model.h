@@ -10,6 +10,9 @@
 #include "mesh.h"
 #include "modelrenderer.h"
 
+/**
+ * \brief Model containing meshes.
+ */
 class Model {
     friend class ModelRenderer;
 

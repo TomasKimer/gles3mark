@@ -14,6 +14,9 @@
 
 #include "log.h"
 
+/**
+ * \brief One KeyFrame.
+ */
 struct KeyFrame {
     glm::vec3 position;  //, direction
     glm::quat rotation;
@@ -23,6 +26,9 @@ struct KeyFrame {
         position(pos), time(time), rotation(rot) {}
 };
 
+/**
+ * \brief Basic KeyFrame animation.
+ */
 class KeyFrameAnimation {
 
     std::vector<KeyFrame> keyFrames;

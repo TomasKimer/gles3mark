@@ -9,6 +9,9 @@
 
 #include <string>
 
+/**
+ * \brief Library interface.
+ */
 class IGLES3MarkLib {
 public:
     virtual ~IGLES3MarkLib() = default;

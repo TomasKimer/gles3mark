@@ -11,6 +11,9 @@
 
 #include "assetmanager.h"
 
+/**
+ * \brief Basic loading screen.
+ */
 class LoadingScreen {  // public Screen
 public:
     LoadingScreen(const AssetManager& assetManager, int width, int height);

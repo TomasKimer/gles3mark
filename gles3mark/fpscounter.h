@@ -10,6 +10,9 @@
 #include <ostream>
 #include <iomanip>
 
+/**
+ * \brief FPS counter.
+ */
 class FPSCounter {
 public:
     FPSCounter();

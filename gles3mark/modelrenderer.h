@@ -17,6 +17,9 @@
 
 class Model;
 
+/**
+ * \brief Model renderer.
+ */
 class ModelRenderer {
     
     Model* owner;  // TODO shared_ptr

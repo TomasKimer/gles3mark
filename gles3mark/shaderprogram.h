@@ -17,6 +17,9 @@
 #include "glinclude.h"
 #include "glerror.h"
 
+/**
+ * \brief Base shader program.
+ */
 class ShaderProgram {
     GLuint shaderProgram;
 

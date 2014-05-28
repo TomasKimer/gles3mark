@@ -27,6 +27,9 @@
 #include "keyframeanimation.h"
 #include "materialdatabase.h"
 
+/**
+ * \brief Benchmark scene.
+ */
 class Scene {  // public Screen
     friend class GLES3Mark;
 

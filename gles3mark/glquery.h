@@ -12,6 +12,9 @@
 
 #include "glinclude.h"
 
+/**
+ * \brief Querying GL info.
+ */
 class GLQuery {
 public:
     static std::vector<std::string> Extensions();

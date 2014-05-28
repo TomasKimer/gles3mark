@@ -16,7 +16,7 @@
 #endif
 
 /**
- * \brief .
+ * \brief Asset file.
  */
 class AssetFile {
 #ifdef ANDROID

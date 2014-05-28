@@ -13,6 +13,9 @@
 
 #include "meshrenderer.h"
 
+/**
+ * \brief Mesh.
+ */
 class Mesh {
     friend class MeshRenderer;
 

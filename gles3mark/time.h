@@ -14,6 +14,9 @@
 #include "log.h"
 
 // http://stackoverflow.com/questions/14391327/how-to-get-duration-as-int-millis-and-float-seconds-from-chrono
+/**
+ * \brief Time measurement.
+ */
 class Time {
     typedef std::chrono::high_resolution_clock Clock;
     
@@ -41,7 +44,8 @@ private:
 
 
 /**
- *  Generic StopWatch
+ *  \brief Generic StopWatch.
+ *
  *  Usage:
  *      StopWatch<std::chrono::high_resolution_clock> sw;
  *      // stuff

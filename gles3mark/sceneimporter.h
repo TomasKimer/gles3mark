@@ -23,7 +23,9 @@
 #include "light.h"
 #include "materialdatabase.h"
 
-
+/**
+ * \brief Scene importer interface.
+ */
 class ISceneImporter {
 public:
     virtual ~ISceneImporter() = default;
@@ -31,6 +33,9 @@ public:
                           std::vector<std::unique_ptr<Light>>& lightDatabase) = 0;
 };
 
+/**
+ * \brief Assimp library scene importer.
+ */
 class AssimpSceneImporter : public ISceneImporter {
 public:
     AssimpSceneImporter() {

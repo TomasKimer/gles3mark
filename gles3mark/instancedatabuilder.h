@@ -11,6 +11,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+/**
+ * \brief Builder for e112 geometry instancing data.
+ */
 class InstanceDataBuilder {
 public:
     static std::vector<glm::mat4>* BuildChairsInstanceData();

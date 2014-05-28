@@ -12,6 +12,9 @@
 
 #include "fpscounter.h"
 
+/**
+ * \brief Benchmark statistics.
+ */
 class BenchmarkStatistics {
     friend class JSONStatsBuilder;
 

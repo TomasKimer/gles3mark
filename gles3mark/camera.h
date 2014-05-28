@@ -12,6 +12,9 @@
 #include <glm/glm.hpp>
 //#include <glm/gtc/quaternion.hpp>
 
+/**
+ * \brief Simple freelook camera.
+ */
 class Camera {
 public:
     Camera(float fovy, float aspect, float zNear, float zFar, const glm::vec4 backgroundColor = glm::vec4());

@@ -13,6 +13,9 @@
 
 #include <string>
 
+/**
+ * \brief Base class for windows application.
+ */
 class BaseApp {
     HWND            hWnd;
     HINSTANCE       hInstance;

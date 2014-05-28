@@ -1,3 +1,9 @@
+/**
+  *  gles3mark v1.0
+  *
+  *  \date   2014-05-28
+  *  \author Tomas Kimer <xkimer00@stud.fit.vutbr.cz>
+  */
 
 #pragma once
 
@@ -6,6 +12,9 @@
 #include "baseapp.h"
 #include "../gles3mark/gles3mark.h"
 
+/**
+ * \brief Benchmark native app.
+ */
 class App : public BaseApp {
 	std::unique_ptr<GLES3Mark> gles3mark;
 

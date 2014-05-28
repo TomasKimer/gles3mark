@@ -14,6 +14,9 @@
 #include "benchmarkstatistics.h"
 #include "rendercontext.h"
 
+/**
+ * \brief Statistics builder in JSON format.
+ */
 class JSONStatsBuilder {
     jsoncons::json result;
 

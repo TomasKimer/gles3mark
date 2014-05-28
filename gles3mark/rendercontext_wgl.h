@@ -13,6 +13,9 @@
 
 #include <windows.h>
 
+/**
+ * \brief OpenGL context WGL.
+ */
 class RenderContextWGL : public RenderContext {
     
     HWND    window;

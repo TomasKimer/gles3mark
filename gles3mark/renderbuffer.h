@@ -11,6 +11,9 @@
 #include "glinclude.h"
 
 // note: The width and height of the off-screen renderbuffers do not have to be a power of 2.
+/**
+ * \brief OpenGL RenderBuffer.
+ */
 class RenderBuffer : public RenderTarget {
     friend class Framebuffer;
     

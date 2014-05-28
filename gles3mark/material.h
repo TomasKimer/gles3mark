@@ -14,6 +14,9 @@
 
 // http://docs.unity3d.com/Documentation/ScriptReference/Material.html
 // http://assimp.sourceforge.net/lib_html/materials.html
+/**
+ * \brief Material.
+ */
 class Material {
 public:
     glm::vec4 diffuseColor;

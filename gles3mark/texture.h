@@ -42,7 +42,9 @@ protected:
     //enum class Dimension {}; // 1,2,3d, array
 };*/
 
-
+/**
+ * \brief OpenGL texture.
+ */
 class Texture : public RenderTarget { 
     friend class Framebuffer;
     

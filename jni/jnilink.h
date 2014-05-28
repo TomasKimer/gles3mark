@@ -1,3 +1,9 @@
+/**
+  *  gles3mark v1.0
+  *
+  *  \date   2014-05-28
+  *  \author Tomas Kimer <xkimer00@stud.fit.vutbr.cz>
+  */
 
 #pragma once
 
@@ -6,6 +12,9 @@
 
 const std::string JNI_STRING_SIGNATURE("(Ljava/lang/String;)V");
 
+/**
+ * \brief Interface to Dalvik via JNI.
+ */
 class JNILink {
 	JNIEnv 			*env; // game thread env (vs main thread env: state->activity->env)
 	jobject			thiz;

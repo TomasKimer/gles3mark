@@ -1,6 +1,9 @@
-/*
- * baseapp.h
- */
+/**
+  *  gles3mark v1.0
+  *
+  *  \date   2014-05-28
+  *  \author Tomas Kimer <xkimer00@stud.fit.vutbr.cz>
+  */
 
 #ifdef ANDROID
 
@@ -13,7 +16,7 @@
 #include "jnilink.h"
 
 /**
- * Shared state for the app.
+ * \brief Shared state for the app.
  */
 class BaseApp {
 	struct Point {

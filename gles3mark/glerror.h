@@ -22,10 +22,16 @@
 #define GL_CHECK(stmt) stmt
 #endif
 
+/**
+ * \brief OpenGL error checking.
+ */
 struct GLError {
     static void CheckOpenGLError(const char* stmt, const char* fname, int line);
     static std::string GetErrorString(GLenum error);
 
+    /**
+     * \brief OpenGL exception.
+     */
     struct GL_Exception : public std::runtime_error {
         GL_Exception(const GLenum error = glGetError()) throw()
             : std::runtime_error("OpenGL: " + GetErrorString(error)) {}

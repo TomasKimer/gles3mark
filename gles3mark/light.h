@@ -13,6 +13,9 @@
 // http://docs.unity3d.com/Documentation/ScriptReference/Light.html
 // renderMode - vertex, pixel
 // cookie - The cookie texture projected by the light. If the cookie is a cube map, the light will become a Point light. Note that cookies are only displayed for pixel lights.
+/**
+ * \brief Light data.
+ */
 class Light {
 public:
     enum class Type {

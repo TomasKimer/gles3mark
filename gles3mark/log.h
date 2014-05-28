@@ -41,6 +41,9 @@ public:
     };
 
 private:
+    /**
+     * \brief Log stream.
+     */
     class LogStream {
     public:            
         LogStream() {}            

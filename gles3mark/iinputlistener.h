@@ -9,7 +9,11 @@
 
 #include "input.h"
 
-/// inspired by libGDX
+/**
+ * \brief Input listener interface.
+ *
+ * inspired by libGDX
+ */
 class IInputListener {
 public:
     virtual ~IInputListener() = default;

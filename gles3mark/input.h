@@ -13,6 +13,9 @@
 
 #include <map> // unordered_map -> problem with 'enum class' key
 
+/**
+ * \brief Windows input for debugging.
+ */
 class Input {
 public:
     enum class KeyCode {

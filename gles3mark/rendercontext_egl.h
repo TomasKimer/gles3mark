@@ -14,6 +14,9 @@
 
 //TODO Unify HWND/ANativeWindow? - #include <EGL/eglplatform.h>, EGL for WIN?
 
+/**
+ * \brief OpenGL context EGL.
+ */
 class RenderContextEGL : public RenderContext {
 	 EGLDisplay display;
 	 EGLSurface surface;

@@ -16,6 +16,9 @@
 
 // Don’t create and destroy framebuffer and renderbuffer objects (or any other large data objects for that matter) per frame.
 // Try to avoid modifying textures (using glTexImage2D, glTexSubImage2D, glCopyTeximage2D, and so on) that are attachments to framebuffer objects used as rendering targets.
+/**
+ * \brief OpenGL framebuffer.
+ */
 class Framebuffer {
     GLuint fb;
     // active attachments?

@@ -16,6 +16,9 @@
 
 class Mesh;
 
+/**
+ * \brief Mesh renderer.
+ */
 class MeshRenderer {
     friend class ModelRenderer;
 
