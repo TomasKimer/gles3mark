@@ -28,7 +28,7 @@ void MeshRenderer::Init(Mesh* mesh) {
     // Narozdil od VBO neukladaji data o vrcholech (pozice, normala, ...), ale ukladaji reference na VBO a nastaveni atributu.
     // VAO usnadnuji a urychluji vykreslovani. Pro vykresleni staci aktivovat VAO a ten si pamatuje veskere nastaveni.
     // subsequent calls that change the vertex array state (glBindBuffer, glVertexAttribPointer, glEnableVertexAttribArray, and glDisableVertexAttribArray) will affect the new VAO.
-    GL_CHECK( glGenVertexArrays(1, &VAO) );  // TODO VAO + UBO pro kazdy mesh?
+    GL_CHECK( glGenVertexArrays(1, &VAO) );  // TODO UBO pro kazdy mesh?
     GL_CHECK( glBindVertexArray(VAO) );
 
     GL_CHECK( glBindBuffer(GL_ARRAY_BUFFER, VBO) );

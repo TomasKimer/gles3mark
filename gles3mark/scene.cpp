@@ -191,6 +191,7 @@ bool Scene::OnInit(const AssetManager& assetManager, int width, int height) {
     // ---------------------------------------
     glEnable(GL_CULL_FACE);
     glEnable(GL_SCISSOR_TEST);
+    glBlendFunc(GL_ONE, GL_ONE);
     
     return true;
 }
@@ -275,7 +276,6 @@ bool Scene::OnStep(const Time& time) {
     framebuffer.ActiveColorAttachments(std::vector<GLenum>{GL_NONE, GL_NONE, GL_COLOR_ATTACHMENT2, GL_NONE});
         
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
     
     glEnable(GL_DEPTH_TEST); 
     glDepthFunc(GL_GEQUAL); // passes if the incoming depth value is greater than or equal to the stored depth value
