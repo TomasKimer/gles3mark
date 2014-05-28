@@ -1,9 +1,10 @@
-
 /**
- * Source:
- * http://blog.evoserv.at/index.php/2012/12/hemispherical-screen-space-ambient-occlusion-ssao-for-deferred-renderers-using-openglglsl
- *
- */
+  *  gles3mark v1.0
+  *
+  *  \date   2014-05-28
+  *  \author Tomas Kimer <xkimer00@stud.fit.vutbr.cz>
+  *  http://blog.evoserv.at/index.php/2012/12/hemispherical-screen-space-ambient-occlusion-ssao-for-deferred-renderers-using-openglglsl
+  */
 
 precision highp float;  // mediump
 

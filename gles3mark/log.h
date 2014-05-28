@@ -1,14 +1,16 @@
+/**
+  *  gles3mark v1.0
+  *
+  *  \date   2014-05-28
+  *  \author Tomas Kimer <xkimer00@stud.fit.vutbr.cz>
+  *  \brief  Event logging to stdout/logcat and into a file together with a timestamp.
+  */
 /*
- *  Desc:   Event logging to stdout/logcat and into a file,
- *           together with a timestamp.
  * TODO
  *  - error param, volba nezapisovat do souboru - automaticky zvolit pry chybe otevreni soubor + informace o tom do logu
  *  - volba min severity pro konzoli/soubor
  *  - pri \n rozdelit na dalsi logMsg
- *
- *  //#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-	//#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
-	//#include <errno.h> ?
+ *  - #include <errno.h> ?
  */
 
 #pragma once
@@ -26,7 +28,7 @@ typedef LogConsole LogConsoleT;
 #endif
 
 /**
- * Event logging.
+ * \brief Event logging.
  */
 class Log {
 public:

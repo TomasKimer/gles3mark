@@ -1,8 +1,8 @@
 /**
-  *  \file   gles3mark.h
+  *  gles3mark v1.0
+  *
   *  \date   2014-05-28
   *  \author Tomas Kimer <xkimer00@stud.fit.vutbr.cz>
-  *  \brief  Lib entry point.
   */
 
 #pragma once
@@ -31,9 +31,7 @@ typedef RenderContextEGL RenderContextT;
 
 /**
  * \brief Lib entry point.
- *
- * Detailed description.
-*/
+ */
 class GLES3Mark : public IGLES3MarkLib, public IInputListener {
     std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<RenderContextT> glContext;

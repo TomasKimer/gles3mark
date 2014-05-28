@@ -1,8 +1,10 @@
-/*
- * dllmain.cpp : Defines the entry point for the DLL application.
- *
- *
- */
+/**
+  *  gles3mark v1.0
+  *
+  *  \date   2014-05-28
+  *  \author Tomas Kimer <xkimer00@stud.fit.vutbr.cz>
+  *  \brief  Defines the entry point for the DLL application.
+  */
 
 #ifdef _WIN32
 
@@ -44,9 +46,7 @@ void DLL_mouseMove(int x, int y, int dx, int dy) {
     gles3mark->OnTouchDragged(x, y, dx, dy);
 }
 
-/*
- *  Entry point.
- */
+/// Entry point.
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH:
