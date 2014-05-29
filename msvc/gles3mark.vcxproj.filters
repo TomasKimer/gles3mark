@@ -45,7 +45,6 @@
     <None Include="..\assets\shaders\lightpass-vs.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\gles3mark\camera.h">
