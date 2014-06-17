@@ -29,7 +29,7 @@ def get_platform_css(user_agent):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        results = ResultItem.query().order(-ResultItem.score).fetch()
+        results = ResultItem.query().order(-ResultItem.score).fetch() #order(ResultItem.date).
         render_html(self, 'main.html', get_platform_css(self.request.headers['User-Agent']), u"gles3mark result database",
                     self.request.headers['User-Agent'], template_values={"results": results})
 
