@@ -1,0 +1,7 @@
+indexes:
+
+- kind: ResultItem
+  properties:
+  - name: score
+    direction: desc
+  - name: date

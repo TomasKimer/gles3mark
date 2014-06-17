@@ -8,7 +8,7 @@ class ResultItem(ndb.Model):
     renderer = ndb.StringProperty()
 
     uploader = ndb.StringProperty()
-    date = ndb.DateTimeProperty(auto_now_add=True) #,indexed=True
+    date = ndb.DateTimeProperty(auto_now_add=True)
 
     benchInfo = ndb.TextProperty()
     glInfo = ndb.TextProperty()
